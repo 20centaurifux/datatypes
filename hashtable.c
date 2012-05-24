@@ -1,8 +1,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <pthread.h>
 #include <assert.h>
+
+#ifdef PTHREADS
+#include <pthread.h>
+#endif
 
 #include "hashtable.h"
 #include "rbtree.h"
@@ -279,6 +282,7 @@ hashtable_new(uint32_t size, HashFunc hash_func, CompareFunc compare_keys, FreeF
 
 #define _hashtable_destroy_bucket(table, i) if(table->buckets[i]) rbtree_free(table->buckets[i])
 
+#ifdef PTHREADS
 static void *
 _hashtable_destroy_worker(void *arg)
 {
@@ -295,20 +299,25 @@ _hashtable_destroy_worker(void *arg)
 
 	pthread_exit(NULL);
 }
+#endif
 
 void
 hashtable_destroy(HashTable *table)
 {
 	int i;
 	int to;
+
+	#ifdef PTHREADS
 	pthread_t thread;
 	pthread_attr_t attr;
+	#endif
 
 	if(table->allocator)
 	{
 		((NodeAllocator *)table->allocator)->reuse_nodes = false;
 	}
 
+	#ifdef PTHREADS
 	if(table->size > 512)
 	{
 		to = table->size / 2;
@@ -320,17 +329,22 @@ hashtable_destroy(HashTable *table)
 	{
 		to = table->size;
 	}
+	#else
+	to = table->size;
+	#endif
 
 	for(i = 0; i < to; ++i)
 	{
 		_hashtable_destroy_bucket(table, i);
 	}
 
+	#ifdef PTHREADS
 	if(table->size > 512)
 	{
 		pthread_join(thread, NULL);
 		pthread_detach(thread);
 	}
+	#endif
 
 	if(table->allocator)
 	{
