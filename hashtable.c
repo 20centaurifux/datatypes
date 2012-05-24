@@ -7,6 +7,10 @@
 #include <pthread.h>
 #endif
 
+#ifdef WIN32
+#include <windows.h>
+#endif
+
 #include "hashtable.h"
 #include "rbtree.h"
 
@@ -282,7 +286,7 @@ hashtable_new(uint32_t size, HashFunc hash_func, CompareFunc compare_keys, FreeF
 
 #define _hashtable_destroy_bucket(table, i) if(table->buckets[i]) rbtree_free(table->buckets[i])
 
-#ifdef PTHREADS
+#if defined(PTHREADS) || defined(WIN32)
 static void *
 _hashtable_destroy_worker(void *arg)
 {
@@ -297,7 +301,11 @@ _hashtable_destroy_worker(void *arg)
 		_hashtable_destroy_bucket(table, i);
 	}
 
+	#ifdef PTHREADS
 	pthread_exit(NULL);
+	#else
+	return NULL;
+	#endif
 }
 #endif
 
@@ -307,9 +315,11 @@ hashtable_destroy(HashTable *table)
 	int i;
 	int to;
 
-	#ifdef PTHREADS
+	#if defined(PTHREADS)
 	pthread_t thread;
 	pthread_attr_t attr;
+	#elif defined(WIN32)
+	HANDLE thread = NULL;
 	#endif
 
 	if(table->allocator)
@@ -317,12 +327,17 @@ hashtable_destroy(HashTable *table)
 		((NodeAllocator *)table->allocator)->reuse_nodes = false;
 	}
 
-	#ifdef PTHREADS
+	#if defined(PTHREADS) || defined(WIN32)
 	if(table->size > 512)
 	{
 		to = table->size / 2;
+
+		#ifdef PTHREADS
 		pthread_create(&thread, NULL, _hashtable_destroy_worker, table);
 		pthread_attr_init(&attr);
+		#else
+		thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)_hashtable_destroy_worker, table, 0, NULL);
+		#endif
 
 	}
 	else
@@ -338,11 +353,16 @@ hashtable_destroy(HashTable *table)
 		_hashtable_destroy_bucket(table, i);
 	}
 
-	#ifdef PTHREADS
+	#if defined(PTHREADS)
 	if(table->size > 512)
 	{
 		pthread_join(thread, NULL);
 		pthread_detach(thread);
+	}
+	#elif defined(WIN32)
+	if(thread)
+	{
+		WaitForSingleObject(thread, INFINITE);
 	}
 	#endif
 
