@@ -517,7 +517,7 @@ _rbtree_remove_case3_to_6(RBTree *tree)
 		sibling = parent->right;
 	}
 
-	if(_rbnode_is_black(sibling) && _rbnode_is_black(sibling->left) && _rbnode_is_black(sibling->left))
+	if(_rbnode_is_black(sibling) && _rbnode_is_black(sibling->left) && _rbnode_is_black(sibling->right))
 	{
 		if(_rbnode_is_black(parent))
 		{
@@ -628,7 +628,7 @@ _rbtree_remove_case2(RBTree *tree)
 	_rbtree_remove_case3_to_6(tree);
 }
 
-static void
+static inline void
 _rbtree_remove_case1(RBTree *tree)
 {
 	if(tree->sp > tree->stack)
@@ -659,8 +659,6 @@ rbtree_remove(RBTree *tree, const void *key)
 	if(node->left && node->right)
 	{
 		/* copy key & value from predecessor */
-		tree->sp = NULL;
-		_rbtree_stack_push(tree, node);
 		max = _rbtree_find_max_node(tree, node->left);
 
 		if(tree->free_key)
@@ -688,11 +686,7 @@ rbtree_remove(RBTree *tree, const void *key)
 
 	if(_rbnode_is_black(node))
 	{
-		if(_rbnode_is_black(child))
-		{
-			node->black = 1;
-		}
-		else
+		if(!_rbnode_is_black(child))
 		{
 			node->black = 0;
 		}
@@ -722,7 +716,7 @@ rbtree_remove(RBTree *tree, const void *key)
 /*
  *	foreach:
  */
-static void
+static inline void
 _rbtree_foreach(jmp_buf *buf, RBNode *node, ForeachKeyValuePairFunc foreach, void *user_data)
 {
 	if(node->left)
