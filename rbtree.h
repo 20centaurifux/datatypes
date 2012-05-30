@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <setjmp.h>
+#include <stdint.h>
 
 #include "generic.h"
 
@@ -23,9 +24,10 @@ typedef struct
 	RBNode *root;
 	RBNode **stack;
 	RBNode **sp;
-	int stack_size;
+	uint32_t stack_size;
 	Allocator *allocator;
 	jmp_buf buf;
+	uint32_t count;
 } RBTree;
 
 typedef enum
@@ -33,6 +35,21 @@ typedef enum
 	RBTREE_INSERT_RESULT_NEW,
 	RBTREE_INSERT_RESULT_REPLACED
 } RBTreeInsertResult;
+
+typedef struct
+{
+	RBNode *node;
+	int state;
+} RBTreeIterStackItem;
+
+typedef struct
+{
+	RBTree *tree;
+	RBTreeIterStackItem *stack;
+	RBTreeIterStackItem *sp;
+	uint32_t stack_size;
+	bool finished;
+} RBTreeIter;
 
 /* return pointer to a new allocated tree */
 RBTree *rbtree_new(CompareFunc compare_keys, FreeFunc free_key, FreeFunc free_value, Allocator *allocator);
@@ -49,6 +66,8 @@ void rbtree_free(RBTree *tree);
 /* save key & value in tree */
 RBTreeInsertResult rbtree_set(RBTree *tree, void * restrict key, void * restrict value, bool replace_key);
 
+uint32_t rbtree_count(RBTree *tree);
+
 /* lookup value */
 void *rbtree_lookup(RBTree *tree, const void *key);
 
@@ -60,6 +79,18 @@ bool rbtree_remove(RBTree *tree, const void *key);
 
 /* traverse tree */
 bool rbtree_foreach(RBTree *tree, ForeachKeyValuePairFunc foreach, void *user_data);
+
+void rbtree_iter_init(RBTree *tree, RBTreeIter *iter);
+
+void rbtree_iter_free(RBTreeIter *iter);
+
+void rbtree_iter_reuse(RBTree *tree, RBTreeIter *iter);
+
+bool rbtree_iter_next(RBTreeIter *iter);
+
+void *rbtree_iter_get_key(RBTreeIter *iter);
+
+void *rbtree_iter_get_value(RBTreeIter *iter);
 
 #endif
 

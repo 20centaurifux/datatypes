@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <assert.h>
 
 #include "rbtree.h"
@@ -16,7 +17,7 @@ rbtree_new(CompareFunc compare_keys, FreeFunc free_key, FreeFunc free_value, All
 	if(!(tree = (RBTree *)malloc(sizeof(RBTree))))
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
-		exit(EXIT_FAILURE);
+		abort();
 	}
 
 	rbtree_init(tree, compare_keys, free_key, free_value, allocator);
@@ -27,17 +28,20 @@ rbtree_new(CompareFunc compare_keys, FreeFunc free_key, FreeFunc free_value, All
 void inline
 rbtree_init(RBTree *tree, CompareFunc compare_keys, FreeFunc free_key, FreeFunc free_value, Allocator *allocator)
 {
+	assert(tree != NULL);
+	assert(compare_keys != NULL);
+
+	memset(tree, 0, sizeof(RBTree));
+
 	if(!(tree->stack = (RBNode **)malloc(sizeof(RBNode *) * RBTREE_INITIAL_BLOCK_SIZE)))
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
-		exit(EXIT_FAILURE);
+		abort();
 	}
 
 	tree->compare_keys = compare_keys;
-	tree->root = NULL;
 	tree->free_key = free_key;
 	tree->free_value = free_value;
-	tree->sp = NULL;
 	tree->stack_size = RBTREE_INITIAL_BLOCK_SIZE;
 	tree->allocator = allocator;
 }
@@ -80,6 +84,8 @@ _rbtree_destroy_node(RBTree *tree, RBNode *node)
 void
 rbtree_destroy(RBTree *tree)
 {
+	assert(tree != NULL);
+
 	rbtree_free(tree);
 	free(tree);
 }
@@ -87,12 +93,22 @@ rbtree_destroy(RBTree *tree)
 void inline
 rbtree_free(RBTree *tree)
 {
+	assert(tree != NULL);
+
 	if(tree->root)
 	{
 		_rbtree_destroy_node(tree, tree->root);
 	}
 
 	free(tree->stack);
+}
+
+uint32_t inline
+rbtree_count(RBTree *tree)
+{
+	assert(tree != NULL);
+
+	return tree->count;
 }
 
 /*
@@ -117,7 +133,7 @@ _rbtree_stack_push(RBTree *tree, RBNode *node)
 			if(!(tree->stack = (RBNode **)realloc(tree->stack, sizeof(RBNode *) * tree->stack_size)))
 			{
 				fprintf(stderr, "Couldn't allocate memory.\n");
-				exit(EXIT_FAILURE);
+				abort();
 			}
 
 			tree->sp = tree->stack + sp;
@@ -148,7 +164,7 @@ _rbnode_create_new(Allocator *allocator, void *key, void *value, int black, RBNo
 	else if(!(node = (RBNode *)malloc(sizeof(RBNode))))
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
-		exit(EXIT_FAILURE);
+		abort();
 	}
 
 	node->key = key;
@@ -337,6 +353,7 @@ rbtree_set(RBTree *tree, void * restrict key, void * restrict value, bool overwr
 	{
 		/* insert root node */
 		tree->root = _rbnode_create_new(tree->allocator, key, value, 1, NULL, NULL);
+		tree->count++;
 		return RBTREE_INSERT_RESULT_NEW;
 	}
 
@@ -410,6 +427,8 @@ rbtree_set(RBTree *tree, void * restrict key, void * restrict value, bool overwr
 			_rbtree_insert_case2_to_6(tree);
 		}
 	}
+
+	tree->count++;
 
 	return RBTREE_INSERT_RESULT_NEW;
 }
@@ -655,6 +674,8 @@ rbtree_remove(RBTree *tree, const void *key)
 		return false;
 	}
 
+	tree->count--;
+
 	/* check if node has two children */
 	if(node->left && node->right)
 	{
@@ -753,5 +774,154 @@ rbtree_foreach(RBTree *tree, ForeachKeyValuePairFunc foreach, void *user_data)
 	}
 
 	return true;
+}
+
+/*
+ *	tree iter:
+ */
+void
+rbtree_iter_init(RBTree *tree, RBTreeIter *iter)
+{
+	assert(tree != NULL);
+	assert(iter != NULL);
+
+	iter->tree = tree;
+	iter->stack_size = tree->count + 1;
+	iter->sp = NULL;
+	iter->finished = false;
+
+	if(!(iter->stack = (RBTreeIterStackItem *)malloc(sizeof(RBTreeIterStackItem) * iter->stack_size)))
+	{
+		fprintf(stderr, "Couldn't allocate memory.\n");
+		abort();
+	}
+}
+
+void
+rbtree_iter_free(RBTreeIter *iter)
+{
+	assert(iter != NULL);
+
+	free(iter->stack);
+}
+
+void
+rbtree_iter_reuse(RBTree *tree, RBTreeIter *iter)
+{
+	assert(tree != NULL);
+	assert(iter != NULL);
+
+	iter->tree = tree;
+
+	if(tree->count + 1 > iter->stack_size)
+	{
+		iter->stack_size = tree->count + 1;
+
+		if(!(iter->stack = (RBTreeIterStackItem *)realloc(iter->stack, sizeof(RBTreeIterStackItem) * iter->stack_size)))
+		{
+			fprintf(stderr, "Couldn't allocate memory.\n");
+			abort();
+		}
+	}
+
+	iter->sp = NULL;
+	iter->finished = false;
+
+	
+}
+
+bool
+rbtree_iter_next(RBTreeIter *iter)
+{
+	assert(iter != NULL);
+
+	if(iter->finished)
+	{
+		return false;
+	}
+
+	if(iter->sp)
+	{
+		for( ;; )
+		{
+			if(iter->sp->state == 0)
+			{
+				iter->sp->state++;
+				iter->sp++;
+				iter->sp->node = (iter->sp - 1)->node->left;
+				iter->sp->state = 0;
+			}
+			else if(iter->sp->state == 1)
+			{
+				iter->sp->state++;
+				iter->sp++;
+				iter->sp->node = (iter->sp - 1)->node->right;
+				iter->sp->state = 0;
+			}
+			else if(iter->sp->state == 2)
+			{
+				iter->sp->state++;
+				iter->sp--;
+			}
+			else
+			{
+				iter->finished = true;
+
+				return false;
+			}
+
+			if(iter->sp < iter->stack)
+			{
+				iter->finished = true;
+				return false;
+			}
+
+			if(iter->sp->node)
+			{
+				if(iter->sp->node && iter->sp->state == 0)
+				{
+					return true;
+				}
+			}
+			else
+			{
+				iter->sp--;
+			}
+		}
+	}
+	else
+	{
+		iter->sp = iter->stack;
+		iter->sp->node = iter->tree->root;
+		iter->sp->state = 0;
+	}
+
+	return true;
+}
+
+void inline *
+rbtree_iter_get_key(RBTreeIter *iter)
+{
+	assert(iter != NULL);
+
+	if(iter->sp && iter->sp->node)
+	{
+		return iter->sp->node->key;
+	}
+
+	return NULL;
+}
+
+void inline *
+rbtree_iter_get_value(RBTreeIter *iter)
+{
+	assert(iter != NULL);
+
+	if(iter->sp && iter->sp->node)
+	{
+		return iter->sp->node->value;
+	}
+
+	return NULL;
 }
 
