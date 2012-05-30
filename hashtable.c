@@ -49,13 +49,13 @@ _node_allocator_create_block(int block_size)
 	if(!(block = (struct _NodeBlock *)malloc(sizeof(struct _NodeBlock))))
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
-		exit(EXIT_FAILURE);
+		abort();
 	}
 
 	if(!(block->nodes = (RBNode *)malloc(sizeof(RBNode) * block_size)))
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
-		exit(EXIT_FAILURE);
+		abort();
 	}
 
 	block->offset = 0;
@@ -72,13 +72,13 @@ _node_allocator_create_ptr_block(int block_size)
 	if(!(block = (struct _NodePtrBlock *)malloc(sizeof(struct _NodePtrBlock))))
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
-		exit(EXIT_FAILURE);
+		abort();
 	}
 
 	if(!(block->nodes = (RBNode **)malloc(sizeof(RBNode *) * block_size)))
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
-		exit(EXIT_FAILURE);
+		abort();
 	}
 
 	block->offset = 0;
@@ -169,7 +169,7 @@ _node_allocator_new(int block_size)
 	if(!(alloc = (NodeAllocator *)malloc(sizeof(NodeAllocator))))
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
-		exit(EXIT_FAILURE);
+		abort();
 	}
 
 	((Allocator *)alloc)->alloc = _node_allocator_alloc;
@@ -245,19 +245,19 @@ hashtable_new(uint32_t size, HashFunc hash_func, CompareFunc compare_keys, FreeF
 	if(!(table = (HashTable *)malloc(sizeof(HashTable))))
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
-		exit(EXIT_FAILURE);
+		abort();
 	}
 
 	if(!(table->buckets = (RBTree **)calloc(size, sizeof(RBTree *))))
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
-		exit(EXIT_FAILURE);
+		abort();
 	}
 
 	if(!(table->pool = (RBTree *)malloc(size * sizeof(RBTree))))
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
-		exit(EXIT_FAILURE);
+		abort();
 	}
 
 	if(size > 1024)
@@ -265,7 +265,7 @@ hashtable_new(uint32_t size, HashFunc hash_func, CompareFunc compare_keys, FreeF
 		if(!(table->allocator = (Allocator *)_node_allocator_new(size / 512)))
 		{
 			fprintf(stderr, "Couldn't allocate memory.\n");
-			exit(EXIT_FAILURE);
+			abort();
 		}
 	}
 	else
