@@ -844,6 +844,8 @@ rbtree_iter_next(RBTreeIter *iter)
 	{
 		for( ;; )
 		{
+			assert(iter->sp->state >= 0 && iter->sp->state <= 2);
+
 			if(iter->sp->state == 0)
 			{
 				iter->sp->state++;
@@ -863,16 +865,11 @@ rbtree_iter_next(RBTreeIter *iter)
 				iter->sp->state++;
 				iter->sp--;
 			}
-			else
-			{
-				iter->finished = true;
-
-				return false;
-			}
 
 			if(iter->sp < iter->stack)
 			{
 				iter->finished = true;
+
 				return false;
 			}
 
