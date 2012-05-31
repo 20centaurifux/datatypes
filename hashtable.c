@@ -14,7 +14,6 @@
 #include "hashtable.h"
 #include "rbtree.h"
 
-
 /*
  *	node allocator:
  */
@@ -234,11 +233,12 @@ str_hash(const char *plain)
 	return hash;
 }
 HashTable *
-hashtable_new(uint32_t size, HashFunc hash_func, CompareFunc compare_keys, FreeFunc free_key, FreeFunc free_value)
+hashtable_new(int32_t size, HashFunc hash_func, CompareFunc compare_keys, FreeFunc free_key, FreeFunc free_value)
 {
 	HashTable *table;
 
 	assert(size > 0);
+	assert(size < INT32_MAX - 1);
 	assert(hash_func != NULL);
 	assert(compare_keys != NULL);
 

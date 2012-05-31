@@ -24,7 +24,7 @@ typedef struct
 	RBNode *root;
 	RBNode **stack;
 	RBNode **sp;
-	uint32_t stack_size;
+	int32_t stack_size;
 	Allocator *allocator;
 	jmp_buf buf;
 	uint32_t count;

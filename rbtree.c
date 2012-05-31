@@ -128,6 +128,12 @@ _rbtree_stack_push(RBTree *tree, RBNode *node)
 		if((sp = tree->sp - tree->stack) >= tree->stack_size - 1)
 		{
 			/* resize stack size */
+			if(tree->stack_size > (INT32_MAX / 2))
+			{
+				fprintf(stderr, "%s: maximum stack size reached\n", __func__);
+				abort();
+			}
+
 			tree->stack_size *= 2;
 
 			if(!(tree->stack = (RBNode **)realloc(tree->stack, sizeof(RBNode *) * tree->stack_size)))
