@@ -790,10 +790,17 @@ rbtree_iter_init(RBTree *tree, RBTreeIter *iter)
 	iter->sp = NULL;
 	iter->finished = false;
 
-	if(!(iter->stack = (RBTreeIterStackItem *)malloc(sizeof(RBTreeIterStackItem) * iter->stack_size)))
+	if(tree->root)
 	{
-		fprintf(stderr, "Couldn't allocate memory.\n");
-		abort();
+		if(!(iter->stack = (RBTreeIterStackItem *)malloc(sizeof(RBTreeIterStackItem) * iter->stack_size)))
+		{
+			fprintf(stderr, "Couldn't allocate memory.\n");
+			abort();
+		}
+	}
+	else
+	{
+		iter->finished = true;
 	}
 }
 
@@ -812,22 +819,27 @@ rbtree_iter_reuse(RBTree *tree, RBTreeIter *iter)
 	assert(iter != NULL);
 
 	iter->tree = tree;
-
-	if(tree->count + 1 > iter->stack_size)
-	{
-		iter->stack_size = tree->count + 1;
-
-		if(!(iter->stack = (RBTreeIterStackItem *)realloc(iter->stack, sizeof(RBTreeIterStackItem) * iter->stack_size)))
-		{
-			fprintf(stderr, "Couldn't allocate memory.\n");
-			abort();
-		}
-	}
-
 	iter->sp = NULL;
-	iter->finished = false;
 
-	
+	if(tree->root)
+	{
+		if(tree->count + 1 > iter->stack_size)
+		{
+			iter->stack_size = tree->count + 1;
+
+			if(!(iter->stack = (RBTreeIterStackItem *)realloc(iter->stack, sizeof(RBTreeIterStackItem) * iter->stack_size)))
+			{
+				fprintf(stderr, "Couldn't allocate memory.\n");
+				abort();
+			}
+		}
+
+		iter->finished = false;
+	}
+	else
+	{
+		iter->finished = true;
+	}
 }
 
 bool
