@@ -445,6 +445,9 @@ hashtable_key_exists(HashTable *table, const void *key)
 	return false;
 }
 
+/*
+ *	foreach:
+ */
 bool
 hashtable_foreach(HashTable *table, ForeachKeyValuePairFunc foreach, void *user_data)
 {
@@ -465,5 +468,107 @@ hashtable_foreach(HashTable *table, ForeachKeyValuePairFunc foreach, void *user_
 	}
 
 	return true;
+}
+
+/*
+ *	iterator:
+ */
+void
+hashtable_iter_init(HashTable *table, HashTableIter *iter)
+{
+	memset(iter, 0, sizeof(HashTableIter));
+	iter->table = table;
+}
+
+void
+hashtable_iter_free(HashTableIter *iter)
+{
+	assert(iter != NULL);
+
+	if(iter->rbiter_init)
+	{
+		rbtree_iter_free(&iter->rbiter);
+	}
+}
+
+static inline bool
+_hashtable_iter_get_next_bucket(HashTableIter *iter)
+{
+	while(!iter->rbiter_set && iter->offset < iter->table->size)
+	{
+		if(iter->table->buckets[iter->offset])
+		{
+			if(iter->rbiter_init)
+			{
+				rbtree_iter_reuse(iter->table->buckets[iter->offset], &iter->rbiter);
+			}
+			else
+			{
+				rbtree_iter_init(iter->table->buckets[iter->offset], &iter->rbiter);
+				iter->rbiter_init = true;
+			}
+
+			iter->rbiter_set = true;
+		}
+
+		iter->offset++;
+	}
+
+	return iter->rbiter_set;
+}
+
+bool
+hashtable_iter_next(HashTableIter *iter)
+{
+	if(iter->finished)
+	{
+		return false;
+	}
+
+	for( ;; )
+	{
+		if(iter->rbiter_set)
+		{
+			if((iter->rbiter_set = rbtree_iter_next(&iter->rbiter)))
+			{
+				return true;
+			}
+		}
+		else
+		{
+			if(!_hashtable_iter_get_next_bucket(iter))
+			{
+				iter->finished = true;
+
+				return false;
+			}
+		}
+	}
+}
+
+void inline *
+hashtable_iter_get_key(HashTableIter *iter)
+{
+	assert(iter != NULL);
+
+	if(iter->rbiter_set)
+	{
+		return rbtree_iter_get_key(&iter->rbiter);
+	}
+
+	return false;
+}
+
+void inline *
+hashtable_iter_get_value(HashTableIter *iter)
+{
+	assert(iter != NULL);
+
+	if(iter->rbiter_set)
+	{
+		return rbtree_iter_get_value(&iter->rbiter);
+	}
+
+	return false;
 }
 

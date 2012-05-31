@@ -22,6 +22,16 @@ typedef struct
 	Allocator *allocator;
 } HashTable;
 
+typedef struct
+{
+	HashTable *table;
+	uint32_t offset;
+	RBTreeIter rbiter;
+	bool rbiter_set:1;
+	bool rbiter_init:1;
+	bool finished:1;
+} HashTableIter;
+
 uint32_t str_hash(const char *plain);
 
 HashTable *hashtable_new(uint32_t size, HashFunc hash_func, CompareFunc compare_keys, FreeFunc free_key, FreeFunc free_value);
@@ -32,6 +42,11 @@ void *hashtable_lookup(HashTable *table, const void *key);
 bool hashtable_key_exists(HashTable *table, const void *key);
 #define hashtable_count(table) table->count
 bool hashtable_foreach(HashTable *table, ForeachKeyValuePairFunc foreach, void *user_data);
+void hashtable_iter_init(HashTable *table, HashTableIter *iter);
+void hashtable_iter_free(HashTableIter *iter);
+bool hashtable_iter_next(HashTableIter *iter);
+void *hashtable_iter_get_key(HashTableIter *iter);
+void *hashtable_iter_get_value(HashTableIter *iter);
 
 #endif
 
