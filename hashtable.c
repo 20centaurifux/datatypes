@@ -341,17 +341,18 @@ hashtable_destroy(HashTable *table)
 
 	if(table->allocator)
 	{
+		/* we don't have to attach freed nodes to the list of available nodes anymore */
 		((NodeAllocator *)table->allocator)->reuse_nodes = false;
 	}
 
 	#if defined(PTHREADS) || defined(WIN32)
-	if(table->size > 512)
+	if(table->size >= 512)
 	{
 		to = table->size / 2;
 
 		#ifdef PTHREADS
-		pthread_create(&thread, NULL, _hashtable_destroy_worker, table);
 		pthread_attr_init(&attr);
+		pthread_create(&thread, NULL, _hashtable_destroy_worker, table);
 		#else
 		thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)_hashtable_destroy_worker, table, 0, NULL);
 		#endif
@@ -371,7 +372,7 @@ hashtable_destroy(HashTable *table)
 	}
 
 	#if defined(PTHREADS)
-	if(table->size > 512)
+	if(table->size >= 512)
 	{
 		pthread_join(thread, NULL);
 		pthread_detach(thread);
