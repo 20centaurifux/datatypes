@@ -260,9 +260,9 @@ hashtable_new(int32_t size, HashFunc hash_func, CompareFunc compare_keys, FreeFu
 		abort();
 	}
 
-	if(size > 1024)
+	if(size >= 512)
 	{
-		if(!(table->allocator = (Allocator *)_node_allocator_new(size / 512)))
+		if(!(table->allocator = (Allocator *)_node_allocator_new(512)))
 		{
 			fprintf(stderr, "Couldn't allocate memory.\n");
 			abort();
