@@ -740,51 +740,6 @@ rbtree_remove(RBTree *tree, const void *key)
 	return true;
 }
 
-/*
- *	foreach:
- */
-static inline void
-_rbtree_foreach(jmp_buf *buf, RBNode *node, ForeachKeyValuePairFunc foreach, void *user_data)
-{
-	if(node->left)
-	{
-		_rbtree_foreach(buf, node->left, foreach, user_data);
-	}
-
-	if(node->right)
-	{
-		_rbtree_foreach(buf, node->right, foreach, user_data);
-	}
-
-	if(!foreach(node->key, node->value, user_data))
-	{
-		longjmp(*buf, 1);
-	}
-}
-
-bool
-rbtree_foreach(RBTree *tree, ForeachKeyValuePairFunc foreach, void *user_data)
-{
-	assert(tree != NULL);
-
-	if(tree->root)
-	{
-		if(!setjmp(tree->buf))
-		{
-			_rbtree_foreach(&tree->buf, tree->root, foreach, user_data);
-		}
-		else
-		{
-			return false;
-		}
-	}
-
-	return true;
-}
-
-/*
- *	tree iter:
- */
 void
 rbtree_iter_init(RBTree *tree, RBTreeIter *iter)
 {

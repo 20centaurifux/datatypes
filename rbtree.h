@@ -77,9 +77,6 @@ bool rbtree_key_exists(RBTree *tree, const void *key);
 /* remove node from tree */
 bool rbtree_remove(RBTree *tree, const void *key);
 
-/* traverse tree */
-bool rbtree_foreach(RBTree *tree, ForeachKeyValuePairFunc foreach, void *user_data);
-
 void rbtree_iter_init(RBTree *tree, RBTreeIter *iter);
 
 void rbtree_iter_free(RBTreeIter *iter);
