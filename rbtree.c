@@ -12,8 +12,6 @@ rbtree_new(CompareFunc compare_keys, FreeFunc free_key, FreeFunc free_value, All
 {
 	RBTree *tree;
 
-	assert(compare_keys != NULL);
-
 	if(!(tree = (RBTree *)malloc(sizeof(RBTree))))
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
@@ -84,13 +82,11 @@ _rbtree_destroy_node(RBTree *tree, RBNode *node)
 void
 rbtree_destroy(RBTree *tree)
 {
-	assert(tree != NULL);
-
 	rbtree_free(tree);
 	free(tree);
 }
 
-inline void
+void
 rbtree_free(RBTree *tree)
 {
 	assert(tree != NULL);
