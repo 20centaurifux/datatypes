@@ -284,7 +284,24 @@ hashtable_new(int32_t size, HashFunc hash_func, CompareFunc compare_keys, FreeFu
 	return table;
 }
 
-#define _hashtable_destroy_bucket(table, i) if(table->buckets[i]) rbtree_free(table->buckets[i])
+static inline void
+_hashtable_destroy_bucket(HashTable *table, int index)
+{
+	if(table->buckets[index])
+	{
+		/* check if we're using an allocator and if we don't have to free keys & values */
+		if(table->allocator && !table->free_key && !table->free_value)
+		{
+			/*
+			 * memory allocated for nodes will be freed when destroying the allocator, so
+			 * we can set the root node of the tree to NULL to improve performance
+			 */
+			table->buckets[index]->root = NULL;
+		}
+
+		rbtree_free(table->buckets[index]);
+	}
+}
 
 #if defined(PTHREADS) || defined(WIN32)
 static void *
