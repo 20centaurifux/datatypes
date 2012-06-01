@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 
-#include "generic.h"
+#include "datatypes.h"
 #include "rbtree.h"
 
 typedef uint32_t (*HashFunc)(const char *plain);

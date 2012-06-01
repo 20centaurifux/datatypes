@@ -5,7 +5,7 @@
 #include <setjmp.h>
 #include <stdint.h>
 
-#include "generic.h"
+#include "datatypes.h"
 
 typedef struct _rbnode
 {
