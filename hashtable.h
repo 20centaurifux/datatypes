@@ -41,7 +41,6 @@ void hashtable_remove(HashTable *table, const void *key);
 void *hashtable_lookup(HashTable *table, const void *key);
 bool hashtable_key_exists(HashTable *table, const void *key);
 #define hashtable_count(table) (table ? table->count : 0)
-bool hashtable_foreach(HashTable *table, ForeachKeyValuePairFunc foreach, void *user_data);
 void hashtable_iter_init(HashTable *table, HashTableIter *iter);
 void hashtable_iter_free(HashTableIter *iter);
 bool hashtable_iter_next(HashTableIter *iter);

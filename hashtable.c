@@ -223,11 +223,10 @@ uint32_t inline
 str_hash(const char *plain)
 {
 	uint32_t hash = 0;
-	char c;
 
-	while((c = *plain++))
+	while(*plain)
 	{
-		hash = c + (hash << 6) + (hash << 16) - hash;
+		hash = *plain++ + (hash << 6) + (hash << 16) - hash;
 	}
 
 	return hash;
@@ -463,34 +462,6 @@ hashtable_key_exists(HashTable *table, const void *key)
 	return false;
 }
 
-/*
- *	foreach:
- */
-bool
-hashtable_foreach(HashTable *table, ForeachKeyValuePairFunc foreach, void *user_data)
-{
-	uint32_t i = 0;
-
-	assert(table != NULL);
-	assert(foreach != NULL);
-
-	for(i = 0; i < table->size; ++i)
-	{
-		if(table->buckets[i])
-		{
-			if(!rbtree_foreach(table->buckets[i], foreach, user_data))
-			{
-				return false;
-			}
-		}
-	}
-
-	return true;
-}
-
-/*
- *	iterator:
- */
 void
 hashtable_iter_init(HashTable *table, HashTableIter *iter)
 {
