@@ -236,16 +236,27 @@ hashtable_new(int32_t size, HashFunc hash_func, CompareFunc compare_keys, FreeFu
 {
 	HashTable *table;
 
-	assert(size > 0);
-	assert(size < INT32_MAX - 1);
-	assert(hash_func != NULL);
-	assert(compare_keys != NULL);
-
 	if(!(table = (HashTable *)malloc(sizeof(HashTable))))
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
 		abort();
 	}
+
+	hashtable_init(table, size, hash_func, compare_keys, free_key, free_value);
+
+	return table;
+}
+
+inline void
+hashtable_init(HashTable *table, int32_t size, HashFunc hash_func, CompareFunc compare_keys, FreeFunc free_key, FreeFunc free_value)
+{
+	assert(table != NULL);
+	assert(size > 0);
+	assert(size < INT32_MAX - 1);
+	assert(hash_func != NULL);
+	assert(compare_keys != NULL);
+
+
 
 	if(!(table->buckets = (RBTree **)calloc(size, sizeof(RBTree *))))
 	{
@@ -278,10 +289,7 @@ hashtable_new(int32_t size, HashFunc hash_func, CompareFunc compare_keys, FreeFu
 	table->size = size;
 	table->hash = hash_func;
 	table->poolptr = table->pool;
-	table->count = 0;
-
-	return table;
-}
+	table->count = 0;}
 
 static inline void
 _hashtable_destroy_bucket(HashTable *table, int index)
@@ -327,6 +335,13 @@ _hashtable_destroy_worker(void *arg)
 
 void
 hashtable_destroy(HashTable *table)
+{
+	hashtable_free(table);
+	free(table);
+}
+
+void
+hashtable_free(HashTable *table)
 {
 	int i;
 	int to;
@@ -389,7 +404,6 @@ hashtable_destroy(HashTable *table)
 	}
 
 	free(table->pool);
-	free(table);
 }
 
 void
