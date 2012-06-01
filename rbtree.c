@@ -5,7 +5,7 @@
 
 #include "rbtree.h"
 
-#define RBTREE_INITIAL_BLOCK_SIZE 2
+#define RBTREE_INITIAL_BLOCK_SIZE 4
 
 RBTree *
 rbtree_new(CompareFunc compare_keys, FreeFunc free_key, FreeFunc free_value, Allocator *allocator)
@@ -25,7 +25,7 @@ rbtree_new(CompareFunc compare_keys, FreeFunc free_key, FreeFunc free_value, All
 	return tree;
 }
 
-void inline
+inline void
 rbtree_init(RBTree *tree, CompareFunc compare_keys, FreeFunc free_key, FreeFunc free_value, Allocator *allocator)
 {
 	assert(tree != NULL);
@@ -90,7 +90,7 @@ rbtree_destroy(RBTree *tree)
 	free(tree);
 }
 
-void inline
+inline void
 rbtree_free(RBTree *tree)
 {
 	assert(tree != NULL);
@@ -103,7 +103,7 @@ rbtree_free(RBTree *tree)
 	free(tree->stack);
 }
 
-uint32_t inline
+inline uint32_t
 rbtree_count(RBTree *tree)
 {
 	assert(tree != NULL);
