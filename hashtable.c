@@ -462,6 +462,14 @@ hashtable_key_exists(HashTable *table, const void *key)
 	return false;
 }
 
+inline uint32_t
+hashtable_count(HashTable *table)
+{
+	assert(table != NULL);
+
+	return table->count;
+}
+
 void
 hashtable_iter_init(HashTable *table, HashTableIter *iter)
 {
