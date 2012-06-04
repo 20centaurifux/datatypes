@@ -256,6 +256,34 @@ list_remove(List *list, void *data, bool remove_all)
 	}
 }
 
+void *
+list_pop(List *list)
+{
+	ListItem *item;
+	void *data = NULL;
+
+	assert(list != NULL);
+
+	if((item = list->head))
+	{
+		if((list->head = item->next))
+		{
+			list->head->prev = NULL;
+		}
+		else
+		{
+			list->head = NULL;
+			list->tail = NULL;
+		}
+
+		data = item->data;
+		free(item);
+		list->count--;
+	}
+
+	return data;
+}
+
 bool
 list_contains(List *list, void *data)
 {

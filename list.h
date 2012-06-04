@@ -43,6 +43,8 @@ bool list_empty(List *list);
 
 void list_remove(List *list, void *data, bool remove_all);
 
+void *list_pop(List *list);
+
 bool list_contains(List *list, void *data);
 
 ListItem *list_next(ListItem *item);
