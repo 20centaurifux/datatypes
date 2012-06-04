@@ -365,7 +365,7 @@ hashtable_free(HashTable *table)
 
 		#ifdef PTHREADS
 		pthread_attr_init(&attr);
-		pthread_create(&thread, NULL, _hashtable_destroy_worker, table);
+		pthread_create(&thread, &attr, _hashtable_destroy_worker, table);
 		#else
 		thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)_hashtable_destroy_worker, table, 0, NULL);
 		#endif
@@ -388,6 +388,7 @@ hashtable_free(HashTable *table)
 	{
 		pthread_join(thread, NULL);
 		pthread_detach(thread);
+		pthread_attr_destroy(&attr);
 	}
 	#elif defined(WIN32)
 	if(thread)
