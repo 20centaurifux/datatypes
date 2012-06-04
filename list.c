@@ -61,6 +61,7 @@ list_destroy(List *list)
 	while(iter)
 	{
 		item = iter;
+		iter = iter->next;
 
 		if(list->free)
 		{
@@ -68,8 +69,6 @@ list_destroy(List *list)
 		}
 
 		free(item);
-
-		iter = iter->next;
 	}
 }
 
