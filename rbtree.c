@@ -152,7 +152,7 @@ _rbtree_stack_push(RBTree *tree, RBNode *node)
 /*
  *	node helpers:
  */
-#define _rbnode_is_black(n)    (n == NULL ? 1 : n->black)
+#define _rbnode_is_black(n) (n == NULL ? 1 : n->black)
 
 static inline RBNode *
 _rbnode_create_new(Allocator *allocator, void *key, void *value, int black, RBNode *left, RBNode *right)
@@ -736,6 +736,9 @@ rbtree_remove(RBTree *tree, const void *key)
 	return true;
 }
 
+/*
+ *	iterator:
+ */
 void
 rbtree_iter_init(RBTree *tree, RBTreeIter *iter)
 {

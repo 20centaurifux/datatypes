@@ -256,8 +256,6 @@ hashtable_init(HashTable *table, int32_t size, HashFunc hash_func, CompareFunc c
 	assert(hash_func != NULL);
 	assert(compare_keys != NULL);
 
-
-
 	if(!(table->buckets = (RBTree **)calloc(size, sizeof(RBTree *))))
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
@@ -289,7 +287,8 @@ hashtable_init(HashTable *table, int32_t size, HashFunc hash_func, CompareFunc c
 	table->size = size;
 	table->hash = hash_func;
 	table->poolptr = table->pool;
-	table->count = 0;}
+	table->count = 0;
+}
 
 static inline void
 _hashtable_destroy_bucket(HashTable *table, int index)
@@ -370,7 +369,6 @@ hashtable_free(HashTable *table)
 		#else
 		thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)_hashtable_destroy_worker, table, 0, NULL);
 		#endif
-
 	}
 	else
 	{
