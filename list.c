@@ -56,11 +56,18 @@ _list_detach(List *list, ListItem *item)
 }
 
 static ListItem *
-_list_find(List *list, void *data)
+_list_find(List *list, ListItem *offset, void *data)
 {
 	ListItem *iter;
 
-	iter = list->head;
+	if(offset)
+	{
+		iter = offset->next;
+	}
+	else
+	{
+		iter = list->head;
+	}
 
 	while(iter)
 	{
@@ -336,13 +343,13 @@ list_contains(List *list, void *data)
 	assert(list != NULL);
 	assert(list->equals != NULL);
 
-	return _list_find(list, data) ? true : false;
+	return _list_find(list, NULL, data) ? true : false;
 }
 
 ListItem *
-list_find(List *list, void *data)
+list_find(List *list, ListItem *offset, void *data)
 {
-	return _list_find(list, data);
+	return _list_find(list, offset, data);
 }
 
 inline ListItem *
