@@ -49,6 +49,8 @@ void *list_pop(List *list);
 
 bool list_contains(List *list, void *data);
 
+ListItem *list_find(List *list, void *data);
+
 ListItem *list_item_next(ListItem *item);
 
 ListItem *list_item_prev(ListItem *item);

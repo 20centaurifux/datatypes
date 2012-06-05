@@ -25,7 +25,7 @@ _list_item_new(void *data)
 	return item;
 }
 
-static inline void
+static void
 _list_detach(List *list, ListItem *item)
 {
 	/* check if there's a previous list item */
@@ -53,6 +53,26 @@ _list_detach(List *list, ListItem *item)
 	{
 		list->tail = item->prev;
 	}
+}
+
+static ListItem *
+_list_find(List *list, void *data)
+{
+	ListItem *iter;
+
+	iter = list->head;
+
+	while(iter)
+	{
+		if(list->equals(iter->data, data))
+		{
+			return iter;
+		}
+
+		iter = iter->next;
+	}
+
+	return NULL;
 }
 
 /*
@@ -316,19 +336,13 @@ list_contains(List *list, void *data)
 	assert(list != NULL);
 	assert(list->equals != NULL);
 
-	iter = list->head;
+	return _list_find(list, data) ? true : false;
+}
 
-	while(iter)
-	{
-		if(list->equals(iter->data, data))
-		{
-			return true;
-		}
-
-		iter = iter->next;
-	}
-
-	return false;
+ListItem *
+list_find(List *list, void *data)
+{
+	return _list_find(list, data);
 }
 
 inline ListItem *
