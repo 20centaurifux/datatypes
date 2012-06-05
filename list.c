@@ -197,14 +197,12 @@ list_insert_sorted(List *list, void *data, CompareFunc compare)
 		/* test if new item can be appended */
 		if(compare(list->tail->data, data) <= 0)
 		{
-			list_append(list, data);
-			return;
+			return list_append(list, data);
 		}
 		else if(list->count == 1)
 		{
 			/* prepend item */
-			list_prepend(list, data);
-			return;
+			return list_prepend(list, data);
 		}
 
 		/* insert list item into list */
