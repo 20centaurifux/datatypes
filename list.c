@@ -183,6 +183,54 @@ list_insert_sorted(List *list, void *data, CompareFunc compare)
 }
 
 void
+list_remove(List *list, ListItem *item)
+{
+	ListItem *p;
+
+	assert(list != NULL);
+	assert(list->head != NULL);
+	assert(item != NULL);
+
+	p = item;
+
+	/* check if there's a previous list item */
+	if(item->prev)
+	{
+		/* update previous list item */
+		item->prev->next = item->next;
+
+		if(item->next)
+		{
+			item->next->prev = item->prev;
+		}
+	}
+	else
+	{
+		/* update list item */
+		if((list->head = item->next))
+		{
+			list->head->prev = NULL;
+		}
+	}
+
+	/* update tail of list */
+	if(item == list->tail)
+	{
+		list->tail = item->prev;
+	}
+
+	/* free allocated memory */
+	if(list->free)
+	{
+		list->free(p->data);
+	}
+
+	free(p);
+
+	list->count--;
+}
+
+void
 list_remove_by_data(List *list, void *data, bool remove_all)
 {
 	ListItem *iter;
@@ -197,44 +245,8 @@ list_remove_by_data(List *list, void *data, bool remove_all)
 	{
 		if(list->equals(iter->data, data))
 		{
-			list->count--;
 			p = iter;
-
-			/* check if there's a previous list item */
-			if(iter->prev)
-			{
-				/* update previous list item */
-				iter->prev->next = iter->next;
-
-				if(iter->next)
-				{
-					iter->next->prev = iter->prev;
-				}
-			}
-			else
-			{
-				/* update head of list */
-				if((list->head = iter->next))
-				{
-					list->head->prev = NULL;
-				}
-			}
-
-			/* update tail of list */
-			if(iter == list->tail)
-			{
-				list->tail = iter->prev;
-			}
-
-			/* free allocated memory */
-			if(list->free)
-			{
-				list->free(p->data);
-			}
-
-			free(p);
-
-			/* get next list item */
+			list_remove(list, iter);
 			iter = iter->next;
 
 			/* leave loop if we don't have to remove all desired items */
