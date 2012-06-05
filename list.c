@@ -25,6 +25,36 @@ _list_item_new(void *data)
 	return item;
 }
 
+static inline void
+_list_detach(List *list, ListItem *item)
+{
+	/* check if there's a previous list item */
+	if(item->prev)
+	{
+		/* update previous list item */
+		item->prev->next = item->next;
+
+		if(item->next)
+		{
+			item->next->prev = item->prev;
+		}
+	}
+	else
+	{
+		/* update list item */
+		if((list->head = item->next))
+		{
+			list->head->prev = NULL;
+		}
+	}
+
+	/* update tail of list */
+	if(item == list->tail)
+	{
+		list->tail = item->prev;
+	}
+}
+
 /*
  *	public:
  */
@@ -193,31 +223,8 @@ list_remove(List *list, ListItem *item)
 
 	p = item;
 
-	/* check if there's a previous list item */
-	if(item->prev)
-	{
-		/* update previous list item */
-		item->prev->next = item->next;
-
-		if(item->next)
-		{
-			item->next->prev = item->prev;
-		}
-	}
-	else
-	{
-		/* update list item */
-		if((list->head = item->next))
-		{
-			list->head->prev = NULL;
-		}
-	}
-
-	/* update tail of list */
-	if(item == list->tail)
-	{
-		list->tail = item->prev;
-	}
+	/* detach list item */
+	_list_detach(list, item);
 
 	/* free allocated memory */
 	if(list->free)
@@ -351,7 +358,7 @@ list_empty(List *list)
 }
 
 inline ListItem *
-list_next(ListItem *item)
+list_item_next(ListItem *item)
 {
 	assert(item != NULL);
 
@@ -359,10 +366,68 @@ list_next(ListItem *item)
 }
 
 inline ListItem *
-list_prev(ListItem *item)
+list_item_prev(ListItem *item)
 {
 	assert(item != NULL);
 
 	return item->prev;
+}
+
+inline void *
+list_item_get_data(ListItem *item)
+{
+	assert(item != NULL);
+
+	return item->data;
+}
+
+inline void
+list_item_set_data(ListItem *item, void *data)
+{
+	assert(item ! NULL);
+
+	item->data = data;
+}
+
+void
+list_reorder(List *list, ListItem *item, CompareFunc compare)
+{
+	ListItem *iter;
+
+	assert(list != NULL);
+	assert(item != NULL);
+
+	if(list->head == item)
+	{
+		return;
+	}
+
+	/* detach list item */
+	_list_detach(list, item);
+
+	/* insert list item */
+	iter = list->head;
+
+	while(iter)
+	{
+		if(compare(iter->data, item->data) >= 0)
+		{
+			if(iter->prev)
+			{
+				iter->prev->next = item;
+			}
+			else
+			{
+				list->head = item;
+			}
+
+			item->next = iter;
+			item->prev = iter->prev;
+			iter->prev = item;
+			break;
+		}
+
+		iter = iter->next;
+	}
 }
 

@@ -49,9 +49,15 @@ void *list_pop(List *list);
 
 bool list_contains(List *list, void *data);
 
-ListItem *list_next(ListItem *item);
+ListItem *list_item_next(ListItem *item);
 
-ListItem *list_prev(ListItem *item);
+ListItem *list_item_prev(ListItem *item);
+
+void *list_item_get_data(ListItem *item);
+
+void list_item_set_data(ListItem *item, void *data);
+
+void list_reorder(List *list, ListItem *item, CompareFunc compare);
 
 #endif
 
