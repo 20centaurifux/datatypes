@@ -12,14 +12,6 @@ char buffer[HASHTABLE_TEST_DATA_SIZE];
 char keys[HASHTABLE_KEY_DATA_SIZE];
 int count;
 
-static bool
-_foreach_count(void *key, void *value, void *user_data)
-{
-	++count;
-
-	return true;
-}
-
 static void
 _test_hashtable(void)
 {
@@ -68,11 +60,7 @@ _test_hashtable(void)
 		}
 	}
 
-	/* foreach */
-	count = 0;
-	hashtable_foreach(table, _foreach_count, NULL);
-
-	printf("%d==%d", hashtable_count(table), count);
+	printf("%d\n", hashtable_count(table));
 
 	/* cleanup */
 	hashtable_destroy(table);
