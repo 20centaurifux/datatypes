@@ -27,11 +27,11 @@ List *list_new(EqualFunc equals, FreeFunc free);
 
 void list_destroy(List *list);
 
-void list_append(List *list, void *data);
+ListItem *list_append(List *list, void *data);
 
-void list_prepend(List *list, void *data);
+ListItem *list_prepend(List *list, void *data);
 
-void list_insert_sorted(List *list, void *data, CompareFunc compare);
+ListItem *list_insert_sorted(List *list, void *data, CompareFunc compare);
 
 ListItem *list_head(List *list);
 

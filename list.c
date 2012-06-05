@@ -102,7 +102,7 @@ list_destroy(List *list)
 	}
 }
 
-void
+ListItem *
 list_append(List *list, void *data)
 {
 	ListItem *item;
@@ -125,9 +125,11 @@ list_append(List *list, void *data)
 	}
 
 	list->count++;
+
+	return item;
 }
 
-void
+ListItem *
 list_prepend(List *list, void *data)
 {
 	ListItem *item;
@@ -150,9 +152,11 @@ list_prepend(List *list, void *data)
 	}
 
 	list->count++;
+
+	return item;
 }
 
-void
+ListItem *
 list_insert_sorted(List *list, void *data, CompareFunc compare)
 {
 	ListItem *iter;
@@ -210,6 +214,8 @@ list_insert_sorted(List *list, void *data, CompareFunc compare)
 	}
 
 	list->count++;
+
+	return item;
 }
 
 void
