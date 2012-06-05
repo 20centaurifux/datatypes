@@ -183,7 +183,7 @@ list_insert_sorted(List *list, void *data, CompareFunc compare)
 }
 
 void
-list_remove(List *list, void *data, bool remove_all)
+list_remove_by_data(List *list, void *data, bool remove_all)
 {
 	ListItem *iter;
 	ListItem *p = NULL;

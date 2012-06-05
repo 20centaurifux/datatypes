@@ -41,7 +41,7 @@ uint32_t list_count(List *list);
 
 bool list_empty(List *list);
 
-void list_remove(List *list, void *data, bool remove_all);
+void list_remove_by_data(List *list, void *data, bool remove_all);
 
 void *list_pop(List *list);
 
