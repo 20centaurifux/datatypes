@@ -336,8 +336,6 @@ list_pop(List *list)
 bool
 list_contains(List *list, void *data)
 {
-	ListItem *iter;
-
 	assert(list != NULL);
 	assert(list->equals != NULL);
 
@@ -409,7 +407,7 @@ list_item_get_data(ListItem *item)
 inline void
 list_item_set_data(ListItem *item, void *data)
 {
-	assert(item ! NULL);
+	assert(item != NULL);
 
 	item->data = data;
 }
