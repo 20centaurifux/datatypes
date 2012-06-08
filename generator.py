@@ -7,7 +7,7 @@ chars = string.letters + string.digits
 
 f = open('test', 'wb')
 
-for i in range(1, 2000000):
+for i in range(1, 20000000):
 	f.write(''.join(choice(chars) for _ in range(5)))
 
 f.close()
