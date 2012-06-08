@@ -63,6 +63,8 @@ void rbtree_destroy(RBTree *tree);
 /* free resources */
 void rbtree_free(RBTree *tree);
 
+void rbtree_clear(RBTree *tree);
+
 /* save key & value in tree */
 RBTreeInsertResult rbtree_set(RBTree *tree, void * restrict key, void * restrict value, bool replace_key);
 

@@ -99,6 +99,20 @@ rbtree_free(RBTree *tree)
 	free(tree->stack);
 }
 
+void
+rbtree_clear(RBTree *tree)
+{
+	assert(tree != NULL);
+
+	/* free nodes */
+	rbtree_free(tree);
+
+	/* reset members */
+	tree->sp = NULL;
+	tree->count = 0;
+	tree->root = NULL;
+}
+
 inline uint32_t
 rbtree_count(RBTree *tree)
 {
