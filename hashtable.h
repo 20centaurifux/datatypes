@@ -38,6 +38,7 @@ HashTable *hashtable_new(int32_t size, HashFunc hash_func, CompareFunc compare_k
 void hashtable_init(HashTable *table, int32_t size, HashFunc hash_func, CompareFunc compare_keys, FreeFunc free_key, FreeFunc free_value);
 void hashtable_destroy(HashTable *table);
 void hashtable_free(HashTable *table);
+void hashtable_clear(HashTable *table);
 void hashtable_set(HashTable *table, void * restrict key, void * restrict value, bool overwrite_key);
 void hashtable_remove(HashTable *table, const void *key);
 void *hashtable_lookup(HashTable *table, const void *key);

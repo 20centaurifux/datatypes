@@ -281,6 +281,8 @@ hashtable_init(HashTable *table, int32_t size, HashFunc hash_func, CompareFunc c
 		table->allocator = NULL;
 	}
 
+	table->allocator = NULL;
+
 	table->compare_keys = compare_keys;
 	table->free_key = free_key;
 	table->free_value = free_value;
@@ -403,6 +405,24 @@ hashtable_free(HashTable *table)
 	}
 
 	free(table->pool);
+}
+
+void
+hashtable_clear(HashTable *table)
+{
+	int i;
+
+	for(i = 0; i < table->size; ++i)
+	{
+		if(table->buckets[i])
+		{
+			rbtree_clear(table->buckets[i]);
+			table->buckets[i] = NULL;
+		}
+	}
+
+	table->poolptr = table->pool;
+	table->count = 0;
 }
 
 void
