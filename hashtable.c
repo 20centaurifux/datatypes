@@ -232,7 +232,7 @@ str_hash(const char *plain)
 	return hash;
 }
 HashTable *
-hashtable_new(int32_t size, HashFunc hash_func, CompareFunc compare_keys, FreeFunc free_key, FreeFunc free_value)
+hashtable_new(int32_t size, HashFunc hash_func, EqualFunc compare_keys, FreeFunc free_key, FreeFunc free_value)
 {
 	HashTable *table;
 
@@ -248,7 +248,7 @@ hashtable_new(int32_t size, HashFunc hash_func, CompareFunc compare_keys, FreeFu
 }
 
 inline void
-hashtable_init(HashTable *table, int32_t size, HashFunc hash_func, CompareFunc compare_keys, FreeFunc free_key, FreeFunc free_value)
+hashtable_init(HashTable *table, int32_t size, HashFunc hash_func, EqualFunc compare_keys, FreeFunc free_key, FreeFunc free_value)
 {
 	assert(table != NULL);
 	assert(size > 0);
@@ -256,32 +256,17 @@ hashtable_init(HashTable *table, int32_t size, HashFunc hash_func, CompareFunc c
 	assert(hash_func != NULL);
 	assert(compare_keys != NULL);
 
-	if(!(table->buckets = (RBTree **)calloc(size, sizeof(RBTree *))))
+	if(!(table->buckets = (List **)calloc(size, sizeof(List *))))
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
 		abort();
 	}
 
-	if(!(table->pool = (RBTree *)malloc(size * sizeof(RBTree))))
+	if(!(table->pool = (List *)malloc(size * sizeof(List))))
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
 		abort();
 	}
-
-	if(size >= 512)
-	{
-		if(!(table->allocator = (Allocator *)_node_allocator_new(512)))
-		{
-			fprintf(stderr, "Couldn't allocate memory.\n");
-			abort();
-		}
-	}
-	else
-	{
-		table->allocator = NULL;
-	}
-
-	table->allocator = NULL;
 
 	table->compare_keys = compare_keys;
 	table->free_key = free_key;
@@ -297,17 +282,7 @@ _hashtable_destroy_bucket(HashTable *table, int index)
 {
 	if(table->buckets[index])
 	{
-		/* check if we're using an allocator and if we don't have to free keys & values */
-		if(table->allocator && !table->free_key && !table->free_value)
-		{
-			/*
-			 * memory allocated for nodes will be freed when destroying the allocator, so
-			 * we can set the root node of the tree to NULL to improve performance
-			 */
-			table->buckets[index]->root = NULL;
-		}
-
-		rbtree_free(table->buckets[index]);
+		list_free(table->buckets[index]);
 	}
 }
 
@@ -354,12 +329,6 @@ hashtable_free(HashTable *table)
 	HANDLE thread = NULL;
 	#endif
 
-	if(table->allocator)
-	{
-		/* we don't have to attach freed nodes to the list of available nodes anymore */
-		((NodeAllocator *)table->allocator)->reuse_nodes = false;
-	}
-
 	#if defined(PTHREADS) || defined(WIN32)
 	if(table->size >= 512)
 	{
@@ -399,11 +368,6 @@ hashtable_free(HashTable *table)
 	}
 	#endif
 
-	if(table->allocator)
-	{
-		_node_allocator_destroy((NodeAllocator *)table->allocator);
-	}
-
 	free(table->pool);
 }
 
@@ -416,7 +380,7 @@ hashtable_clear(HashTable *table)
 	{
 		if(table->buckets[i])
 		{
-			rbtree_clear(table->buckets[i]);
+			//list_clear(table->buckets[i]); TODO
 			table->buckets[i] = NULL;
 		}
 	}
@@ -425,11 +389,28 @@ hashtable_clear(HashTable *table)
 	table->count = 0;
 }
 
+typedef struct
+{
+	void *key;
+	void *value;
+} _HashtableItem;
+
+static bool
+_hashtable_item_equals(void const *a, void const *b)
+{
+	_HashtableItem *item = (_HashtableItem *)a;
+	const char *key = (const char *)b;
+
+	return str_equal(item->key, key);
+}
+
 void
 hashtable_set(HashTable *table, void * restrict key, void * restrict value, bool overwrite_key)
 {
 	uint32_t index;
-	RBTree *bucket;
+	List *bucket;
+	ListItem *el;
+	_HashtableItem *item = NULL;
 
 	assert(table != NULL);
 	assert(key != NULL);
@@ -440,11 +421,36 @@ hashtable_set(HashTable *table, void * restrict key, void * restrict value, bool
 	if(!(bucket = table->buckets[index]))
 	{
 		bucket = table->buckets[index] = table->poolptr++;
-		rbtree_init(bucket, table->compare_keys, table->free_key, table->free_value, table->allocator);
+		list_init(bucket, _hashtable_item_equals, table->free_key);
 	}
 
-	if(rbtree_set(bucket, key, value, overwrite_key) == RBTREE_INSERT_RESULT_NEW)
+	if((el = list_find(bucket, NULL, key)))
 	{
+		item = list_item_get_data(el);
+
+		if(overwrite_key)
+		{
+			if(table->free_key)
+			{
+				table->free_key(item->key);
+			}
+
+			item->key = key;
+		}
+
+		if(table->free_value)
+		{
+			table->free_value(item->value);
+		}
+
+		item->value = value;
+	}
+	else
+	{
+		item = (_HashtableItem *)malloc(sizeof(_HashtableItem));
+		item->key = key;
+		item->value = value;
+		list_prepend(bucket, item);
 		table->count++;
 	}
 }
@@ -452,15 +458,33 @@ hashtable_set(HashTable *table, void * restrict key, void * restrict value, bool
 void
 hashtable_remove(HashTable *table, const void *key)
 {
-	RBTree *bucket;
+	List *bucket;
+	ListItem *el;
+	_HashtableItem *item;
 
 	assert(table != NULL);
 	assert(key != NULL);
 
 	if((bucket = table->buckets[HASHTABLE_INDEX(table, key)]))
 	{
-		if(rbtree_remove(bucket, key))
+		if((el = list_find(bucket, NULL, key)))
 		{
+			item = list_item_get_data(el);
+
+			if(table->free_key)
+			{
+				table->free_key(item->key);
+			}
+
+			if(table->free_value)
+			{
+				table->free_key(item->value);
+			}
+
+			free(item);
+			list_item_set_data(el, NULL);
+
+			list_remove(bucket, el);
 			table->count--;
 		}
 	}
@@ -469,14 +493,24 @@ hashtable_remove(HashTable *table, const void *key)
 void *
 hashtable_lookup(HashTable *table, const void *key)
 {
-	RBTree *bucket;
+	List *bucket;
+	ListItem *el;
+	_HashtableItem *item;
 
 	assert(table != NULL);
 	assert(key != NULL);
 
 	if((bucket = table->buckets[HASHTABLE_INDEX(table, key)]))
 	{
-		return rbtree_lookup(bucket, key);
+		if((el = list_find(bucket, NULL, key)))
+		{
+			item = list_item_get_data(el);
+
+			if(table->compare_keys(key, item->key))
+			{
+				return item->value;
+			}
+		}
 	}
 
 	return NULL;
@@ -485,11 +519,14 @@ hashtable_lookup(HashTable *table, const void *key)
 bool
 hashtable_key_exists(HashTable *table, const void *key)
 {
-	RBTree *bucket;
+	List *bucket;
 
 	if((bucket = table->buckets[HASHTABLE_INDEX(table, key)]))
 	{
-		return rbtree_key_exists(bucket, key);
+		if((list_find(bucket, NULL, key)))
+		{
+			return true;
+		}
 	}
 
 	return false;
@@ -503,6 +540,7 @@ hashtable_count(HashTable *table)
 	return table->count;
 }
 
+/*
 void
 hashtable_iter_init(HashTable *table, HashTableIter *iter)
 {
@@ -601,4 +639,5 @@ hashtable_iter_get_value(HashTableIter *iter)
 
 	return false;
 }
+*/
 

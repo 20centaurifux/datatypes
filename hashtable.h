@@ -4,29 +4,28 @@
 #include <stdbool.h>
 
 #include "datatypes.h"
-#include "rbtree.h"
+#include "list.h"
 
 typedef uint32_t (*HashFunc)(const char *plain);
 
 typedef struct
 {
-	CompareFunc compare_keys;
+	EqualFunc compare_keys;
 	FreeFunc free_key;
 	FreeFunc free_value;
 	HashFunc hash;
 	int32_t size;
-	RBTree **buckets;
-	RBTree *pool;
-	RBTree *poolptr;
+	List **buckets;
+	List *pool;
+	List *poolptr;
 	uint32_t count;
-	Allocator *allocator;
 } HashTable;
 
 typedef struct
 {
 	HashTable *table;
 	uint32_t offset;
-	RBTreeIter rbiter;
+	List liter;
 	bool rbiter_set:1;
 	bool rbiter_init:1;
 	bool finished:1;
@@ -34,8 +33,8 @@ typedef struct
 
 uint32_t str_hash(const char *plain);
 
-HashTable *hashtable_new(int32_t size, HashFunc hash_func, CompareFunc compare_keys, FreeFunc free_key, FreeFunc free_value);
-void hashtable_init(HashTable *table, int32_t size, HashFunc hash_func, CompareFunc compare_keys, FreeFunc free_key, FreeFunc free_value);
+HashTable *hashtable_new(int32_t size, HashFunc hash_func, EqualFunc compare_keys, FreeFunc free_key, FreeFunc free_value);
+void hashtable_init(HashTable *table, int32_t size, HashFunc hash_func, EqualFunc compare_keys, FreeFunc free_key, FreeFunc free_value);
 void hashtable_destroy(HashTable *table);
 void hashtable_free(HashTable *table);
 void hashtable_clear(HashTable *table);

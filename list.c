@@ -56,7 +56,7 @@ _list_detach(List *list, ListItem *item)
 }
 
 static ListItem *
-_list_find(List *list, ListItem *offset, void *data)
+_list_find(List *list, ListItem *offset, void const *data)
 {
 	ListItem *iter;
 
@@ -356,7 +356,7 @@ list_contains(List *list, void *data)
 }
 
 ListItem *
-list_find(List *list, ListItem *offset, void *data)
+list_find(List *list, ListItem *offset, void const *data)
 {
 	return _list_find(list, offset, data);
 }
