@@ -68,26 +68,25 @@ _bucket_allocator_create_ptr_block(int block_size)
 static _HashtableItem *
 _bucket_allocator_create_list_item(_BucketAllocator *allocator)
 {
-	_BucketAllocator *alloc = (_BucketAllocator *)allocator;
 	struct _BucketBlock *block;
 	struct _BucketPtrBlock *pblock;
 	_HashtableItem *item = NULL;
 
 	/* try to get detached node */
-	if(alloc->free_block)
+	if(allocator->free_block)
 	{
-		item = alloc->free_block->lists[alloc->free_block->offset--];
+		item = allocator->free_block->lists[--allocator->free_block->offset];
 
-		if(alloc->free_block->offset == -1)
+		if(!allocator->free_block->offset)
 		{
-			pblock = alloc->free_block;
-			alloc->free_block = pblock->next;
+			pblock = allocator->free_block;
+			allocator->free_block = pblock->next;
 			free(pblock->lists);
 			free(pblock);
 
-			if(alloc->free_block)
+			if(allocator->free_block)
 			{
-				alloc->free_block->offset--;
+				allocator->free_block->offset--;
 			}
 		}
 
@@ -95,20 +94,20 @@ _bucket_allocator_create_list_item(_BucketAllocator *allocator)
 	}
 
 	/* test if we have reached end of the current block */
-	if(alloc->block->offset < alloc->block_size)
+	if(allocator->block->offset < allocator->block_size)
 	{
 		/* end not reached => return current node & increment offset */
-		item = &alloc->block->lists[alloc->block->offset++];
+		item = &allocator->block->lists[allocator->block->offset++];
 	}
 	else
 	{
 		/* end reached => create a new block & prepend it to our list */
-		block = _bucket_allocator_create_block(alloc->block_size);
-		block->next = alloc->block;
-		alloc->block = block;
+		block = _bucket_allocator_create_block(allocator->block_size);
+		block->next = allocator->block;
+		allocator->block = block;
 
 		/* return first node from current block & increment offset */
-		item = &alloc->block->lists[alloc->block->offset++];
+		item = &allocator->block->lists[allocator->block->offset++];
 	}
 
 	return item;
@@ -117,18 +116,17 @@ _bucket_allocator_create_list_item(_BucketAllocator *allocator)
 static void
 _bucket_allocator_free_list_item(_BucketAllocator *allocator, _HashtableItem *item)
 {
-	_BucketAllocator *alloc = (_BucketAllocator *)allocator;
 	struct _BucketPtrBlock *cur;
 
-	if(!(cur = alloc->free_block))
+	if(!(cur = allocator->free_block))
 	{
-		alloc->free_block = cur = _bucket_allocator_create_ptr_block(alloc->block_size);
+		allocator->free_block = cur = _bucket_allocator_create_ptr_block(allocator->block_size);
 	}
-	else if(cur->offset == alloc->block_size)
+	else if(cur->offset == allocator->block_size)
 	{
-		cur = _bucket_allocator_create_ptr_block(alloc->block_size);
-		cur->next = alloc->free_block;
-		alloc->free_block = cur;
+		cur = _bucket_allocator_create_ptr_block(allocator->block_size);
+		cur->next = allocator->free_block;
+		allocator->free_block = cur;
 	}
 
 	cur->lists[cur->offset++] = item;
