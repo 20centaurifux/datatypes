@@ -96,7 +96,7 @@ list_new(EqualFunc equals, FreeFunc free)
 		abort();
 	}
 
-	list_init(&list, equals, free);
+	list_init(list, equals, free);
 
 	return list;
 }
