@@ -10,6 +10,32 @@ typedef uint32_t (*HashFunc)(const char *plain);
 
 typedef struct
 {
+	void *key;
+	void *value;
+} _HashtableItem;
+
+typedef struct
+{
+	/* store blocks of memory in a list */
+	struct _BucketBlock
+	{
+		_HashtableItem *lists;
+		int offset;
+		struct _BucketBlock *next;
+	} *block;
+	/* store free nodes in blocks containing pointers */
+	struct _BucketPtrBlock
+	{
+		_HashtableItem **lists;
+		int offset;
+		struct _BucketPtrBlock *next;
+		struct _BucketPtrBlock *prev;
+	} *free_block;
+	int block_size;
+} _BucketAllocator;
+
+typedef struct
+{
 	EqualFunc compare_keys;
 	FreeFunc free_key;
 	FreeFunc free_value;
@@ -19,6 +45,7 @@ typedef struct
 	List *pool;
 	List *poolptr;
 	uint32_t count;
+	_BucketAllocator allocator;
 } HashTable;
 
 typedef struct

@@ -14,44 +14,23 @@
 #include "hashtable.h"
 #include "rbtree.h"
 
+#define HASHTABLE_BUCKET_ALLOCATOR_BLOCK_SIZE 4096
+
 /*
- *	node allocator:
+ *	bucket allocator:
  */
-typedef struct
+static struct _BucketBlock *
+_bucket_allocator_create_block(int block_size)
 {
-	Allocator padding;
+	struct _BucketBlock *block;
 
-	/* store blocks of memory in a list */
-	struct _NodeBlock
-	{
-		RBNode *nodes;
-		int offset;
-		struct _NodeBlock *next;
-	} *block;
-	/* store free nodes in blocks containing pointers */
-	struct _NodePtrBlock
-	{
-		RBNode **nodes;
-		int offset;
-		struct _NodePtrBlock *next;
-		struct _NodePtrBlock *prev;
-	} *free_block;
-	bool reuse_nodes;
-	int block_size;
-} NodeAllocator;
-
-static struct _NodeBlock *
-_node_allocator_create_block(int block_size)
-{
-	struct _NodeBlock *block;
-
-	if(!(block = (struct _NodeBlock *)malloc(sizeof(struct _NodeBlock))))
+	if(!(block = (struct _BucketBlock *)malloc(sizeof(struct _BucketBlock))))
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
 		abort();
 	}
 
-	if(!(block->nodes = (RBNode *)malloc(sizeof(RBNode) * block_size)))
+	if(!(block->lists = (_HashtableItem *)malloc(sizeof(_HashtableItem) * block_size)))
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
 		abort();
@@ -63,18 +42,18 @@ _node_allocator_create_block(int block_size)
 	return block;
 }
 
-static struct _NodePtrBlock *
-_node_allocator_create_ptr_block(int block_size)
+static struct _BucketPtrBlock *
+_bucket_allocator_create_ptr_block(int block_size)
 {
-	struct _NodePtrBlock *block;
+	struct _BucketPtrBlock *block;
 
-	if(!(block = (struct _NodePtrBlock *)malloc(sizeof(struct _NodePtrBlock))))
+	if(!(block = (struct _BucketPtrBlock *)malloc(sizeof(struct _BucketPtrBlock))))
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
 		abort();
 	}
 
-	if(!(block->nodes = (RBNode **)malloc(sizeof(RBNode *) * block_size)))
+	if(!(block->lists = (_HashtableItem **)malloc(sizeof(_HashtableItem *) * block_size)))
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
 		abort();
@@ -86,24 +65,24 @@ _node_allocator_create_ptr_block(int block_size)
 	return block;
 }
 
-static void *
-_node_allocator_alloc(Allocator *allocator)
+static _HashtableItem *
+_bucket_allocator_create_list_item(_BucketAllocator *allocator)
 {
-	NodeAllocator *alloc = (NodeAllocator *)allocator;
-	struct _NodeBlock *block;
-	struct _NodePtrBlock *pblock;
-	RBNode *node = NULL;
+	_BucketAllocator *alloc = (_BucketAllocator *)allocator;
+	struct _BucketBlock *block;
+	struct _BucketPtrBlock *pblock;
+	_HashtableItem *item = NULL;
 
 	/* try to get detached node */
 	if(alloc->free_block)
 	{
-		node = alloc->free_block->nodes[alloc->free_block->offset--];
+		item = alloc->free_block->lists[alloc->free_block->offset--];
 
 		if(alloc->free_block->offset == -1)
 		{
 			pblock = alloc->free_block;
 			alloc->free_block = pblock->next;
-			free(pblock->nodes);
+			free(pblock->lists);
 			free(pblock);
 
 			if(alloc->free_block)
@@ -112,97 +91,78 @@ _node_allocator_alloc(Allocator *allocator)
 			}
 		}
 
-		return node;
+		return item;
 	}
 
 	/* test if we have reached end of the current block */
 	if(alloc->block->offset < alloc->block_size)
 	{
 		/* end not reached => return current node & increment offset */
-		node = &alloc->block->nodes[alloc->block->offset++];
+		item = &alloc->block->lists[alloc->block->offset++];
 	}
 	else
 	{
 		/* end reached => create a new block & prepend it to our list */
-		block = _node_allocator_create_block(alloc->block_size);
+		block = _bucket_allocator_create_block(alloc->block_size);
 		block->next = alloc->block;
 		alloc->block = block;
 
 		/* return first node from current block & increment offset */
-		node = &alloc->block->nodes[alloc->block->offset++];
+		item = &alloc->block->lists[alloc->block->offset++];
 	}
 
-	return node;
+	return item;
 }
 
 static void
-_node_allocator_free(Allocator *allocator, void *ptr)
+_bucket_allocator_free_list_item(_BucketAllocator *allocator, _HashtableItem *item)
 {
-	NodeAllocator *alloc = (NodeAllocator *)allocator;
-	struct _NodePtrBlock *cur;
-
-	if(!alloc->reuse_nodes)
-	{
-		return;
-	}
+	_BucketAllocator *alloc = (_BucketAllocator *)allocator;
+	struct _BucketPtrBlock *cur;
 
 	if(!(cur = alloc->free_block))
 	{
-		alloc->free_block = cur = _node_allocator_create_ptr_block(alloc->block_size);
+		alloc->free_block = cur = _bucket_allocator_create_ptr_block(alloc->block_size);
 	}
 	else if(cur->offset == alloc->block_size)
 	{
-		cur = _node_allocator_create_ptr_block(alloc->block_size);
+		cur = _bucket_allocator_create_ptr_block(alloc->block_size);
 		cur->next = alloc->free_block;
 		alloc->free_block = cur;
 	}
 
-	cur->nodes[cur->offset++] = (RBNode *)ptr;
-}
-
-static NodeAllocator *
-_node_allocator_new(int block_size)
-{
-	NodeAllocator *alloc = NULL;
-
-	if(!(alloc = (NodeAllocator *)malloc(sizeof(NodeAllocator))))
-	{
-		fprintf(stderr, "Couldn't allocate memory.\n");
-		abort();
-	}
-
-	((Allocator *)alloc)->alloc = _node_allocator_alloc;
-	((Allocator *)alloc)->free = _node_allocator_free;
-
-	alloc->block = _node_allocator_create_block(block_size);
-	alloc->reuse_nodes = true;
-	alloc->free_block = NULL;
-	alloc->block_size = block_size;
-
-	return alloc;
+	cur->lists[cur->offset++] = item;
 }
 
 static void
-_node_allocator_destroy(NodeAllocator *alloc)
+_bucket_allocator_init(_BucketAllocator *allocator, int block_size)
 {
-	struct _NodeBlock *block;
-	struct _NodeBlock *iter;
-	struct _NodePtrBlock *pblock;
-	struct _NodePtrBlock *piter;
+	allocator->block = _bucket_allocator_create_block(block_size);
+	allocator->free_block = NULL;
+	allocator->block_size = block_size;
+}
+
+static void
+_bucket_allocator_free(_BucketAllocator *allocator)
+{
+	struct _BucketBlock *block;
+	struct _BucketBlock *iter;
+	struct _BucketPtrBlock *pblock;
+	struct _BucketPtrBlock *piter;
 
 	/* free memory blocks & list */
-	iter = alloc->block;
+	iter = allocator->block;
 
 	while(iter)
 	{
 		block = iter;
 		iter = iter->next;
-		free(block->nodes);
+		free(block->lists);
 		free(block);
 	}
 
 	/* free list containing free nodes */
-	piter = alloc->free_block;
+	piter = allocator->free_block;
 
 	while(piter)
 	{
@@ -210,8 +170,6 @@ _node_allocator_destroy(NodeAllocator *alloc)
 		piter = piter->next;
 		free(pblock);
 	}
-
-	free(alloc);
 }
 
 /*
@@ -275,6 +233,8 @@ hashtable_init(HashTable *table, int32_t size, HashFunc hash_func, EqualFunc com
 	table->hash = hash_func;
 	table->poolptr = table->pool;
 	table->count = 0;
+
+	_bucket_allocator_init(&table->allocator, HASHTABLE_BUCKET_ALLOCATOR_BLOCK_SIZE);
 }
 
 static inline void
@@ -368,6 +328,7 @@ hashtable_free(HashTable *table)
 	}
 	#endif
 
+	_bucket_allocator_free(&table->allocator);
 	free(table->pool);
 }
 
@@ -388,12 +349,6 @@ hashtable_clear(HashTable *table)
 	table->poolptr = table->pool;
 	table->count = 0;
 }
-
-typedef struct
-{
-	void *key;
-	void *value;
-} _HashtableItem;
 
 static bool
 _hashtable_item_equals(void const *a, void const *b)
@@ -447,7 +402,7 @@ hashtable_set(HashTable *table, void * restrict key, void * restrict value, bool
 	}
 	else
 	{
-		item = (_HashtableItem *)malloc(sizeof(_HashtableItem));
+		item = _bucket_allocator_create_list_item(&table->allocator);
 		item->key = key;
 		item->value = value;
 		list_prepend(bucket, item);
@@ -481,7 +436,7 @@ hashtable_remove(HashTable *table, const void *key)
 				table->free_key(item->value);
 			}
 
-			free(item);
+			_bucket_allocator_free_list_item(&table->allocator, item);
 			list_item_set_data(el, NULL);
 
 			list_remove(bucket, el);
