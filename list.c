@@ -90,23 +90,29 @@ list_new(EqualFunc equals, FreeFunc free)
 {
 	List *list;
 
-	assert(equals != NULL);
-
 	if(!(list = (List *)malloc(sizeof(List))))
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
 		abort();
 	}
 
-	memset(list, 0, sizeof(List));
-	list->equals = equals;
-	list->free = free;
+	list_init(&list, equals, free);
 
 	return list;
 }
 
 void
-list_destroy(List *list)
+list_init(List *list, EqualFunc equals, FreeFunc free)
+{
+	assert(equals != NULL);
+
+	memset(list, 0, sizeof(List));
+	list->equals = equals;
+	list->free = free;
+}
+
+void
+list_free(List *list)
 {
 	ListItem *iter;
 	ListItem *item;
@@ -127,6 +133,13 @@ list_destroy(List *list)
 
 		free(item);
 	}
+}
+
+void
+list_destroy(List *list)
+{
+	list_free(list);
+	free(list);
 }
 
 ListItem *

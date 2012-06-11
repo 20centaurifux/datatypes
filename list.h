@@ -25,6 +25,10 @@ typedef struct _List
 
 List *list_new(EqualFunc equals, FreeFunc free);
 
+void list_init(List *list, EqualFunc equals, FreeFunc free);
+
+void list_free(List *list);
+
 void list_destroy(List *list);
 
 ListItem *list_append(List *list, void *data);
