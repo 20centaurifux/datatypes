@@ -355,6 +355,34 @@ list_contains(List *list, void *data)
 	return _list_find(list, NULL, data) ? true : false;
 }
 
+void
+list_clear(List *list)
+{
+	ListItem *iter;
+	ListItem *next;
+
+	assert(list != NULL);
+
+	iter = list->head;
+
+	while(iter)
+	{
+		next = iter->next;
+
+		if(list->free)
+		{
+			list->free(iter->data);
+		}
+
+		free(iter);
+
+		iter = next;
+	}
+
+	list->count = 0;
+	list->head = list->tail = NULL;
+}
+
 ListItem *
 list_find(List *list, ListItem *offset, void const *data)
 {
