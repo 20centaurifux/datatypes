@@ -52,9 +52,7 @@ typedef struct
 {
 	HashTable *table;
 	uint32_t offset;
-	List liter;
-	bool rbiter_set:1;
-	bool rbiter_init:1;
+	ListItem *liter;
 	bool finished:1;
 } HashTableIter;
 
@@ -71,7 +69,6 @@ void *hashtable_lookup(HashTable *table, const void *key);
 bool hashtable_key_exists(HashTable *table, const void *key);
 uint32_t hashtable_count(HashTable *table);
 void hashtable_iter_init(HashTable *table, HashTableIter *iter);
-void hashtable_iter_free(HashTableIter *iter);
 bool hashtable_iter_next(HashTableIter *iter);
 void *hashtable_iter_get_key(HashTableIter *iter);
 void *hashtable_iter_get_value(HashTableIter *iter);

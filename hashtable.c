@@ -235,15 +235,6 @@ hashtable_init(HashTable *table, int32_t size, HashFunc hash_func, EqualFunc com
 	_bucket_allocator_init(&table->allocator, HASHTABLE_BUCKET_ALLOCATOR_BLOCK_SIZE);
 }
 
-static inline void
-_hashtable_destroy_bucket(HashTable *table, int index)
-{
-	if(table->buckets[index])
-	{
-		list_free(table->buckets[index]);
-	}
-}
-
 #if defined(PTHREADS) || defined(WIN32)
 static void *
 _hashtable_destroy_worker(void *arg)
@@ -256,7 +247,10 @@ _hashtable_destroy_worker(void *arg)
 
 	for(i = from ; i < table->size; ++i)
 	{
-		_hashtable_destroy_bucket(table, i);
+		if(table->buckets[i])
+		{
+			list_free(table->buckets[i]);
+		}
 	}
 
 	#ifdef PTHREADS
@@ -288,7 +282,7 @@ hashtable_free(HashTable *table)
 	#endif
 
 	#if defined(PTHREADS) || defined(WIN32)
-	if(table->size >= 512)
+	if(table->size >= 256)
 	{
 		to = table->size / 2;
 
@@ -309,11 +303,14 @@ hashtable_free(HashTable *table)
 
 	for(i = 0; i < to; ++i)
 	{
-		_hashtable_destroy_bucket(table, i);
+		if(table->buckets[i])
+		{
+			list_free(table->buckets[i]);
+		}
 	}
 
 	#if defined(PTHREADS)
-	if(table->size >= 512)
+	if(table->size >= 256)
 	{
 		pthread_join(thread, NULL);
 		pthread_detach(thread);
@@ -330,19 +327,88 @@ hashtable_free(HashTable *table)
 	free(table->pool);
 }
 
+#if defined(PTHREADS) || defined(WIN32)
+static void *
+_hashtable_clear_worker(void *arg)
+{
+	HashTable *table = (HashTable *)arg;
+	int i;
+	int from;
+
+	from = table->size / 2 + 1;
+
+	for(i = from ; i < table->size; ++i)
+	{
+		if(table->buckets[i])
+		{
+			list_clear(table->buckets[i]);
+			table->buckets[i] = NULL;
+		}
+	}
+
+	#ifdef PTHREADS
+	pthread_exit(NULL);
+	#else
+	return NULL;
+	#endif
+}
+
+#endif
 void
 hashtable_clear(HashTable *table)
 {
 	int i;
+	int to;
 
-	for(i = 0; i < table->size; ++i)
+	#if defined(PTHREADS)
+	pthread_t thread;
+	pthread_attr_t attr;
+	#elif defined(WIN32)
+	HANDLE thread = NULL;
+	#endif
+
+	#if defined(PTHREADS) || defined(WIN32)
+	if(table->size >= 256)
+	{
+		to = table->size / 2;
+
+		#ifdef PTHREADS
+		pthread_attr_init(&attr);
+		pthread_create(&thread, &attr, _hashtable_clear_worker, table);
+		#else
+		thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)_hashtable_clear_worker, table, 0, NULL);
+		#endif
+	}
+	else
+	{
+		to = table->size;
+	}
+	#else
+	to = table->size;
+	#endif
+
+	for(i = 0; i < to; ++i)
 	{
 		if(table->buckets[i])
 		{
-			//list_clear(table->buckets[i]); TODO
+			list_clear(table->buckets[i]);
 			table->buckets[i] = NULL;
 		}
 	}
+
+	#if defined(PTHREADS)
+	if(table->size >= 256)
+	{
+		pthread_join(thread, NULL);
+		pthread_detach(thread);
+		pthread_attr_destroy(&attr);
+	}
+	#elif defined(WIN32)
+	if(thread)
+	{
+		WaitForSingleObject(thread, INFINITE);
+	}
+	#endif
 
 	table->poolptr = table->pool;
 	table->count = 0;
@@ -493,7 +559,6 @@ hashtable_count(HashTable *table)
 	return table->count;
 }
 
-/*
 void
 hashtable_iter_init(HashTable *table, HashTableIter *iter)
 {
@@ -501,41 +566,22 @@ hashtable_iter_init(HashTable *table, HashTableIter *iter)
 	iter->table = table;
 }
 
-void
-hashtable_iter_free(HashTableIter *iter)
-{
-	assert(iter != NULL);
-
-	if(iter->rbiter_init)
-	{
-		rbtree_iter_free(&iter->rbiter);
-	}
-}
-
 static inline bool
 _hashtable_iter_get_next_bucket(HashTableIter *iter)
 {
-	while(!iter->rbiter_set && iter->offset < iter->table->size)
+	iter->liter = NULL;
+
+	while(!iter->liter && iter->offset < iter->table->size)
 	{
 		if(iter->table->buckets[iter->offset])
 		{
-			if(iter->rbiter_init)
-			{
-				rbtree_iter_reuse(iter->table->buckets[iter->offset], &iter->rbiter);
-			}
-			else
-			{
-				rbtree_iter_init(iter->table->buckets[iter->offset], &iter->rbiter);
-				iter->rbiter_init = true;
-			}
-
-			iter->rbiter_set = true;
+			iter->liter = list_head(iter->table->buckets[iter->offset]);
 		}
 
 		iter->offset++;
 	}
 
-	return iter->rbiter_set;
+	return iter->liter ? true : false;
 }
 
 bool
@@ -548,9 +594,9 @@ hashtable_iter_next(HashTableIter *iter)
 
 	for( ;; )
 	{
-		if(iter->rbiter_set)
+		if(iter->liter)
 		{
-			if((iter->rbiter_set = rbtree_iter_next(&iter->rbiter)))
+			if((iter->liter = list_item_next(iter->liter)))
 			{
 				return true;
 			}
@@ -563,6 +609,10 @@ hashtable_iter_next(HashTableIter *iter)
 
 				return false;
 			}
+			else
+			{
+				return true;
+			}
 		}
 	}
 }
@@ -572,9 +622,9 @@ hashtable_iter_get_key(HashTableIter *iter)
 {
 	assert(iter != NULL);
 
-	if(iter->rbiter_set)
+	if(iter->liter)
 	{
-		return rbtree_iter_get_key(&iter->rbiter);
+		return ((_HashtableItem *)list_item_get_data(iter->liter))->key;
 	}
 
 	return false;
@@ -585,12 +635,11 @@ hashtable_iter_get_value(HashTableIter *iter)
 {
 	assert(iter != NULL);
 
-	if(iter->rbiter_set)
+	if(iter->liter)
 	{
-		return rbtree_iter_get_value(&iter->rbiter);
+		return ((_HashtableItem *)list_item_get_data(iter->liter))->value;
 	}
 
 	return false;
 }
-*/
 
