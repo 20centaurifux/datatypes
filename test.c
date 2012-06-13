@@ -12,24 +12,24 @@ char buffer[HASHTABLE_TEST_DATA_SIZE];
 char keys[HASHTABLE_KEY_DATA_SIZE];
 int count;
 
+HashTable *table;
+
 static void
 _test_hashtable(void)
 {
 	FILE *in;
-	HashTable *table;
 	char *p = keys;
 	void *v;
 	int i;
 	char key[6];
+
+	count = 0;
 
 	/* create data from test file */
 	memset(keys, 0, HASHTABLE_KEY_DATA_SIZE);
 	in = fopen("test", "rb");
 	fread(buffer, 1, HASHTABLE_TEST_DATA_SIZE, in);
 	fclose(in);
-
-	/* create hashtable */
-	table = hashtable_new(10000000, str_hash, str_compare, NULL, NULL);
 
 	/* insert test data into table (count keys) */
 	for(i = 0; i < HASHTABLE_TEST_DATA_SIZE; i += 5)
@@ -60,16 +60,32 @@ _test_hashtable(void)
 		}
 	}
 
-	printf("%d\n", hashtable_count(table));
+	HashTableIter iter;
 
-	/* cleanup */
-	hashtable_destroy(table);
+	hashtable_iter_init(table, &iter);
+
+	while(hashtable_iter_next(&iter))
+	{
+		count++;
+	}
+
+	printf("%d==%d\n", hashtable_count(table), count);
+
+	hashtable_clear(table);
+
+	printf("%d==%d\n", hashtable_count(table), count);
 }
 
 int
 main(int argc, char *argv[])
 {
+	table = hashtable_new(25000000, str_hash, str_equal, NULL, NULL);
+
 	_test_hashtable();
+	_test_hashtable();
+	_test_hashtable();
+
+	hashtable_destroy(table);
 
 	return 0;
 }
