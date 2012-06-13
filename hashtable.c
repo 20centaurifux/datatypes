@@ -17,160 +17,6 @@
 #define HASHTABLE_BUCKET_ALLOCATOR_BLOCK_SIZE 4096
 
 /*
- *	bucket allocator:
- */
-static struct _BucketBlock *
-_bucket_allocator_create_block(int block_size)
-{
-	struct _BucketBlock *block;
-
-	if(!(block = (struct _BucketBlock *)malloc(sizeof(struct _BucketBlock))))
-	{
-		fprintf(stderr, "Couldn't allocate memory.\n");
-		abort();
-	}
-
-	if(!(block->lists = (_HashtableItem *)malloc(sizeof(_HashtableItem) * block_size)))
-	{
-		fprintf(stderr, "Couldn't allocate memory.\n");
-		abort();
-	}
-
-	block->offset = 0;
-	block->next = NULL;
-
-	return block;
-}
-
-static struct _BucketPtrBlock *
-_bucket_allocator_create_ptr_block(int block_size)
-{
-	struct _BucketPtrBlock *block;
-
-	if(!(block = (struct _BucketPtrBlock *)malloc(sizeof(struct _BucketPtrBlock))))
-	{
-		fprintf(stderr, "Couldn't allocate memory.\n");
-		abort();
-	}
-
-	if(!(block->lists = (_HashtableItem **)malloc(sizeof(_HashtableItem *) * block_size)))
-	{
-		fprintf(stderr, "Couldn't allocate memory.\n");
-		abort();
-	}
-
-	block->offset = 0;
-	block->next = NULL;
-
-	return block;
-}
-
-static _HashtableItem *
-_bucket_allocator_create_list_item(_BucketAllocator *allocator)
-{
-	struct _BucketBlock *block;
-	struct _BucketPtrBlock *pblock;
-	_HashtableItem *item = NULL;
-
-	/* try to get detached node */
-	if(allocator->free_block)
-	{
-		item = allocator->free_block->lists[--allocator->free_block->offset];
-
-		if(!allocator->free_block->offset)
-		{
-			pblock = allocator->free_block;
-			allocator->free_block = pblock->next;
-			free(pblock->lists);
-			free(pblock);
-
-			if(allocator->free_block)
-			{
-				allocator->free_block->offset--;
-			}
-		}
-
-		return item;
-	}
-
-	/* test if we have reached end of the current block */
-	if(allocator->block->offset < allocator->block_size)
-	{
-		/* end not reached => return current node & increment offset */
-		item = &allocator->block->lists[allocator->block->offset++];
-	}
-	else
-	{
-		/* end reached => create a new block & prepend it to our list */
-		block = _bucket_allocator_create_block(allocator->block_size);
-		block->next = allocator->block;
-		allocator->block = block;
-
-		/* return first node from current block & increment offset */
-		item = &allocator->block->lists[allocator->block->offset++];
-	}
-
-	return item;
-}
-
-static void
-_bucket_allocator_free_list_item(_BucketAllocator *allocator, _HashtableItem *item)
-{
-	struct _BucketPtrBlock *cur;
-
-	if(!(cur = allocator->free_block))
-	{
-		allocator->free_block = cur = _bucket_allocator_create_ptr_block(allocator->block_size);
-	}
-	else if(cur->offset == allocator->block_size)
-	{
-		cur = _bucket_allocator_create_ptr_block(allocator->block_size);
-		cur->next = allocator->free_block;
-		allocator->free_block = cur;
-	}
-
-	cur->lists[cur->offset++] = item;
-}
-
-static void
-_bucket_allocator_init(_BucketAllocator *allocator, int block_size)
-{
-	allocator->block = _bucket_allocator_create_block(block_size);
-	allocator->free_block = NULL;
-	allocator->block_size = block_size;
-}
-
-static void
-_bucket_allocator_free(_BucketAllocator *allocator)
-{
-	struct _BucketBlock *block;
-	struct _BucketBlock *iter;
-	struct _BucketPtrBlock *pblock;
-	struct _BucketPtrBlock *piter;
-
-	/* free memory blocks & list */
-	iter = allocator->block;
-
-	while(iter)
-	{
-		block = iter;
-		iter = iter->next;
-		free(block->lists);
-		free(block);
-	}
-
-	/* free list containing free nodes */
-	piter = allocator->free_block;
-
-	while(piter)
-	{
-		pblock = piter;
-		piter = piter->next;
-		free(pblock);
-	}
-}
-
-/*
  *	public:
  */
 #define HASHTABLE_INDEX(table, key) table->hash(key) % table->size
@@ -232,7 +78,7 @@ hashtable_init(HashTable *table, int32_t size, HashFunc hash_func, EqualFunc com
 	table->poolptr = table->pool;
 	table->count = 0;
 
-	_bucket_allocator_init(&table->allocator, HASHTABLE_BUCKET_ALLOCATOR_BLOCK_SIZE);
+	table->allocator = (Allocator *)hungry_allocator_new(sizeof(_HashtableItem), HASHTABLE_BUCKET_ALLOCATOR_BLOCK_SIZE);
 }
 
 #if defined(PTHREADS) || defined(WIN32)
@@ -323,7 +169,7 @@ hashtable_free(HashTable *table)
 	}
 	#endif
 
-	_bucket_allocator_free(&table->allocator);
+	hungry_allocator_destroy((HungryAllocator *)table->allocator);
 	free(table->pool);
 }
 
@@ -466,7 +312,7 @@ hashtable_set(HashTable *table, void * restrict key, void * restrict value, bool
 	}
 	else
 	{
-		item = _bucket_allocator_create_list_item(&table->allocator);
+		item = (_HashtableItem *)table->allocator->alloc(table->allocator);
 		item->key = key;
 		item->value = value;
 		list_prepend(bucket, item);
@@ -500,7 +346,7 @@ hashtable_remove(HashTable *table, const void *key)
 				table->free_key(item->value);
 			}
 
-			_bucket_allocator_free_list_item(&table->allocator, item);
+			table->allocator->free(table->allocator, item);
 			list_item_set_data(el, NULL);
 
 			list_remove(bucket, el);

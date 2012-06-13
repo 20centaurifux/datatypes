@@ -4,6 +4,7 @@
 #include <stdbool.h>
 
 #include "datatypes.h"
+#include "allocator.h"
 #include "list.h"
 
 typedef uint32_t (*HashFunc)(const char *plain);
@@ -45,7 +46,7 @@ typedef struct
 	List *pool;
 	List *poolptr;
 	uint32_t count;
-	_BucketAllocator allocator;
+	Allocator *allocator;
 } HashTable;
 
 typedef struct

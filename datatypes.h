@@ -14,11 +14,5 @@ int32_t int_compare(const void *a, const void *b);
 bool str_equal(const void * restrict a, const void * restrict b);
 bool int_equal(const void * restrict a, const void * restrict b);
 
-typedef struct _Allocator
-{
-	void *(*alloc)(struct _Allocator *allocator);
-	void (*free)(struct _Allocator *allocator, void *ptr);
-} Allocator;
-
 #endif
 
