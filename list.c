@@ -9,11 +9,16 @@
  *	helpers:
  */
 static inline ListItem *
-_list_item_new(void *data)
+_list_item_new(Allocator *allocator, void *data)
 {
-	ListItem *item;
+	ListItem *item = NULL;
 
-	if(!(item = (ListItem *)malloc(sizeof(ListItem))))
+	if(allocator)
+	{
+		item = (ListItem *)allocator->alloc(allocator);
+	}
+
+	if(!item && !(item = (ListItem *)malloc(sizeof(ListItem))))
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
 		abort();
@@ -86,7 +91,7 @@ _list_find(List *list, ListItem *offset, void const *data)
  *	public:
  */
 List *
-list_new(EqualFunc equals, FreeFunc free)
+list_new(EqualFunc equals, FreeFunc free, Allocator *allocator)
 {
 	List *list;
 
@@ -96,19 +101,20 @@ list_new(EqualFunc equals, FreeFunc free)
 		abort();
 	}
 
-	list_init(list, equals, free);
+	list_init(list, equals, free, allocator);
 
 	return list;
 }
 
 void
-list_init(List *list, EqualFunc equals, FreeFunc free)
+list_init(List *list, EqualFunc equals, FreeFunc free, Allocator *allocator)
 {
 	assert(equals != NULL);
 
 	memset(list, 0, sizeof(List));
 	list->equals = equals;
 	list->free = free;
+	list->allocator = allocator;
 }
 
 void
@@ -128,10 +134,17 @@ list_free(List *list)
 
 		if(list->free)
 		{
-			list->free(item);
+			list->free(item->data);
 		}
 
-		free(item);
+		if(list->allocator)
+		{
+			list->allocator->free(list->allocator, item);
+		}
+		else
+		{
+			free(item);
+		}
 	}
 }
 
@@ -149,7 +162,7 @@ list_append(List *list, void *data)
 
 	assert(list != NULL);
 
-	item = _list_item_new(data);
+	item = _list_item_new(list->allocator, data);
 
 	if(list->tail)
 	{
@@ -176,7 +189,7 @@ list_prepend(List *list, void *data)
 
 	assert(list != NULL);
 
-	item = _list_item_new(data);
+	item = _list_item_new(list->allocator, data);
 
 	if(list->head)
 	{
@@ -219,7 +232,7 @@ list_insert_sorted(List *list, void *data, CompareFunc compare)
 		}
 
 		/* insert list item into list */
-		item = _list_item_new(data);
+		item = _list_item_new(list->allocator, data);
 
 		while(iter)
 		{
@@ -246,7 +259,7 @@ list_insert_sorted(List *list, void *data, CompareFunc compare)
 	else
 	{
 		/* insert head */
-		item = _list_item_new(data);
+		item = _list_item_new(list->allocator, data);
 		list->head = item;
 		list->tail = item;
 	}
@@ -276,7 +289,14 @@ list_remove(List *list, ListItem *item)
 		list->free(p->data);
 	}
 
-	free(p);
+	if(list->allocator)
+	{
+		list->allocator->free(list->allocator, p);
+	}
+	else
+	{
+		free(p);
+	}
 
 	list->count--;
 }
@@ -374,7 +394,14 @@ list_clear(List *list)
 			list->free(iter->data);
 		}
 
-		free(iter);
+		if(list->allocator)
+		{
+			//list->allocator->free(list->allocator, iter);
+		}
+		else
+		{
+			free(iter);
+		}
 
 		iter = next;
 	}

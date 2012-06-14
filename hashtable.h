@@ -47,6 +47,7 @@ typedef struct
 	List *poolptr;
 	uint32_t count;
 	Allocator *allocator;
+	Allocator *list_allocator;
 } HashTable;
 
 typedef struct

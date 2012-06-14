@@ -5,6 +5,7 @@
 #include <stdbool.h>
 
 #include "datatypes.h"
+#include "allocator.h"
 
 typedef struct _ListItem
 {
@@ -21,11 +22,12 @@ typedef struct _List
 	uint32_t count;
 	EqualFunc equals;
 	FreeFunc free;
+	Allocator *allocator;
 } List;
 
-List *list_new(EqualFunc equals, FreeFunc free);
+List *list_new(EqualFunc equals, FreeFunc free, Allocator *allocator);
 
-void list_init(List *list, EqualFunc equals, FreeFunc free);
+void list_init(List *list, EqualFunc equals, FreeFunc free, Allocator *allocator);
 
 void list_free(List *list);
 

@@ -14,7 +14,8 @@
 #include "hashtable.h"
 #include "rbtree.h"
 
-#define HASHTABLE_BUCKET_ALLOCATOR_BLOCK_SIZE 4096
+#define HASHTABLE_BUCKET_ALLOCATOR_BLOCK_SIZE 5192
+#define HASTABLE_LIST_ALLOCATOR_BLOCK_SIZE    5192
 
 /*
  *	public:
@@ -78,7 +79,8 @@ hashtable_init(HashTable *table, int32_t size, HashFunc hash_func, EqualFunc com
 	table->poolptr = table->pool;
 	table->count = 0;
 
-	table->allocator = (Allocator *)hungry_allocator_new(sizeof(_HashtableItem), HASHTABLE_BUCKET_ALLOCATOR_BLOCK_SIZE);
+	table->allocator = (Allocator *)g_allocator_new(sizeof(_HashtableItem), HASHTABLE_BUCKET_ALLOCATOR_BLOCK_SIZE);
+	table->list_allocator = (Allocator *)g_allocator_new(sizeof(ListItem), HASTABLE_LIST_ALLOCATOR_BLOCK_SIZE);
 }
 
 #if defined(PTHREADS) || defined(WIN32)
@@ -169,7 +171,8 @@ hashtable_free(HashTable *table)
 	}
 	#endif
 
-	hungry_allocator_destroy((HungryAllocator *)table->allocator);
+	g_allocator_destroy((GAllocator *)table->allocator);
+	g_allocator_destroy((GAllocator *)table->list_allocator);
 	free(table->pool);
 }
 
@@ -286,7 +289,7 @@ hashtable_set(HashTable *table, void * restrict key, void * restrict value, bool
 	if(!(bucket = table->buckets[index]))
 	{
 		bucket = table->buckets[index] = table->poolptr++;
-		list_init(bucket, _hashtable_item_equals, table->free_key);
+		list_init(bucket, _hashtable_item_equals, table->free_key, table->list_allocator);
 	}
 
 	if((el = list_find(bucket, NULL, key)))
