@@ -7,3 +7,8 @@ all:
 	gcc -c allocator.c -o allocator.o $(CFLAGS)
 	gcc -c test.c -o test.o $(CFLAGS)
 	gcc hashtable.o rbtree.o test.o list.o datatypes.o allocator.o -o hashtable $(CFLAGS)
+
+clean:
+	rm *.o
+	rm -f hashtable
+	rm -f hashtable.exe
