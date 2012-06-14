@@ -15,7 +15,6 @@
 #include "rbtree.h"
 
 #define HASHTABLE_BUCKET_ALLOCATOR_BLOCK_SIZE 5192
-#define HASTABLE_LIST_ALLOCATOR_BLOCK_SIZE    5192
 
 /*
  *	public:
@@ -53,6 +52,8 @@ hashtable_new(int32_t size, HashFunc hash_func, EqualFunc compare_keys, FreeFunc
 inline void
 hashtable_init(HashTable *table, int32_t size, HashFunc hash_func, EqualFunc compare_keys, FreeFunc free_key, FreeFunc free_value)
 {
+	int block_div = 1;
+
 	assert(table != NULL);
 	assert(size > 0);
 	assert(size < INT32_MAX - 1);
@@ -80,7 +81,13 @@ hashtable_init(HashTable *table, int32_t size, HashFunc hash_func, EqualFunc com
 	table->count = 0;
 
 	table->allocator = (Allocator *)g_allocator_new(sizeof(_HashtableItem), HASHTABLE_BUCKET_ALLOCATOR_BLOCK_SIZE);
-	table->list_allocator = (Allocator *)g_allocator_new(sizeof(ListItem), HASTABLE_LIST_ALLOCATOR_BLOCK_SIZE);
+
+	if(table->size >= 8)
+	{
+		block_div = 8;
+	}
+
+	table->list_allocator = (Allocator *)g_allocator_new(sizeof(ListItem), table->size / block_div);
 }
 
 #if defined(PTHREADS) || defined(WIN32)
