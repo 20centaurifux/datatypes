@@ -28,10 +28,10 @@ typedef struct
 	} *free_block;
 	int block_size;
 	int item_size;
-} HungryAllocator;
+} GAllocator;
 
-HungryAllocator *hungry_allocator_new(int item_size, int block_size);
-void hungry_allocator_destroy(HungryAllocator *allocator);
+GAllocator *g_allocator_new(int item_size, int block_size);
+void g_allocator_destroy(GAllocator *allocator);
 
 #endif
 

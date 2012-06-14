@@ -1,10 +1,11 @@
-#include "stdlib.h"
-#include "stdio.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <assert.h>
 
 #include "allocator.h"
 
 static struct _MemoryBlock *
-_hungry_allocator_create_block(HungryAllocator *allocator)
+_g_allocator_create_block(GAllocator *allocator)
 {
 	struct _MemoryBlock *block;
 
@@ -27,7 +28,7 @@ _hungry_allocator_create_block(HungryAllocator *allocator)
 }
 
 static struct _MemoryPtrBlock *
-_hungry_allocator_create_ptr_block(HungryAllocator *allocator)
+_g_allocator_create_ptr_block(GAllocator *allocator)
 {
 	struct _MemoryPtrBlock *block;
 
@@ -50,9 +51,9 @@ _hungry_allocator_create_ptr_block(HungryAllocator *allocator)
 }
 
 static void *
-_hungry_allocator_alloc(Allocator *alloc)
+_g_allocator_alloc(Allocator *alloc)
 {
-	HungryAllocator *allocator = (HungryAllocator *)alloc;
+	GAllocator *allocator = (GAllocator *)alloc;
 	struct _MemoryBlock *block;
 	struct _MemoryPtrBlock *pblock;
 	void *item = NULL;
@@ -87,7 +88,7 @@ _hungry_allocator_alloc(Allocator *alloc)
 	else
 	{
 		/* end reached => create a new block & prepend it to our list */
-		block = _hungry_allocator_create_block(allocator);
+		block = _g_allocator_create_block(allocator);
 		block->next = allocator->block;
 		allocator->block = block;
 
@@ -100,18 +101,18 @@ _hungry_allocator_alloc(Allocator *alloc)
 }
 
 static void
-_hungry_allocator_free(Allocator *alloc, void *item)
+_g_allocator_free(Allocator *alloc, void *item)
 {
-	HungryAllocator *allocator = (HungryAllocator *)alloc;
+	GAllocator *allocator = (GAllocator *)alloc;
 	struct _MemoryPtrBlock *cur;
 
 	if(!(cur = allocator->free_block))
 	{
-		allocator->free_block = cur = _hungry_allocator_create_ptr_block(allocator);
+		allocator->free_block = cur = _g_allocator_create_ptr_block(allocator);
 	}
 	else if(cur->offset == allocator->block_size)
 	{
-		cur = _hungry_allocator_create_ptr_block(allocator);
+		cur = _g_allocator_create_ptr_block(allocator);
 		cur->next = allocator->free_block;
 		allocator->free_block = cur;
 	}
@@ -119,12 +120,15 @@ _hungry_allocator_free(Allocator *alloc, void *item)
 	cur->items[cur->offset++] = item;
 }
 
-HungryAllocator *
-hungry_allocator_new(int item_size, int block_size)
+GAllocator *
+g_allocator_new(int item_size, int block_size)
 {
-	HungryAllocator *allocator;
+	GAllocator *allocator;
 
-	if(!(allocator = (HungryAllocator *)malloc(sizeof(HungryAllocator))))
+	assert(item_size > 1);
+	assert(block_size > 1);
+
+	if(!(allocator = (GAllocator *)malloc(sizeof(GAllocator))))
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
 		abort();
@@ -133,16 +137,16 @@ hungry_allocator_new(int item_size, int block_size)
 	allocator->free_block = NULL;
 	allocator->item_size = item_size;
 	allocator->block_size = block_size;
-	allocator->block = _hungry_allocator_create_block(allocator);
+	allocator->block = _g_allocator_create_block(allocator);
 
-	((Allocator *)allocator)->alloc = _hungry_allocator_alloc;
-	((Allocator *)allocator)->free = _hungry_allocator_free;
+	((Allocator *)allocator)->alloc = _g_allocator_alloc;
+	((Allocator *)allocator)->free = _g_allocator_free;
 
 	return allocator;
 }
 
 void
-hungry_allocator_destroy(HungryAllocator *allocator)
+g_allocator_destroy(GAllocator *allocator)
 {
 	struct _MemoryBlock *block;
 	struct _MemoryBlock *iter;
