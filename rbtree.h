@@ -6,6 +6,7 @@
 #include <stdint.h>
 
 #include "datatypes.h"
+#include "allocator.h"
 
 typedef struct _rbnode
 {
