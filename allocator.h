@@ -1,6 +1,8 @@
 #ifndef __ALLOCATOR_H__
 #define __ALLOCATOR_H__
 
+#include <stdint.h>
+
 typedef struct _Allocator
 {
 	void *(*alloc)(struct _Allocator *allocator);

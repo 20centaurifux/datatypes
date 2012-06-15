@@ -1,4 +1,4 @@
-CFLAGS = -Wall -std=c99 -O3 -DPTHREADS -DNDEBUG
+CFLAGS = -Wall -std=c99 -O3 -DNDEBUG -DWIN32
 all:
 	gcc -c hashtable.c -o hashtable.o $(CFLAGS)
 	gcc -c rbtree.c -o rbtree.o $(CFLAGS)

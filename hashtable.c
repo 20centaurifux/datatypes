@@ -3,14 +3,6 @@
 #include <string.h>
 #include <assert.h>
 
-#ifdef PTHREADS
-#include <pthread.h>
-#endif
-
-#ifdef WIN32
-#include <windows.h>
-#endif
-
 #include "hashtable.h"
 #include "rbtree.h"
 
@@ -33,6 +25,7 @@ str_hash(const char *plain)
 
 	return hash;
 }
+
 HashTable *
 hashtable_new(int32_t size, HashFunc hash_func, EqualFunc compare_keys, FreeFunc free_key, FreeFunc free_value)
 {
@@ -90,31 +83,32 @@ hashtable_init(HashTable *table, int32_t size, HashFunc hash_func, EqualFunc com
 	table->list_allocator = (Allocator *)g_allocator_new(sizeof(ListItem), table->size / block_div);
 }
 
-#if defined(PTHREADS) || defined(WIN32)
-static void *
-_hashtable_destroy_worker(void *arg)
+static inline void
+_hashtable_clear_list(HashTable *table, List *list)
 {
-	HashTable *table = (HashTable *)arg;
-	int i;
-	int from;
+	ListItem *head;
+	_HashtableItem *item;
 
-	from = table->size / 2 + 1;
-
-	for(i = from ; i < table->size; ++i)
+	if(list)
 	{
-		if(table->buckets[i])
+		while((head = list_pop(list)))
 		{
-			list_free(table->buckets[i]);
+			item = (_HashtableItem *)head;
+
+			if(table->free_key)
+			{
+				table->free_key(item->key);
+			}
+
+			if(table->free_value)
+			{
+				table->free_value(item->value);
+			}
+
+			table->allocator->free(table->allocator, item);
 		}
 	}
-
-	#ifdef PTHREADS
-	pthread_exit(NULL);
-	#else
-	return NULL;
-	#endif
 }
-#endif
 
 void
 hashtable_destroy(HashTable *table)
@@ -127,144 +121,28 @@ void
 hashtable_free(HashTable *table)
 {
 	int i;
-	int to;
 
-	#if defined(PTHREADS)
-	pthread_t thread;
-	pthread_attr_t attr;
-	#elif defined(WIN32)
-	HANDLE thread = NULL;
-	#endif
-
-	#if defined(PTHREADS) || defined(WIN32)
-	if(table->size >= 256)
+	for(i = 0; i < table->size; ++i)
 	{
-		to = table->size / 2;
-
-		#ifdef PTHREADS
-		pthread_attr_init(&attr);
-		pthread_create(&thread, &attr, _hashtable_destroy_worker, table);
-		#else
-		thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)_hashtable_destroy_worker, table, 0, NULL);
-		#endif
+		_hashtable_clear_list(table, table->buckets[i]);
 	}
-	else
-	{
-		to = table->size;
-	}
-	#else
-	to = table->size;
-	#endif
-
-	for(i = 0; i < to; ++i)
-	{
-		if(table->buckets[i])
-		{
-			list_free(table->buckets[i]);
-		}
-	}
-
-	#if defined(PTHREADS)
-	if(table->size >= 256)
-	{
-		pthread_join(thread, NULL);
-		pthread_detach(thread);
-		pthread_attr_destroy(&attr);
-	}
-	#elif defined(WIN32)
-	if(thread)
-	{
-		WaitForSingleObject(thread, INFINITE);
-	}
-	#endif
 
 	g_allocator_destroy((GAllocator *)table->allocator);
 	g_allocator_destroy((GAllocator *)table->list_allocator);
+	free(table->buckets);
 	free(table->pool);
 }
 
-#if defined(PTHREADS) || defined(WIN32)
-static void *
-_hashtable_clear_worker(void *arg)
-{
-	HashTable *table = (HashTable *)arg;
-	int i;
-	int from;
-
-	from = table->size / 2 + 1;
-
-	for(i = from ; i < table->size; ++i)
-	{
-		if(table->buckets[i])
-		{
-			list_clear(table->buckets[i]);
-			table->buckets[i] = NULL;
-		}
-	}
-
-	#ifdef PTHREADS
-	pthread_exit(NULL);
-	#else
-	return NULL;
-	#endif
-}
-
-#endif
 void
 hashtable_clear(HashTable *table)
 {
 	int i;
-	int to;
 
-	#if defined(PTHREADS)
-	pthread_t thread;
-	pthread_attr_t attr;
-	#elif defined(WIN32)
-	HANDLE thread = NULL;
-	#endif
-
-	#if defined(PTHREADS) || defined(WIN32)
-	if(table->size >= 256)
+	for(i = 0; i < table->size; ++i)
 	{
-		to = table->size / 2;
-
-		#ifdef PTHREADS
-		pthread_attr_init(&attr);
-		pthread_create(&thread, &attr, _hashtable_clear_worker, table);
-		#else
-		thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)_hashtable_clear_worker, table, 0, NULL);
-		#endif
+		_hashtable_clear_list(table, table->buckets[i]);
+		table->buckets[i] = NULL;
 	}
-	else
-	{
-		to = table->size;
-	}
-	#else
-	to = table->size;
-	#endif
-
-	for(i = 0; i < to; ++i)
-	{
-		if(table->buckets[i])
-		{
-			list_clear(table->buckets[i]);
-			table->buckets[i] = NULL;
-		}
-	}
-
-	#if defined(PTHREADS)
-	if(table->size >= 256)
-	{
-		pthread_join(thread, NULL);
-		pthread_detach(thread);
-		pthread_attr_destroy(&attr);
-	}
-	#elif defined(WIN32)
-	if(thread)
-	{
-		WaitForSingleObject(thread, INFINITE);
-	}
-	#endif
 
 	table->poolptr = table->pool;
 	table->count = 0;
@@ -296,7 +174,7 @@ hashtable_set(HashTable *table, void * restrict key, void * restrict value, bool
 	if(!(bucket = table->buckets[index]))
 	{
 		bucket = table->buckets[index] = table->poolptr++;
-		list_init(bucket, _hashtable_item_equals, table->free_key, table->list_allocator);
+		list_init(bucket, _hashtable_item_equals, NULL, table->list_allocator);
 	}
 
 	if((el = list_find(bucket, NULL, key)))
@@ -353,11 +231,12 @@ hashtable_remove(HashTable *table, const void *key)
 
 			if(table->free_value)
 			{
-				table->free_key(item->value);
+				table->free_value(item->value);
 			}
 
-			table->allocator->free(table->allocator, item);
 			list_item_set_data(el, NULL);
+			
+			table->allocator->free(table->allocator, item);
 
 			list_remove(bucket, el);
 			table->count--;

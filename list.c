@@ -305,7 +305,7 @@ void
 list_remove_by_data(List *list, void *data, bool remove_all)
 {
 	ListItem *iter;
-	ListItem *p = NULL;
+	ListItem *next;
 
 	assert(list != NULL);
 	assert(list->equals != NULL);
@@ -316,9 +316,9 @@ list_remove_by_data(List *list, void *data, bool remove_all)
 	{
 		if(list->equals(iter->data, data))
 		{
-			p = iter;
+			next = iter->next;
 			list_remove(list, iter);
-			iter = iter->next;
+			iter = next;
 
 			/* leave loop if we don't have to remove all desired items */
 			if(!remove_all)
@@ -359,7 +359,16 @@ list_pop(List *list)
 		}
 
 		data = item->data;
-		free(item);
+
+		if(list->allocator)
+		{
+			list->allocator->free(list->allocator, item);
+		}
+		else
+		{
+			free(item);
+		}
+
 		list->count--;
 	}
 
@@ -396,7 +405,7 @@ list_clear(List *list)
 
 		if(list->allocator)
 		{
-			//list->allocator->free(list->allocator, iter);
+			list->allocator->free(list->allocator, iter);
 		}
 		else
 		{

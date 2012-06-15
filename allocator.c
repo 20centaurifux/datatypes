@@ -38,7 +38,7 @@ _g_allocator_create_ptr_block(GAllocator *allocator)
 		abort();
 	}
 
-	if(!(block->items = malloc(allocator->item_size * allocator->block_size)))
+	if(!(block->items = (void **)malloc(allocator->block_size * sizeof(void *))))
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
 		abort();
@@ -171,8 +171,11 @@ g_allocator_destroy(GAllocator *allocator)
 	{
 		pblock = piter;
 		piter = piter->next;
+		free(pblock->items);
 		free(pblock);
 	}
+
+	free(allocator);
 }
 
 

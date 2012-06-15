@@ -42,7 +42,7 @@ _test_hashtable(void)
 		}
 		else
 		{
-			hashtable_set(table, p, (void *)((long)v + 1), false);
+			hashtable_set(table, strdup(p), (void *)((long)v + 1), true);
 		}
 
 		p += 6;
@@ -79,12 +79,13 @@ _test_hashtable(void)
 int
 main(int argc, char *argv[])
 {
-	table = hashtable_new(25000000, str_hash, str_equal, NULL, NULL);
+	table = hashtable_new(10000000, str_hash, str_equal, NULL, NULL);
 
 	_test_hashtable();
 	_test_hashtable();
 	_test_hashtable();
 
+	printf("destroy\n");
 	hashtable_destroy(table);
 
 	return 0;
