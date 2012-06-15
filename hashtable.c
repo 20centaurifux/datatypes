@@ -97,8 +97,6 @@ _hashtable_clear_list(HashTable *table, List *list)
 			{
 				table->free_value(item->value);
 			}
-
-			table->allocator->free(table->allocator, item);
 		}
 	}
 }
@@ -114,10 +112,32 @@ void
 hashtable_free(HashTable *table)
 {
 	int i;
+	ListItem *iter;
 
-	for(i = 0; i < table->size; ++i)
+	if(table->free_key || table->free_value)
 	{
-		_hashtable_clear_list(table, table->buckets[i]);
+		for(i = 0; i < table->size; ++i)
+		{
+			if(table->buckets[i])
+			{
+				iter = list_head(table->buckets[i]);
+
+				while(iter)
+				{
+					if(table->free_key)
+					{
+						table->free_key(((_HashtableItem *)list_item_get_data(iter))->key);
+					}
+
+					if(table->free_value)
+					{
+						table->free_value(((_HashtableItem *)list_item_get_data(iter))->value);
+					}
+
+					iter = list_item_next(iter);
+				}
+			}
+		}
 	}
 
 	g_allocator_destroy((GAllocator *)table->allocator);
@@ -130,12 +150,45 @@ void
 hashtable_clear(HashTable *table)
 {
 	int i;
+	ListItem *iter;
 
-	for(i = 0; i < table->size; ++i)
+	if(!table->free_key && !table->free_value)
 	{
-		_hashtable_clear_list(table, table->buckets[i]);
-		table->buckets[i] = NULL;
+		for(i = 0; i < table->size; ++i)
+		{
+			table->buckets[i] = NULL;
+		}
 	}
+	else
+	{
+		for(i = 0; i < table->size; ++i)
+		{
+			if(table->buckets[i])
+			{
+				iter = list_head(table->buckets[i]);
+
+				while(iter)
+				{
+					if(table->free_key)
+					{
+						table->free_key(((_HashtableItem *)list_item_get_data(iter))->key);
+					}
+
+					if(table->free_value)
+					{
+						table->free_value(((_HashtableItem *)list_item_get_data(iter))->value);
+					}
+
+					iter = list_item_next(iter);
+				}
+			}
+
+			table->buckets[i] = NULL;
+		}
+	}
+
+	g_allocator_destroy(table->list_allocator);
+	table->list_allocator = (Allocator *)g_allocator_new(sizeof(ListItem), HASHTABLE_LIST_ALLOCATOR_BLOCK_SIZE);
 
 	table->poolptr = table->pool;
 	table->count = 0;
