@@ -76,31 +76,6 @@ hashtable_init(HashTable *table, int32_t size, HashFunc hash_func, EqualFunc com
 	table->list_allocator = (Allocator *)g_allocator_new(sizeof(ListItem), HASHTABLE_LIST_ALLOCATOR_BLOCK_SIZE);
 }
 
-static inline void
-_hashtable_clear_list(HashTable *table, List *list)
-{
-	ListItem *head;
-	_HashtableItem *item;
-
-	if(list)
-	{
-		while((head = list_pop(list)))
-		{
-			item = (_HashtableItem *)head;
-
-			if(table->free_key)
-			{
-				table->free_key(item->key);
-			}
-
-			if(table->free_value)
-			{
-				table->free_value(item->value);
-			}
-		}
-	}
-}
-
 void
 hashtable_destroy(HashTable *table)
 {
