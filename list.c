@@ -63,25 +63,40 @@ _list_detach(List *list, ListItem *item)
 static ListItem *
 _list_find(List *list, ListItem *offset, void const *data)
 {
-	ListItem *iter;
+	ListItem *begin;
+	ListItem *end;
 
 	if(offset)
 	{
-		iter = offset->next;
+		begin = offset->next;
 	}
 	else
 	{
-		iter = list->head;
+		begin = list->head;
 	}
 
-	while(iter)
+	end = list->tail;
+
+	while(begin)
 	{
-		if(list->equals(iter->data, data))
+		if(list->equals(begin->data, data))
 		{
-			return iter;
+			return begin;
 		}
 
-		iter = iter->next;
+		if(list->equals(end->data, data))
+		{
+			return end;
+		}
+
+		begin = begin->next;
+
+		if(begin == end)
+		{
+			return NULL;
+		}
+
+		end = end->prev;
 	}
 
 	return NULL;
