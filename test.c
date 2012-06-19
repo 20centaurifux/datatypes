@@ -38,7 +38,7 @@ _test_hashtable(void)
 
 		if(!(v = hashtable_lookup(table, p)))
 		{
-			hashtable_set(table, p, (void *)1, false);
+			hashtable_set(table, strdup(p), (void *)1, false);
 		}
 		else
 		{
@@ -79,7 +79,7 @@ _test_hashtable(void)
 int
 main(int argc, char *argv[])
 {
-	table = hashtable_new(10000000, str_hash, str_equal, NULL, NULL);
+	table = hashtable_new(10000000, str_hash, str_equal, free, NULL);
 
 	_test_hashtable();
 	_test_hashtable();
