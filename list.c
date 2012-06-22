@@ -472,38 +472,6 @@ list_empty(List *list)
 	return list->head ? true : false;
 }
 
-inline ListItem *
-list_item_next(ListItem *item)
-{
-	assert(item != NULL);
-
-	return item->next;
-}
-
-inline ListItem *
-list_item_prev(ListItem *item)
-{
-	assert(item != NULL);
-
-	return item->prev;
-}
-
-inline void *
-list_item_get_data(ListItem *item)
-{
-	assert(item != NULL);
-
-	return item->data;
-}
-
-inline void
-list_item_set_data(ListItem *item, void *data)
-{
-	assert(item != NULL);
-
-	item->data = data;
-}
-
 void
 list_reorder(List *list, ListItem *item, CompareFunc compare)
 {

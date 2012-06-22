@@ -59,13 +59,13 @@ void list_clear(List *list);
 
 ListItem *list_find(List *list, ListItem *offset, void const *data);
 
-ListItem *list_item_next(ListItem *item);
+#define list_item_next(item) item->next
 
-ListItem *list_item_prev(ListItem *item);
+#define list_item_prev(item) item->prev
 
-void *list_item_get_data(ListItem *item);
+#define list_item_get_data(item) item->data
 
-void list_item_set_data(ListItem *item, void *data);
+#define list_item_set_data(item, value) item->data = value
 
 void list_reorder(List *list, ListItem *item, CompareFunc compare);
 
