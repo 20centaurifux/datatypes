@@ -136,13 +136,7 @@ hashtable_clear(HashTable *table)
 
 	if(!table->free_key && !table->free_value)
 	{
-		#ifdef OPENMP
-		#pragma omp parallel for
-		#endif
-		for(i = 0; i < table->size; ++i)
-		{
-			table->buckets[i] = NULL;
-		}
+		memset(table->buckets, 0, sizeof(List *) * table->size);
 	}
 	else
 	{
