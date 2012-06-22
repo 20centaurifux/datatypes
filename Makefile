@@ -1,4 +1,4 @@
-CFLAGS = -Wall -std=c99 -O3 -DNDEBUG -DWIN32 -fopenmp
+CFLAGS = -Wall -std=c99 -O3 -DNDEBUG -DOPENMP -fopenmp
 
 all:
 	gcc -c hashtable.c -o hashtable.o $(CFLAGS)

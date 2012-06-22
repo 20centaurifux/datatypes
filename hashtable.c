@@ -2,7 +2,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+
+#ifdef OPENMP
 #include <omp.h>
+#endif
 
 #include "hashtable.h"
 #include "list.h"
@@ -92,7 +95,9 @@ hashtable_free(HashTable *table)
 
 	if(table->free_key || table->free_value)
 	{
+		#ifdef OPENMP
 		#pragma omp parallel for private(iter)
+		#endif
 		for(i = 0; i < table->size; ++i)
 		{
 			if(table->buckets[i])
@@ -131,7 +136,9 @@ hashtable_clear(HashTable *table)
 
 	if(!table->free_key && !table->free_value)
 	{
+		#ifdef OPENMP
 		#pragma omp parallel for
+		#endif
 		for(i = 0; i < table->size; ++i)
 		{
 			table->buckets[i] = NULL;
@@ -139,7 +146,9 @@ hashtable_clear(HashTable *table)
 	}
 	else
 	{
+		#ifdef OPENMP
 		#pragma omp parallel for private(iter)
+		#endif
 		for(i = 0; i < table->size; ++i)
 		{
 			if(table->buckets[i])
