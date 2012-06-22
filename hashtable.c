@@ -2,9 +2,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <omp.h>
 
 #include "hashtable.h"
-#include "rbtree.h"
+#include "list.h"
 
 #define HASHTABLE_BUCKET_ALLOCATOR_BLOCK_SIZE 5192
 #define HASHTABLE_LIST_ALLOCATOR_BLOCK_SIZE   512
@@ -91,6 +92,7 @@ hashtable_free(HashTable *table)
 
 	if(table->free_key || table->free_value)
 	{
+		#pragma omp parallel for private(iter)
 		for(i = 0; i < table->size; ++i)
 		{
 			if(table->buckets[i])
@@ -113,6 +115,7 @@ hashtable_free(HashTable *table)
 				}
 			}
 		}
+		#pragma omp barrier
 	}
 
 	g_allocator_destroy((GAllocator *)table->allocator);
@@ -129,13 +132,16 @@ hashtable_clear(HashTable *table)
 
 	if(!table->free_key && !table->free_value)
 	{
+		#pragma omp parallel for
 		for(i = 0; i < table->size; ++i)
 		{
 			table->buckets[i] = NULL;
 		}
+		#pragma omp barrier
 	}
 	else
 	{
+		#pragma omp parallel for private(iter)
 		for(i = 0; i < table->size; ++i)
 		{
 			if(table->buckets[i])
@@ -160,9 +166,10 @@ hashtable_clear(HashTable *table)
 
 			table->buckets[i] = NULL;
 		}
+		#pragma omp barrier
 	}
 
-	g_allocator_destroy(table->list_allocator);
+	g_allocator_destroy((GAllocator *)table->list_allocator);
 	table->list_allocator = (Allocator *)g_allocator_new(sizeof(ListItem), HASHTABLE_LIST_ALLOCATOR_BLOCK_SIZE);
 
 	table->poolptr = table->pool;
