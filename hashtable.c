@@ -334,7 +334,7 @@ _hashtable_iter_get_next_bucket(HashTableIter *iter)
 
 	while(!iter->liter && iter->offset < iter->table->size)
 	{
-		return iter->table->buckets[iter->offset++];
+		iter->liter = iter->table->buckets[iter->offset++];
 	}
 
 	return iter->liter ? true : false;
