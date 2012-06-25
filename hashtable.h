@@ -5,7 +5,6 @@
 
 #include "datatypes.h"
 #include "allocator.h"
-#include "list.h"
 
 typedef uint32_t (*HashFunc)(const char *plain);
 
@@ -17,44 +16,26 @@ typedef struct
 
 typedef struct
 {
-	/* store blocks of memory in a list */
-	struct _BucketBlock
-	{
-		_HashtableItem *lists;
-		int offset;
-		struct _BucketBlock *next;
-	} *block;
-	/* store free nodes in blocks containing pointers */
-	struct _BucketPtrBlock
-	{
-		_HashtableItem **lists;
-		int offset;
-		struct _BucketPtrBlock *next;
-		struct _BucketPtrBlock *prev;
-	} *free_block;
-	int block_size;
-} _BucketAllocator;
-
-typedef struct
-{
 	EqualFunc compare_keys;
 	FreeFunc free_key;
 	FreeFunc free_value;
 	HashFunc hash;
 	int32_t size;
-	List **buckets;
-	List *pool;
-	List *poolptr;
+	struct _Bucket
+	{
+		void *key;
+		void *data;
+		void *next;
+	} **buckets;
 	uint32_t count;
 	Allocator *allocator;
-	Allocator *list_allocator;
 } HashTable;
 
 typedef struct
 {
 	HashTable *table;
 	uint32_t offset;
-	ListItem *liter;
+	struct _Bucket *liter;
 	bool finished:1;
 } HashTableIter;
 

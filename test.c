@@ -79,7 +79,7 @@ _test_hashtable(void)
 int
 main(int argc, char *argv[])
 {
-	table = hashtable_new(10000000, str_hash, str_equal, free, NULL);
+	table = hashtable_new(20000000, str_hash, str_equal, free, NULL);
 
 	_test_hashtable();
 	_test_hashtable();
