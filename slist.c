@@ -221,7 +221,7 @@ slist_remove(SList *list, SListIter *iter)
 
 	assert(list != NULL);
 	assert(list->head != NULL);
-	assert(item != NULL);
+	assert(iter != NULL);
 
 	p = iter->cur;
 
@@ -410,7 +410,7 @@ slist_iter_next(SListIter *iter)
 {
 	SListItem *next;
 
-	assert(item != NULL);
+	assert(iter != NULL);
 
 	if(iter->finished)
 	{
@@ -443,7 +443,7 @@ slist_iter_next(SListIter *iter)
 inline void *
 slist_iter_get_data(SListIter *iter)
 {
-	assert(item != NULL);
+	assert(iter != NULL);
 
 	if(iter->cur)
 	{
@@ -456,7 +456,7 @@ slist_iter_get_data(SListIter *iter)
 inline void
 slist_iter_set_data(SListIter *iter, void *data)
 {
-	assert(item != NULL);
+	assert(iter != NULL);
 
 	if(!iter->finished)
 	{
