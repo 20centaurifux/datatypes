@@ -109,6 +109,7 @@ hashtable_free(HashTable *table)
 				}
 			}
 		}
+		#pragma omp barrier
 	}
 
 	g_allocator_destroy((GAllocator *)table->allocator);
@@ -152,6 +153,7 @@ hashtable_clear(HashTable *table)
 
 			table->buckets[i] = NULL;
 		}
+		#pragma omp barrier
 	}
 
 	g_allocator_destroy((GAllocator *)table->allocator);
