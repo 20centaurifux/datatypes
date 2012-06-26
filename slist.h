@@ -115,6 +115,16 @@ SListItem *slist_append(SList *list, void *data);
 SListItem *slist_prepend(SList *list, void *data);
 
 /**
+ *\param list a List
+ *\param data data to insert
+ *\param compare function to compare list item data
+ *\return a new ListItem
+ *
+ * Inserts data into list, using the given comparison function to determine its position.
+ */
+SListItem *slist_insert_sorted(SList *list, void *data, CompareFunc compare);
+
+/**
  *\param list a SList
  *\return head of the list
  *

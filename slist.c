@@ -212,6 +212,66 @@ slist_prepend(SList *list, void *data)
 	return item;
 }
 
+SListItem *
+slist_insert_sorted(SList *list, void *data, CompareFunc compare)
+{
+	SListItem *iter;
+	SListItem *item;
+	SListItem *prev = NULL;
+
+	assert(list != NULL);
+	assert(compare != NULL);
+
+	if((iter = list->head))
+	{
+		/* test if new item can be appended */
+		if(compare(list->tail->data, data) <= 0)
+		{
+			return slist_append(list, data);
+		}
+		else if(list->count == 1)
+		{
+			/* prepend item */
+			return list_prepend(list, data);
+		}
+
+		/* insert list item into list */
+		item = _slist_item_new(list->allocator, data);
+
+		while(iter)
+		{
+			if(compare(iter->data, data) >= 0)
+			{
+				if(prev)
+				{
+					prev->next = item;
+				}
+				else
+				{
+					list->head = item;
+				}
+
+				item->next = iter;
+				break;
+			}
+
+			prev = iter;
+			iter = iter->next;
+		}
+	}
+	else
+	{
+		/* insert head */
+		item = _slist_item_new(list->allocator, data);
+		list->head = item;
+		list->tail = item;
+	}
+
+	list->count++;
+
+	return item;
+}
+
 void
 slist_remove(SList *list, SListItem *item)
 {
