@@ -1,5 +1,5 @@
 /***************************************************************************
-    begin........: April 2010
+    begin........: May 2012
     copyright....: Sebastian Fedrau
     email........: lord-kefir@arcor.de
  ***************************************************************************/
@@ -16,10 +16,10 @@
  ***************************************************************************/
 /*!
  * \file hashtable.h
- * \brief Hashtable implementation.
+ * \brief A generic hashtable.
  * \author Sebastian Fedrau <lord-kefir@arcor.de>
  * \version 0.1.0
- * \date 28. December 2010
+ * \date 26. June 2012
  */
 
 #ifndef __HASHTABLE_H__
@@ -97,10 +97,10 @@ uint32_t str_hash(const char *plain);
 
 /**
  *\param size size of the hash table
- *\param function to create hash from a key
- *\param function to check equality of two keys
- *\param function to free keys
- *\param function to free values
+ *\param hash_func function to create hash from a key
+ *\param compare_keys function to check equality of two keys
+ *\param free_key function to free keys or NULL
+ *\param free_value function to free values OR NULL
  *\return a new HashTable
  *
  * Creates a new HashTable.
@@ -110,10 +110,10 @@ HashTable *hashtable_new(int32_t size, HashFunc hash_func, EqualFunc compare_key
 /**
  *\param table a HashTable
  *\param size size of the hash table
- *\param function to create hash from a key
- *\param function to check equality of two keys
- *\param function to free keys
- *\param function to free values
+ *\param hash_func function to create hash from a key
+ *\param compare_keys function to check equality of two keys
+ *\param free_key function to free keys OR NULL
+ *\param free_value function to free values OR NULL
  *
  * Initializes a HashTable.
  */
@@ -122,7 +122,7 @@ void hashtable_init(HashTable *table, int32_t size, HashFunc hash_func, EqualFun
 /**
  *\param table a HashTable
  *
- * Destroys all keys and values in the HashTable. Will also free memory allocated for the HashTable instance.
+ * Destroys all keys and values in the HashTable. Frees also memory allocated for the HashTable instance.
  */
 void hashtable_destroy(HashTable *table);
 
