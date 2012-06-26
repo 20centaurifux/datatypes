@@ -30,33 +30,31 @@ _slist_item_new(Allocator *allocator, void *data)
 	return item;
 }
 
-static bool
-_slist_find(SList *list, void const *data, SListIter *iter)
+static SListItem *
+_slist_find(SList *list, SListItem *offset, void const *data)
 {
 	SListItem *p;
 
-	memset(iter, 0, sizeof(SListIter));
-
-	p = list->head;
+	if(offset)
+	{
+		p = offset;
+	}
+	else
+	{
+		p = list->head;
+	}
 
 	while(p)
 	{
-		iter->next = p->next;
-
 		if(list->equals(p->data, data))
 		{
-			iter->cur = p;
-
-			return true;
+			return p;
 		}
 
-		iter->prev = p;
 		p = p->next;
 	}
 
-	iter->finished = true;
-
-	return false;
+	return NULL;
 }
 
 static void
@@ -215,35 +213,30 @@ slist_prepend(SList *list, void *data)
 }
 
 void
-slist_remove(SList *list, SListIter *iter)
+slist_remove(SList *list, SListItem *item)
 {
 	SListItem *p;
+	SListItem *prev = NULL;
 
 	assert(list != NULL);
 	assert(list->head != NULL);
 	assert(iter != NULL);
 
-	p = iter->cur;
+	p = list->head;
 
-	/* remove list item */
-	_slist_remove(list, iter->prev, iter->cur);
-
-	/* free allocated memory */
-	if(list->free)
+	while(p)
 	{
-		list->free(p->data);
-	}
+		if(p == item)
+		{
+			/* remove list item */
+			_slist_remove(list, prev, p);
+			list->count--;
+			break;
+		}
 
-	if(list->allocator)
-	{
-		list->allocator->free(list->allocator, p);
+		prev = p;
+		p = p->next;
 	}
-	else
-	{
-		free(p);
-	}
-
-	list->count--;
 }
 
 void
@@ -320,12 +313,10 @@ slist_pop(SList *list)
 bool
 slist_contains(SList *list, void *data)
 {
-	SListIter iter;
-
 	assert(list != NULL);
 	assert(list->equals != NULL);
 
-	return _slist_find(list, data, &iter);
+	return _slist_find(list, NULL, data) ? true : false;
 }
 
 void
@@ -363,30 +354,10 @@ slist_clear(SList *list)
 	list->head = list->tail = NULL;
 }
 
-bool
-slist_find(SList *list, void const *data, SListIter *iter)
+SListItem *
+slist_find(SList *list, SListItem *offset, void const *data)
 {
-	return _slist_find(list, data, iter);
-}
-
-inline void
-slist_iter_init(SList *list, SListIter *iter)
-{
-	assert(list != NULL);
-
-	if(list->head)
-	{
-		iter->prev = NULL;
-		iter->next = list->head->next;
-		iter->cur = list->head;
-		iter->finished = false;
-		iter->head = false;
-	}
-	else
-	{
-		memset(iter, 0, sizeof(SListIter));
-		iter->finished = true;
-	}
+	return _slist_find(list, offset, data);
 }
 
 inline uint32_t
@@ -397,70 +368,19 @@ slist_count(SList *list)
 	return list->count;
 }
 
+inline SListItem *
+slist_head(SList *list)
+{
+	assert(list != NULL);
+
+	return list->head;
+}
+
 inline bool
 slist_empty(SList *list)
 {
 	assert(list != NULL);
 
 	return list->head ? true : false;
-}
-
-inline bool
-slist_iter_next(SListIter *iter)
-{
-	SListItem *next;
-
-	assert(iter != NULL);
-
-	if(iter->finished)
-	{
-		return false;
-	}
-
-	if(iter->head)
-	{
-		if((next = iter->next))
-		{
-			iter->prev = iter->cur;
-			iter->cur = next;
-			iter->next = next->next;
-		}
-		else
-		{
-			iter->finished = true;
-
-			return false;
-		}
-	}
-	else
-	{
-		iter->head = true;
-	}
-
-	return true;
-}
-
-inline void *
-slist_iter_get_data(SListIter *iter)
-{
-	assert(iter != NULL);
-
-	if(iter->cur)
-	{
-		return iter->cur->data;
-	}
-
-	return NULL;
-}
-
-inline void
-slist_iter_set_data(SListIter *iter, void *data)
-{
-	assert(iter != NULL);
-
-	if(!iter->finished)
-	{
-		iter->cur->data = data;
-	}
 }
 

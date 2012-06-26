@@ -44,24 +44,6 @@ typedef struct _SListItem
 } SListItem;
 
 /**
- * \struct SListIter
- * \brief A structure to iterate over the elements of a SList.
- */
-typedef struct
-{
-	/*! Pointer to net list element. */
-	SListItem *next;
-	/*! Pointer to previous list element. */
-	SListItem *prev;
-	/*! Pointer to current list element. */
-	SListItem *cur;
-	/*! true if iterator has been completed. */
-	bool finished:1;
-	/*! false until first iteration. */
-	bool head:1;
-} SListIter;
-
-/**
  * \struct _SList
  * \brief A singly-linked list.
  */
@@ -134,6 +116,14 @@ SListItem *slist_prepend(SList *list, void *data);
 
 /**
  *\param list a SList
+ *\return head of the list
+ *
+ * Gets the head of the list.
+ */
+SListItem *slist_head(SList *list);
+
+/**
+ *\param list a SList
  *\return number of items
  *
  * Gets the number of items.
@@ -154,7 +144,7 @@ bool slist_empty(SList *list);
  *
  * Removes an item from the list.
  */
-void slist_remove(SList *list, SListIter *iter);
+void slist_remove(SList *list, SListItem *iter);
 
 /**
  *\param list a SList
@@ -192,18 +182,20 @@ void slist_clear(SList *list);
  *\param list a SList
  *\param offset position to start search from
  *\param data data to search
+ *\return found SListItem or NULL
  *
  * Searches for given data.
  */
-bool slist_find(SList *list, void const *data, SListIter *iter);
+SListItem *slist_find(SList *list, SListItem *offset, void const *data);
 
-void slist_iter_init(SList *list, SListIter *iter);
+/*! Get next list item. */
+#define slist_item_next(item) item->next
 
-bool slist_iter_next(SListIter *iter);
+/*! Get list item's data. */
+#define slist_item_get_data(item) item->data
 
-void *slist_iter_get_data(SListIter *iter);
-
-void slist_iter_set_data(SListIter *iter, void *data);
+/*! Set list item's data. */
+#define slist_item_set_data(item, value) item->data = value
 
 #endif
 
