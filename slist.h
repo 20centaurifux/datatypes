@@ -207,5 +207,13 @@ SListItem *slist_find(SList *list, SListItem *offset, void const *data);
 /*! Set list item's data. */
 #define slist_item_set_data(item, value) item->data = value
 
+/**
+ *\param list a SList
+ *\param item a SListItem
+ *\param compare function to compare list item data
+ *
+ * Arrange given SListItem in order, using the given comparison function to determine its position.
+ */
+void slist_reorder(SList *list, SListItem *item, CompareFunc compare);
 #endif
 

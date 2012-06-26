@@ -444,3 +444,75 @@ slist_empty(SList *list)
 	return list->head ? true : false;
 }
 
+void
+slist_reorder(SList *list, SListItem *item, CompareFunc compare)
+{
+	SListItem *iter;
+	SListItem *prev = NULL;
+	bool inserted = false;
+
+	assert(list != NULL);
+	assert(item != NULL);
+
+	/* detach list item */
+	iter = list->head;
+
+	while(iter)
+	{
+		if(iter == item)
+		{
+			if(prev)
+			{
+				prev->next = iter->next;
+			}
+			else
+			{
+				list->head = iter->next;
+			}
+
+			if(list->tail == item)
+			{
+				list->tail = prev;
+			}
+
+			break;
+		}
+
+		prev = iter;
+		iter = iter->next;
+	}
+
+	/* insert list item */
+	iter = list->head;
+	prev = NULL;
+
+	while(iter)
+	{
+		if(compare(iter->data, item->data) >= 0)
+		{
+			if(prev)
+			{
+				prev->next = item;
+			}
+			else
+			{
+				list->head = item;
+			}
+
+			item->next = iter;
+			inserted = true;
+			break;
+		}
+
+		prev = iter;
+		iter = iter->next;
+	}
+
+	if(!inserted)
+	{
+		list->tail->next = item;
+		list->tail = item;
+		item->next = NULL;
+	}
+}
+
