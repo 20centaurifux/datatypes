@@ -203,6 +203,7 @@ void list_clear(List *list);
  *\param list a List
  *\param offset position to start search from
  *\param data data to search
+ *\param found ListItem or NULL
  *
  * Searches for given data.
  */
