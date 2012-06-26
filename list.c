@@ -476,14 +476,10 @@ void
 list_reorder(List *list, ListItem *item, CompareFunc compare)
 {
 	ListItem *iter;
+	bool inserted = false;
 
 	assert(list != NULL);
 	assert(item != NULL);
-
-	if(list->head == item)
-	{
-		return;
-	}
 
 	/* detach list item */
 	_list_detach(list, item);
@@ -497,20 +493,29 @@ list_reorder(List *list, ListItem *item, CompareFunc compare)
 		{
 			if(iter->prev)
 			{
+				item->prev = iter->prev;
 				iter->prev->next = item;
 			}
 			else
 			{
 				list->head = item;
+				item->prev = NULL;
 			}
 
 			item->next = iter;
-			item->prev = iter->prev;
-			iter->prev = item;
+			inserted = true;
 			break;
 		}
 
 		iter = iter->next;
+	}
+
+	if(!inserted)
+	{
+		list->tail->next = item;
+		item->prev = list->tail;
+		list->tail = item;
+		item->next = NULL;
 	}
 }
 
