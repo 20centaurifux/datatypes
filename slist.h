@@ -15,7 +15,7 @@
     General Public License for more details.
  ***************************************************************************/
 /*!
- * \file list.h
+ * \file slist.h
  * \brief A singly-linked list.
  * \author Sebastian Fedrau <lord-kefir@arcor.de>
  * \version 0.1.0
