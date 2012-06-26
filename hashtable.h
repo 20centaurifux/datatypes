@@ -1,3 +1,27 @@
+/***************************************************************************
+    begin........: April 2010
+    copyright....: Sebastian Fedrau
+    email........: lord-kefir@arcor.de
+ ***************************************************************************/
+
+/***************************************************************************
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    General Public License for more details.
+ ***************************************************************************/
+/*!
+ * \file hashtable.h
+ * \brief Hashtable implementation.
+ * \author Sebastian Fedrau <lord-kefir@arcor.de>
+ * \version 0.1.0
+ * \date 28. December 2010
+ */
+
 #ifndef __HASHTABLE_H__
 #define __HASHTABLE_H__
 
@@ -6,54 +30,192 @@
 #include "datatypes.h"
 #include "allocator.h"
 
+/*! Specifies the type of the hash function which is passed to hashtable_new() or hashtable_init(). */
 typedef uint32_t (*HashFunc)(const char *plain);
 
+/**
+ * \struct HashTable
+ * \brief A datatype to create associations between keys and values.
+ */
 typedef struct
 {
-	void *key;
-	void *value;
-} _HashtableItem;
-
-typedef struct
-{
+	/*! A function to check equality of two keys. */
 	EqualFunc compare_keys;
+	/*! A function to free keys. */
 	FreeFunc free_key;
+	/*! A function to free values. */
 	FreeFunc free_value;
+	/*! A function to create a hash from a value. */
 	HashFunc hash;
+	/*! Size of the hash table. */
 	int32_t size;
+	/**
+	 *\struct _Bucket
+	 *\brief A singly-linked list implementation.
+	 *
+	 *\var buckets
+	 *\brief An array containing pointers to lists.
+	 */
 	struct _Bucket
 	{
+		/*! Key of the element. */
 		void *key;
+		/*! Value of the element. */
 		void *data;
-		void *next;
+		/*! Pointer to next list element */
+		struct _Bucket *next;
 	} **buckets;
+	/*! Number of stored elements. */
 	uint32_t count;
+	/*! Allocator used to create/destroy list elements. */
 	Allocator *allocator;
 } HashTable;
 
+/**
+ * \struct HashTableIter
+ * \brief A structure to iterate over the elements of a HashTable.
+ */
 typedef struct
 {
+	/*! Pointer to the associated HashTable. */
 	HashTable *table;
+	/*! Index of current bucket. */
 	uint32_t offset;
+	/*! Pointer to current list element. */
 	struct _Bucket *liter;
-	bool finished:1;
+	/*! true if iteration has been completed. */
+	bool finished;
 } HashTableIter;
 
+/**
+ *\param plain plain text
+ *\return a hash value
+ *
+ * Hash of the given plain text.
+ */
 uint32_t str_hash(const char *plain);
 
+/**
+ *\param size size of the hash table
+ *\param function to create hash from a key
+ *\param function to check equality of two keys
+ *\param function to free keys
+ *\param function to free values
+ *\return a new HashTable
+ *
+ * Creates a new HashTable.
+ */
 HashTable *hashtable_new(int32_t size, HashFunc hash_func, EqualFunc compare_keys, FreeFunc free_key, FreeFunc free_value);
+
+/**
+ *\param table a HashTable
+ *\param size size of the hash table
+ *\param function to create hash from a key
+ *\param function to check equality of two keys
+ *\param function to free keys
+ *\param function to free values
+ *
+ * Initializes a HashTable.
+ */
 void hashtable_init(HashTable *table, int32_t size, HashFunc hash_func, EqualFunc compare_keys, FreeFunc free_key, FreeFunc free_value);
+
+/**
+ *\param table a HashTable
+ *
+ * Destroys all keys and values in the HashTable. Will also free memory allocated for the HashTable instance.
+ */
 void hashtable_destroy(HashTable *table);
+
+/**
+ *\param table a HashTable
+ *
+ * Destroys all keys and values in the HashTable.
+ */
 void hashtable_free(HashTable *table);
+
+/**
+ *\param table a HashTable
+ *
+ * Removes all elements from the HashTable.
+ */
 void hashtable_clear(HashTable *table);
+
+/**
+ *\param table a HashTable
+ *\param key a key to insert
+ *\param value the value to associate with the key
+ *\param overwrite_key true to overwrite already exisiting keys
+ *
+ * Inserts a new key and value in the HashTable. If overwrite_key has been set an exisiting key will be
+ * freed using the specified free_key function and then get replaced afterwards.
+ */
 void hashtable_set(HashTable *table, void * restrict key, void * restrict value, bool overwrite_key);
+
+/**
+ *\param table a HashTable
+ *\param key a key
+ *
+ * Removes an element from the HashTable.
+ */
 void hashtable_remove(HashTable *table, const void *key);
+
+/**
+ *\param table a HashTable
+ *\param key a key
+ *\return a key
+ *
+ * Looks up a key in the HashTable and returns its key.
+ */
 void *hashtable_lookup(HashTable *table, const void *key);
+
+/**
+ *\param table a HashTable
+ *\param key a key
+ *\return true if given key does exist
+ *
+ * Checks if a key does exist.
+ */
 bool hashtable_key_exists(HashTable *table, const void *key);
+
+/**
+ *\param table a HashTable
+ *\return number of stored elements
+ *
+ * Gets the number of stored elements.
+ */
 uint32_t hashtable_count(HashTable *table);
+
+/**
+ *\param table a HashTable
+ *\param an uninitialized HashTableIter
+ *
+ * Initializes a key/value pair iterator and associates it with hash_table. Modifying the table while
+ * using the iterator might lead to undefined behaviour.
+ */
 void hashtable_iter_init(HashTable *table, HashTableIter *iter);
+
+/**
+ *\param iter a HashTableIter
+ *\return false if end of the HashTable has been reached
+ *
+ * Go to next element of Hashtable.
+ */
 bool hashtable_iter_next(HashTableIter *iter);
+
+/**
+ *\param iter a HashTableIter
+ *\return key of current element
+ *
+ * Retrieves the key of the current element.
+ */
 void *hashtable_iter_get_key(HashTableIter *iter);
+
+/**
+ *\param iter a HashTableIter
+ *\return value of current element
+ *
+ * Retrieves the value of the current element.
+ */
 void *hashtable_iter_get_value(HashTableIter *iter);
 
 #endif
