@@ -34,8 +34,8 @@
 typedef uint32_t (*HashFunc)(const char *plain);
 
 /**
- * \struct HashTable
- * \brief A datatype to create associations between keys and values.
+ *\struct HashTable
+ *\brief A datatype to create associations between keys and values.
  */
 typedef struct
 {
@@ -72,8 +72,8 @@ typedef struct
 } HashTable;
 
 /**
- * \struct HashTableIter
- * \brief A structure to iterate over the elements of a HashTable.
+ *\struct HashTableIter
+ *\brief A structure to iterate over the elements of a HashTable.
  */
 typedef struct
 {
@@ -147,7 +147,7 @@ void hashtable_clear(HashTable *table);
  *\param overwrite_key true to overwrite already exisiting keys
  *
  * Inserts a new key and value in the HashTable. If overwrite_key has been set an exisiting key will be
- * freed using the specified free_key function and then get replaced afterwards.
+ * freed using the specified free_key function and then get replaced.
  */
 void hashtable_set(HashTable *table, void * restrict key, void * restrict value, bool overwrite_key);
 
@@ -164,7 +164,7 @@ void hashtable_remove(HashTable *table, const void *key);
  *\param key a key
  *\return a key
  *
- * Looks up a key in the HashTable and returns its key.
+ * Looks up a key in the HashTable and returns its value.
  */
 void *hashtable_lookup(HashTable *table, const void *key);
 
@@ -189,7 +189,7 @@ uint32_t hashtable_count(HashTable *table);
  *\param table a HashTable
  *\param an uninitialized HashTableIter
  *
- * Initializes a key/value pair iterator and associates it with hash_table. Modifying the table while
+ * Initializes a key/value pair iterator and associates it with the table. Modifying the table while
  * using the iterator might lead to undefined behaviour.
  */
 void hashtable_iter_init(HashTable *table, HashTableIter *iter);

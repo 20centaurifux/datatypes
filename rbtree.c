@@ -1,3 +1,27 @@
+/***************************************************************************
+    begin........: May 2012
+    copyright....: Sebastian Fedrau
+    email........: lord-kefir@arcor.de
+ ***************************************************************************/
+
+/***************************************************************************
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    General Public License for more details.
+ ***************************************************************************/
+/*!
+ * \file rbtree.c
+ * \brief A generic balanced binary tree.
+ * \author Sebastian Fedrau <lord-kefir@arcor.de>
+ * \version 0.1.0
+ * \date 26. June 2012
+ */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -880,31 +904,5 @@ rbtree_iter_next(RBTreeIter *iter)
 	}
 
 	return true;
-}
-
-void inline *
-rbtree_iter_get_key(RBTreeIter *iter)
-{
-	assert(iter != NULL);
-
-	if(iter->sp && iter->sp->node)
-	{
-		return iter->sp->node->key;
-	}
-
-	return NULL;
-}
-
-void inline *
-rbtree_iter_get_value(RBTreeIter *iter)
-{
-	assert(iter != NULL);
-
-	if(iter->sp && iter->sp->node)
-	{
-		return iter->sp->node->value;
-	}
-
-	return NULL;
 }
 
