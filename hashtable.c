@@ -33,12 +33,13 @@
 
 #include "hashtable.h"
 
-#define HASHTABLE_BUCKET_ALLOCATOR_BLOCK_SIZE 5192
+/*! Memory allocator block size. */
 #define HASHTABLE_LIST_ALLOCATOR_BLOCK_SIZE   512
 
 /*
  *	public:
  */
+/*! Calculates table index of a key. */
 #define HASHTABLE_INDEX(table, key) table->hash(key) % table->size
 
 uint32_t inline

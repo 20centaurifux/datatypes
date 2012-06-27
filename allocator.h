@@ -28,7 +28,7 @@
 #include <stdint.h>
 
 /**
- *\struct _Allocator
+ *\struct Allocator
  *\brief A memory allocator.
  */
 typedef struct _Allocator
@@ -52,6 +52,9 @@ typedef struct
 	/**
 	 *\struct _MemoryBlock
 	 *\brief Blocks of memory are stored in a singly-linked list.
+	 *
+	 *\var block
+	 *\brief First memory block.
 	 */
 	struct _MemoryBlock
 	{
@@ -65,6 +68,9 @@ typedef struct
 	/**
 	 *\struct _MemoryPtrBlock
 	 *\brief Freed pointers are stored in blocks holding addresses.
+	 *
+	 *\var free_block
+	 *\brief First pointer block.
 	 */
 	struct _MemoryPtrBlock
 	{

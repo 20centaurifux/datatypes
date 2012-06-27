@@ -32,7 +32,7 @@
 #include "allocator.h"
 
 /**
- * \struct _SListItem
+ * \struct SListItem
  * \brief Structure holding list item data.
  */
 typedef struct _SListItem
@@ -44,7 +44,7 @@ typedef struct _SListItem
 } SListItem;
 
 /**
- * \struct _SList
+ * \struct SList
  * \brief A singly-linked list.
  */
 typedef struct _SList
@@ -154,7 +154,7 @@ bool slist_empty(SList *list);
  *
  * Removes an item from the list.
  */
-void slist_remove(SList *list, SListItem *iter);
+void slist_remove(SList *list, SListItem *item);
 
 /**
  *\param list a SList
@@ -175,6 +175,7 @@ void *slist_pop(SList *list);
 
 /**
  *\param list a SList
+ *\param data data to search
  *\return true if data exists in list
  *
  * Test if list contains given data.

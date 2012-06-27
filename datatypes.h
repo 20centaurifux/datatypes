@@ -49,7 +49,7 @@ int32_t int_compare(const void *a, const void *b);
 
 /**
  *\param a pointer to a string
- *\param a pointer to a string
+ *\param b pointer to a string
  *\return true if values are equal
  *
  * Checks if two strings are equal.
@@ -58,7 +58,7 @@ bool str_equal(const void * restrict a, const void * restrict b);
 
 /**
  *\param a pointer to an integer
- *\param a pointer to an integer
+ *\param b pointer to an integer
  *\return true if values are equal
  *
  * Checks if two integers are equal.

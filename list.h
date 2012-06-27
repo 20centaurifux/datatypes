@@ -32,7 +32,7 @@
 #include "allocator.h"
 
 /**
- * \struct _ListItem
+ * \struct ListItem
  * \brief Structure holding list item data.
  */
 typedef struct _ListItem
@@ -186,6 +186,7 @@ void *list_pop(List *list);
 
 /**
  *\param list a List
+ *\param data data
  *\return true if data exists in list
  *
  * Test if list contains given data.
@@ -203,7 +204,7 @@ void list_clear(List *list);
  *\param list a List
  *\param offset position to start search from
  *\param data data to search
- *\param found ListItem or NULL
+ *\return found ListItem or NULL
  *
  * Searches for given data.
  */

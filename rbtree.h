@@ -32,7 +32,7 @@
 #include "allocator.h"
 
 /**
- *\struct _rbnode
+ *\struct RBNode
  *\brief Structure holding node data.
  */
 typedef struct _rbnode
@@ -76,7 +76,8 @@ typedef struct
 } RBTree;
 
 /**
- *\enum result of rbtree_set() method
+ *\enum RBTreeInsertResult
+ *\brief result of rbtree_set() method
  */
 typedef enum
 {
@@ -120,7 +121,7 @@ typedef struct
  *\param compare_keys function to compare two keys
  *\param free_key function to free a key
  *\param free_value function to free a value
- *\param an optional memory allocator
+ *\param allocator an optional memory allocator
  *\return a new RBTree
  *
  * Creates a new RBTree.
@@ -132,7 +133,7 @@ RBTree *rbtree_new(CompareFunc compare_keys, FreeFunc free_key, FreeFunc free_va
  *\param compare_keys function to compare two keys
  *\param free_key function to free a key
  *\param free_value function to free a value
- *\param an optional memory allocator
+ *\param allocator an optional memory allocator
  *
  * Initializes a RBTree.
  */
@@ -200,7 +201,7 @@ bool rbtree_key_exists(RBTree *tree, const void *key);
 /**
  *\param tree a RBTree
  *\param key a key
- *\param true if node has been removed
+ *\return true if node has been removed
  *
  * Removes an element from the RBTree.
  */
@@ -208,7 +209,7 @@ bool rbtree_remove(RBTree *tree, const void *key);
 
 /**
  *\param tree a RBTree
- *\param an uninitialized RBTreeIter
+ *\param iter an uninitialized RBTreeIter
  *
  * Initializes a key/value pair iterator and associates it with the tree. Modifying the tree while
  * using the iterator might lead to undefined behaviour.

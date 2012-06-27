@@ -187,7 +187,7 @@ uint32_t hashtable_count(HashTable *table);
 
 /**
  *\param table a HashTable
- *\param an uninitialized HashTableIter
+ *\param iter an uninitialized HashTableIter
  *
  * Initializes a key/value pair iterator and associates it with the table. Modifying the table while
  * using the iterator might lead to undefined behaviour.

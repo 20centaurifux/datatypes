@@ -29,6 +29,7 @@
 
 #include "rbtree.h"
 
+/*! Initial stack size. */
 #define RBTREE_INITIAL_BLOCK_SIZE 4
 
 RBTree *
@@ -190,6 +191,7 @@ _rbtree_stack_push(RBTree *tree, RBNode *node)
 /*
  *	node helpers:
  */
+/*! Check if node color is black. */
 #define _rbnode_is_black(n) (n == NULL ? 1 : n->black)
 
 static inline RBNode *
