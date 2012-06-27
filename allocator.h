@@ -40,7 +40,7 @@ typedef struct _Allocator
 } Allocator;
 
 /**
- *\struct GAllocator
+ *\struct ChunkAllocator
  *\brief This memory allocator allocates blocks of memory and grows automatically.
  *
  */
@@ -81,7 +81,7 @@ typedef struct
 	int block_size;
 	/*! Size of an allocated item. */
 	int item_size;
-} GAllocator;
+} ChunkAllocator;
 
 /**
  *\param item_size size of allocated items
@@ -90,14 +90,14 @@ typedef struct
  *
  * Creates a new memory allocator.
  */
-GAllocator *g_allocator_new(int item_size, int block_size);
+ChunkAllocator *chunk_allocator_new(int item_size, int block_size);
 
 /**
  *\param allocator a memory allocator
  *
  * Destroys the given memory allocator.
  */
-void g_allocator_destroy(GAllocator *allocator);
+void chunk_allocator_destroy(ChunkAllocator *allocator);
 
 #endif
 

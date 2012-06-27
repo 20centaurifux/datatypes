@@ -29,7 +29,7 @@
 #include "allocator.h"
 
 static struct _MemoryBlock *
-_g_allocator_create_block(GAllocator *allocator)
+_chunk_allocator_create_block(ChunkAllocator *allocator)
 {
 	struct _MemoryBlock *block;
 
@@ -52,7 +52,7 @@ _g_allocator_create_block(GAllocator *allocator)
 }
 
 static struct _MemoryPtrBlock *
-_g_allocator_create_ptr_block(GAllocator *allocator)
+_chunk_allocator_create_ptr_block(ChunkAllocator *allocator)
 {
 	struct _MemoryPtrBlock *block;
 
@@ -75,9 +75,9 @@ _g_allocator_create_ptr_block(GAllocator *allocator)
 }
 
 static void *
-_g_allocator_alloc(Allocator *alloc)
+_chunk_allocator_alloc(Allocator *alloc)
 {
-	GAllocator *allocator = (GAllocator *)alloc;
+	ChunkAllocator *allocator = (ChunkAllocator *)alloc;
 	struct _MemoryBlock *block;
 	struct _MemoryPtrBlock *pblock;
 	void *item = NULL;
@@ -112,7 +112,7 @@ _g_allocator_alloc(Allocator *alloc)
 	else
 	{
 		/* end reached => create a new block & prepend it to our list */
-		block = _g_allocator_create_block(allocator);
+		block = _chunk_allocator_create_block(allocator);
 		block->next = allocator->block;
 		allocator->block = block;
 
@@ -125,18 +125,18 @@ _g_allocator_alloc(Allocator *alloc)
 }
 
 static void
-_g_allocator_free(Allocator *alloc, void *item)
+_chunk_allocator_free(Allocator *alloc, void *item)
 {
-	GAllocator *allocator = (GAllocator *)alloc;
+	ChunkAllocator *allocator = (ChunkAllocator *)alloc;
 	struct _MemoryPtrBlock *cur;
 
 	if(!(cur = allocator->free_block))
 	{
-		allocator->free_block = cur = _g_allocator_create_ptr_block(allocator);
+		allocator->free_block = cur = _chunk_allocator_create_ptr_block(allocator);
 	}
 	else if(cur->offset == allocator->block_size)
 	{
-		cur = _g_allocator_create_ptr_block(allocator);
+		cur = _chunk_allocator_create_ptr_block(allocator);
 		cur->next = allocator->free_block;
 		allocator->free_block = cur;
 	}
@@ -144,15 +144,15 @@ _g_allocator_free(Allocator *alloc, void *item)
 	cur->items[cur->offset++] = item;
 }
 
-GAllocator *
-g_allocator_new(int item_size, int block_size)
+ChunkAllocator *
+chunk_allocator_new(int item_size, int block_size)
 {
-	GAllocator *allocator;
+	ChunkAllocator *allocator;
 
 	assert(item_size > 1);
 	assert(block_size > 1);
 
-	if(!(allocator = (GAllocator *)malloc(sizeof(GAllocator))))
+	if(!(allocator = (ChunkAllocator *)malloc(sizeof(ChunkAllocator))))
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
 		abort();
@@ -161,16 +161,16 @@ g_allocator_new(int item_size, int block_size)
 	allocator->free_block = NULL;
 	allocator->item_size = item_size;
 	allocator->block_size = block_size;
-	allocator->block = _g_allocator_create_block(allocator);
+	allocator->block = _chunk_allocator_create_block(allocator);
 
-	((Allocator *)allocator)->alloc = _g_allocator_alloc;
-	((Allocator *)allocator)->free = _g_allocator_free;
+	((Allocator *)allocator)->alloc = _chunk_allocator_alloc;
+	((Allocator *)allocator)->free = _chunk_allocator_free;
 
 	return allocator;
 }
 
 void
-g_allocator_destroy(GAllocator *allocator)
+chunk_allocator_destroy(ChunkAllocator *allocator)
 {
 	struct _MemoryBlock *block;
 	struct _MemoryBlock *iter;

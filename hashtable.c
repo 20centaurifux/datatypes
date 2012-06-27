@@ -85,7 +85,7 @@ hashtable_init(HashTable *table, int32_t size, HashFunc hash_func, EqualFunc com
 		abort();
 	}
 
-	table->allocator = (Allocator *)g_allocator_new(sizeof(struct _Bucket), HASHTABLE_LIST_ALLOCATOR_BLOCK_SIZE);
+	table->allocator = (Allocator *)chunk_allocator_new(sizeof(struct _Bucket), HASHTABLE_LIST_ALLOCATOR_BLOCK_SIZE);
 
 	table->compare_keys = compare_keys;
 	table->free_key = free_key;
@@ -136,7 +136,7 @@ hashtable_free(HashTable *table)
 		#pragma omp barrier
 	}
 
-	g_allocator_destroy((GAllocator *)table->allocator);
+	chunk_allocator_destroy((ChunkAllocator *)table->allocator);
 	free(table->buckets);
 }
 
@@ -180,8 +180,8 @@ hashtable_clear(HashTable *table)
 		#pragma omp barrier
 	}
 
-	g_allocator_destroy((GAllocator *)table->allocator);
-	table->allocator = (Allocator *)g_allocator_new(sizeof(struct _Bucket), HASHTABLE_LIST_ALLOCATOR_BLOCK_SIZE);
+	chunk_allocator_destroy((ChunkAllocator *)table->allocator);
+	table->allocator = (Allocator *)chunk_allocator_new(sizeof(struct _Bucket), HASHTABLE_LIST_ALLOCATOR_BLOCK_SIZE);
 
 	table->count = 0;
 }
