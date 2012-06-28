@@ -314,7 +314,6 @@ slist_remove(SList *list, SListItem *item)
 		{
 			/* remove list item */
 			_slist_remove(list, prev, p);
-			list->count--;
 			break;
 		}
 
