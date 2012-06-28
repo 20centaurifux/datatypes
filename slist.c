@@ -19,7 +19,7 @@
  * \brief A singly-linked list.
  * \author Sebastian Fedrau <lord-kefir@arcor.de>
  * \version 0.1.0
- * \date 26. June 2012
+ * \date 27. June 2012
  */
 
 #include <stdlib.h>

@@ -19,7 +19,7 @@
  * \brief A generic balanced binary tree.
  * \author Sebastian Fedrau <lord-kefir@arcor.de>
  * \version 0.1.0
- * \date 26. June 2012
+ * \date 27. June 2012
  */
 
 #include <stdlib.h>
@@ -130,7 +130,10 @@ rbtree_clear(RBTree *tree)
 	assert(tree != NULL);
 
 	/* free nodes */
-	rbtree_free(tree);
+	if(tree->root)
+	{
+		_rbtree_destroy_node(tree, tree->root);
+	}
 
 	/* reset members */
 	tree->sp = NULL;
@@ -718,25 +721,26 @@ rbtree_remove(RBTree *tree, const void *key)
 
 	tree->count--;
 
+	/* free key & value */
+	if(tree->free_key)
+	{
+		tree->free_key(node->key);
+	}
+
+	if(tree->free_value)
+	{
+		tree->free_value(node->value);
+	}
+
 	/* check if node has two children */
 	if(node->left && node->right)
 	{
 		/* copy key & value from predecessor */
 		max = _rbtree_find_max_node(tree, node->left);
 
-		if(tree->free_key)
-		{
-			tree->free_key(node->key);
-		}
-
 		node->key = max->key;
-
-		if(tree->free_value)
-		{
-			tree->free_value(node->value);
-		}
-
 		node->value = max->value;
+
 		node = max;
 	}
 
