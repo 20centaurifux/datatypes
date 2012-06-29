@@ -256,7 +256,7 @@ slist_insert_sorted(SList *list, void *data, CompareFunc compare)
 		else if(list->count == 1)
 		{
 			/* prepend item */
-			return list_prepend(list, data);
+			return slist_prepend(list, data);
 		}
 
 		/* insert list item into list */
