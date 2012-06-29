@@ -39,7 +39,7 @@ typedef struct _SListItem
 {
 	/*! Data of the list item. */
 	void *data;
-	/*! Pointer to next list element. */
+	/*! Pointer to next list element or NULL. */
 	struct _SListItem *next;
 } SListItem;
 
@@ -66,7 +66,7 @@ typedef struct _SList
 /**
  *\param equals function to compare item data
  *\param free function to free item data OR NULL
- *\param allocator a user-defined memory allocator or NULL
+ *\param allocator a user-defined memory allocator for creating/destroying SListItems or NULL
  *\return a new SList
  *
  * Creates a new SList.
@@ -77,7 +77,7 @@ SList *slist_new(EqualFunc equals, FreeFunc free, Allocator *allocator);
  *\param list a SList
  *\param equals function to compare item data
  *\param free function to free item data OR NULL
- *\param allocator a user-defined memory allocator or NULL
+ *\param allocator a user-defined memory allocator for creating/destroying SListItems or NULL
  *
  * Initializes a new SList.
  */void slist_init(SList *list, EqualFunc equals, FreeFunc free, Allocator *allocator);
@@ -120,7 +120,7 @@ SListItem *slist_prepend(SList *list, void *data);
  *\param compare function to compare list item data
  *\return a new ListItem
  *
- * Inserts data into list, using the given comparison function to determine its position.
+ * Inserts data into list using the given comparison function to determine its position.
  */
 SListItem *slist_insert_sorted(SList *list, void *data, CompareFunc compare);
 
@@ -202,10 +202,10 @@ SListItem *slist_find(SList *list, SListItem *offset, void const *data);
 /*! Get next list item. */
 #define slist_item_next(item) item->next
 
-/*! Get list item's data. */
+/*! Gets data of the specified SListItem. */
 #define slist_item_get_data(item) item->data
 
-/*! Set list item's data. */
+/*! Sets data of the specified SListItem. */
 #define slist_item_set_data(item, value) item->data = value
 
 /**
@@ -213,7 +213,7 @@ SListItem *slist_find(SList *list, SListItem *offset, void const *data);
  *\param item a SListItem
  *\param compare function to compare list item data
  *
- * Arrange given SListItem in order, using the given comparison function to determine its position.
+ * Arrange given SListItem in order using the given comparison function to determine its position.
  */
 void slist_reorder(SList *list, SListItem *item, CompareFunc compare);
 #endif

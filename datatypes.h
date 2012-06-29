@@ -35,7 +35,7 @@ typedef bool (*EqualFunc)(const void *a, const void *b);
 /*! A function to free memory. */
 typedef void (*FreeFunc)(void *p);
 
-/*! Compares two strings. */
+ /*! Compares two strings. Return 0 if values are equal, or a positive integer if the first value comes after the second */
 #define str_compare (CompareFunc)strcmp
 
 /**

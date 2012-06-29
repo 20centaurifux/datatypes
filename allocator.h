@@ -41,7 +41,7 @@ typedef struct _Allocator
 
 /**
  *\struct ChunkAllocator
- *\brief This memory allocator allocates blocks of memory and grows automatically.
+ *\brief This memory allocator allocates chunks of memory and grows automatically.
  *
  */
 typedef struct
@@ -51,7 +51,7 @@ typedef struct
 
 	/**
 	 *\struct _MemoryBlock
-	 *\brief Blocks of memory are stored in a singly-linked list.
+	 *\brief Chunks of memory are stored in a singly-linked list.
 	 *
 	 *\var block
 	 *\brief First memory block.
@@ -60,14 +60,14 @@ typedef struct
 	{
 		/*! The allocated memory block. */
 		int8_t *items;
-		/*! Offset to find next free address of the memory block. */
+		/*! Offset of the next available address. */
 		int offset;
-		/*! Pointer to next memory block. */
+		/*! Pointer to next available memory block or NULL. */
 		struct _MemoryBlock *next;
 	} *block;
 	/**
 	 *\struct _MemoryPtrBlock
-	 *\brief Freed pointers are stored in blocks holding addresses.
+	 *\brief Freed pointers are stored in chunks holding addresses.
 	 *
 	 *\var free_block
 	 *\brief First pointer block.
@@ -78,12 +78,12 @@ typedef struct
 		void **items;
 		/*! Offset to detect next index to store a freed pointer. */
 		int offset;
-		/*! Pointer to next memory block */
+		/*! Pointer to next chunk or NULL. */
 		struct _MemoryPtrBlock *next;
-		/*! Pointer to previous memory block */
+		/*! Pointer to previous chunk or NULL. */
 		struct _MemoryPtrBlock *prev;
 	} *free_block;
-	/*! NUmber of memory blocks. */
+	/*! Number of items a memory chunk can hold. */
 	int block_size;
 	/*! Size of an allocated item. */
 	int item_size;
@@ -91,7 +91,7 @@ typedef struct
 
 /**
  *\param item_size size of allocated items
- *\param block_size size of allocated memory blocks
+ *\param block_size number of elements a chunk can hold
  *\return a new allocator
  *
  * Creates a new memory allocator.

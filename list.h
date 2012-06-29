@@ -67,8 +67,8 @@ typedef struct
 
 /**
  *\param equals function to compare item data
- *\param free function to free item data OR NULL
- *\param allocator a user-defined memory allocator or NULL
+ *\param free function to free item data or NULL
+ *\param allocator a user-defined memory allocator for creating/destroying ListItems  or NULL
  *\return a new List
  *
  * Creates a new List.
@@ -78,8 +78,8 @@ List *list_new(EqualFunc equals, FreeFunc free, Allocator *allocator);
 /**
  *\param list a List
  *\param equals function to compare item data
- *\param free function to free item data OR NULL
- *\param allocator a user-defined memory allocator or NULL
+ *\param free function to free item data or NULL
+ *\param allocator a user-defined memory allocator for creating/destroying ListItems  or NULL
  *
  * Initializes a List.
  */
@@ -88,14 +88,14 @@ void list_init(List *list, EqualFunc equals, FreeFunc free, Allocator *allocator
 /**
  *\param list a List
  *
- * Destroys all items in the list.
+ * Destroys all items in the list. Frees also memory allocated for the List instance.
  */
 void list_destroy(List *list);
 
 /**
  *\param list a List
  *
- * Destroys all items in the list. Frees also memory allocated for the List instance.
+ * Destroys all items in the list.
  */
 void list_free(List *list);
 
@@ -123,7 +123,7 @@ ListItem *list_prepend(List *list, void *data);
  *\param compare function to compare list item data
  *\return a new ListItem
  *
- * Inserts data into list, using the given comparison function to determine its position.
+ * Inserts data into list using the given comparison function to determine its position.
  */
 ListItem *list_insert_sorted(List *list, void *data, CompareFunc compare);
 
@@ -189,7 +189,7 @@ void *list_pop(List *list);
  *\param data data
  *\return true if data exists in list
  *
- * Test if list contains given data.
+ * Tests if list contains given data.
  */
 bool list_contains(List *list, void *data);
 
@@ -210,16 +210,16 @@ void list_clear(List *list);
  */
 ListItem *list_find(List *list, ListItem *offset, void const *data);
 
-/*! Get next list item. */
+/*! Gets next list item. */
 #define list_item_next(item) item->next
 
-/*! Get previous list item. */
+/*! Gets previous list item. */
 #define list_item_prev(item) item->prev
 
-/*! Get list item's data. */
+/*! Gets data of the specified ListItem. */
 #define list_item_get_data(item) item->data
 
-/*! Set list item's data. */
+/*! Sets data of the specified ListItem. */
 #define list_item_set_data(item, value) item->data = value
 
 /**
@@ -227,7 +227,7 @@ ListItem *list_find(List *list, ListItem *offset, void const *data);
  *\param item a ListItem
  *\param compare function to compare list item data
  *
- * Arrange given ListItem in order, using the given comparison function to determine its position.
+ * Arrange given ListItem in order using the given comparison function to determine its position.
  */
 void list_reorder(List *list, ListItem *item, CompareFunc compare);
 

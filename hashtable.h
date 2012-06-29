@@ -51,7 +51,7 @@ typedef struct
 	int32_t size;
 	/**
 	 *\struct _Bucket
-	 *\brief A singly-linked list implementation.
+	 *\brief A singly-linked list implementation storing keys & values.
 	 *
 	 *\var buckets
 	 *\brief An array containing pointers to lists.
@@ -62,7 +62,7 @@ typedef struct
 		void *key;
 		/*! Value of the element. */
 		void *data;
-		/*! Pointer to next list element */
+		/*! Pointer to next list element or NULL. */
 		struct _Bucket *next;
 	} **buckets;
 	/*! Number of stored elements. */
@@ -100,7 +100,7 @@ uint32_t str_hash(const char *plain);
  *\param hash_func function to create hash from a key
  *\param compare_keys function to check equality of two keys
  *\param free_key function to free keys or NULL
- *\param free_value function to free values OR NULL
+ *\param free_value function to free values or NULL
  *\return a new HashTable
  *
  * Creates a new HashTable.
@@ -112,8 +112,8 @@ HashTable *hashtable_new(int32_t size, HashFunc hash_func, EqualFunc compare_key
  *\param size size of the hash table
  *\param hash_func function to create hash from a key
  *\param compare_keys function to check equality of two keys
- *\param free_key function to free keys OR NULL
- *\param free_value function to free values OR NULL
+ *\param free_key function to free keys or NULL
+ *\param free_value function to free values or NULL
  *
  * Initializes a HashTable.
  */
@@ -198,7 +198,7 @@ void hashtable_iter_init(HashTable *table, HashTableIter *iter);
  *\param iter a HashTableIter
  *\return false if end of the HashTable has been reached
  *
- * Go to next element of Hashtable.
+ * Goes to next element of Hashtable.
  */
 bool hashtable_iter_next(HashTableIter *iter);
 

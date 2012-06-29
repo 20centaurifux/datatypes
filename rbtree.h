@@ -41,9 +41,9 @@ typedef struct _rbnode
 	void *key;
 	/*! Value of the node. */
 	void *value;
-	/*! Left node. */
+	/*! Left node or NULL. */
 	struct _rbnode *left;
-	/*! Right node. */
+	/*! Right node or NULL. */
 	struct _rbnode *right;
 	/*! true if color is black. */
 	bool black;
@@ -55,7 +55,7 @@ typedef struct _rbnode
  */
 typedef struct
 {
-	/*! Function to compare two key. */
+	/*! Function to compare two keys. */
 	CompareFunc compare_keys;
 	/*! Function to free a key. */
 	FreeFunc free_key;
@@ -109,7 +109,7 @@ typedef struct
 	RBTree *tree;
 	/*! A stack holding nodes and an iteration state. */
 	RBTreeIterStackItem *stack;
-	/*! A stack pointer. */
+	/*! The stack pointer. */
 	RBTreeIterStackItem *sp;
 	/*! Size of the stack. */
 	uint32_t stack_size;
@@ -121,7 +121,7 @@ typedef struct
  *\param compare_keys function to compare two keys
  *\param free_key function to free a key
  *\param free_value function to free a value
- *\param allocator an optional memory allocator
+ *\param allocator an optional memory allocator for creating/destroying RBNodes or NULL
  *\return a new RBTree
  *
  * Creates a new RBTree.
@@ -133,7 +133,7 @@ RBTree *rbtree_new(CompareFunc compare_keys, FreeFunc free_key, FreeFunc free_va
  *\param compare_keys function to compare two keys
  *\param free_key function to free a key
  *\param free_value function to free a value
- *\param allocator an optional memory allocator
+ *\param allocator an optional memory allocator for creating/destroying RBNodes or NULL
  *
  * Initializes a RBTree.
  */
@@ -227,7 +227,7 @@ void rbtree_iter_free(RBTreeIter *iter);
  *\param tree a RBTree
  *\param iter an already initialized RBTreeIter
  *
- * Reuse an iterator.
+ * Reuses an iterator.
  */
 void rbtree_iter_reuse(RBTree *tree, RBTreeIter *iter);
 
@@ -235,14 +235,14 @@ void rbtree_iter_reuse(RBTree *tree, RBTreeIter *iter);
  *\param iter a RBTreeIter
  *\return false if end of the RBTree has been reached
  *
- * Go to next element of RBTree.
+ * Goes to next element of RBTree.
  */
 bool rbtree_iter_next(RBTreeIter *iter);
 
-/*! Get key of the current node. */
+/*! Gets key of the current node. */
 #define rbtree_iter_get_key(iter) iter->sp->node->key
 
-/*! Get value of the current node. */
+/*! Gets value of the current node. */
 #define rbtree_iter_get_value(iter) iter->sp->node->value
 
 #endif
