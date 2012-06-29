@@ -194,7 +194,13 @@ _rbtree_stack_push(RBTree *tree, RBNode *node)
 /*
  *	node helpers:
  */
-/*! Check if node color is black. */
+
+/**
+ *\param b a RBNode
+ *\return true if node is black
+ *
+ * Check if node color is black.
+ */
 #define _rbnode_is_black(n) (n == NULL ? 1 : n->black)
 
 static inline RBNode *

@@ -68,7 +68,7 @@ typedef struct
 /**
  *\param equals function to compare item data
  *\param free function to free item data or NULL
- *\param allocator a user-defined memory allocator for creating/destroying ListItems  or NULL
+ *\param allocator a user-defined memory allocator for creating/destroying ListItems or NULL
  *\return a new List
  *
  * Creates a new List.
@@ -79,7 +79,7 @@ List *list_new(EqualFunc equals, FreeFunc free, Allocator *allocator);
  *\param list a List
  *\param equals function to compare item data
  *\param free function to free item data or NULL
- *\param allocator a user-defined memory allocator for creating/destroying ListItems  or NULL
+ *\param allocator a user-defined memory allocator for creating/destroying ListItems or NULL
  *
  * Initializes a List.
  */

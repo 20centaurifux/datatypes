@@ -39,7 +39,14 @@
 /*
  *	public:
  */
-/*! Calculates table index of a key. */
+
+/**
+ *\param table a HashTable
+ *\param key a key
+ *\return index of the given key
+ *
+ * Calculates table index of a key.
+ */
 #define HASHTABLE_INDEX(table, key) table->hash(key) % table->size
 
 uint32_t inline
