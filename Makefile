@@ -1,16 +1,21 @@
+CC=gcc
 CFLAGS = -Wall -std=c99 -O3 -DNDEBUG -DOPENMP -fopenmp
 
+MAJOR_VERSION=0
+MINOR_VERSION=1
+PATCHLEVEL=0
+
 all:
-	gcc -c hashtable.c -o hashtable.o $(CFLAGS)
-	gcc -c rbtree.c -o rbtree.o $(CFLAGS)
-	gcc -c slist.c -o slist.o $(CFLAGS)
-	gcc -c list.c -o list.o $(CFLAGS)
-	gcc -c datatypes.c -o datatypes.o $(CFLAGS)
-	gcc -c allocator.c -o allocator.o $(CFLAGS)
-	gcc -c test.c -o test.o $(CFLAGS)
-	gcc hashtable.o rbtree.o test.o slist.o list.o datatypes.o allocator.o -o hashtable $(CFLAGS)
+	$(CC) -c hashtable.c -o hashtable.o $(CFLAGS)
+	$(CC) -c rbtree.c -o rbtree.o $(CFLAGS)
+	$(CC) -c slist.c -o slist.o $(CFLAGS)
+	$(CC) -c list.c -o list.o $(CFLAGS)
+	$(CC) -c datatypes.c -o datatypes.o $(CFLAGS)
+	$(CC) -c allocator.c -o allocator.o $(CFLAGS)
+	ar rcs libdatatypes.a $(OBJS)
+	$(CC) -shared -Wl,-soname,libdatatypes.so.0 -o libdatatypes-$(MAJOR_VERSION).$(MINOR_VERSION).$(PATCHLEVEL).so $(OBJ)
 
 clean:
-	rm *.o
-	rm -f hashtable
-	rm -f hashtable.exe
+	rm -f *.o
+	rm -f libdatatypes.a
+	rm -f ./libdatatypes-$(MAJOR_VERSION).$(MINOR_VERSION).$(PATCHLEVEL).so
