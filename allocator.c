@@ -202,4 +202,3 @@ chunk_allocator_destroy(ChunkAllocator *allocator)
 	free(allocator);
 }
 
-
