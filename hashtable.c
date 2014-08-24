@@ -417,7 +417,7 @@ hashtable_iter_get_key(HashTableIter *iter)
 		return iter->liter->key;
 	}
 
-	return false;
+	return NULL;
 }
 
 void inline *
@@ -430,6 +430,6 @@ hashtable_iter_get_value(HashTableIter *iter)
 		return iter->liter->data;
 	}
 
-	return false;
+	return NULL;
 }
 
