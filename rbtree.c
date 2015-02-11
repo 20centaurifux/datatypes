@@ -141,7 +141,7 @@ rbtree_clear(RBTree *tree)
 	tree->root = NULL;
 }
 
-inline uint32_t
+inline size_t
 rbtree_count(RBTree *tree)
 {
 	assert(tree != NULL);
@@ -404,7 +404,7 @@ rbtree_set(RBTree *tree, void * restrict key, void * restrict value, bool overwr
 	{
 		/* insert root node */
 		tree->root = _rbnode_create_new(tree->allocator, key, value, 1, NULL, NULL);
-		tree->count++;
+		++tree->count;
 		return RBTREE_INSERT_RESULT_NEW;
 	}
 
@@ -479,7 +479,7 @@ rbtree_set(RBTree *tree, void * restrict key, void * restrict value, bool overwr
 		}
 	}
 
-	tree->count++;
+	++tree->count;
 
 	return RBTREE_INSERT_RESULT_NEW;
 }
@@ -725,7 +725,7 @@ rbtree_remove(RBTree *tree, const void *key)
 		return false;
 	}
 
-	tree->count--;
+	--tree->count;
 
 	/* free key & value */
 	if(tree->free_key)
@@ -870,22 +870,22 @@ rbtree_iter_next(RBTreeIter *iter)
 
 			if(iter->sp->state == 0)
 			{
-				iter->sp->state++;
-				iter->sp++;
+				++iter->sp->state;
+				++iter->sp;
 				iter->sp->node = (iter->sp - 1)->node->left;
 				iter->sp->state = 0;
 			}
 			else if(iter->sp->state == 1)
 			{
-				iter->sp->state++;
-				iter->sp++;
+				++iter->sp->state;
+				++iter->sp;
 				iter->sp->node = (iter->sp - 1)->node->right;
 				iter->sp->state = 0;
 			}
 			else if(iter->sp->state == 2)
 			{
-				iter->sp->state++;
-				iter->sp--;
+				++iter->sp->state;
+				--iter->sp;
 			}
 
 			if(iter->sp < iter->stack)
@@ -904,7 +904,7 @@ rbtree_iter_next(RBTreeIter *iter)
 			}
 			else
 			{
-				iter->sp--;
+				--iter->sp;
 			}
 		}
 	}

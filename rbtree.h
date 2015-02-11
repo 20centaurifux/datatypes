@@ -68,11 +68,11 @@ typedef struct
 	/*! The stack pointer. */
 	RBNode **sp;
 	/*! Size of the stack. */
-	int32_t stack_size;
+	size_t stack_size;
 	/*! An optional allocator to create nodes. */
 	Allocator *allocator;
 	/*! Number of stored items. */
-	uint32_t count;
+	size_t count;
 } RBTree;
 
 /**
@@ -112,7 +112,7 @@ typedef struct
 	/*! The stack pointer. */
 	RBTreeIterStackItem *sp;
 	/*! Size of the stack. */
-	uint32_t stack_size;
+	size_t stack_size;
 	/*! true if iteration has been finished. */
 	bool finished;
 } RBTreeIter;
@@ -178,7 +178,7 @@ RBTreeInsertResult rbtree_set(RBTree *tree, void * restrict key, void * restrict
  *
  * Gets the number of stored nodes.
  */
-uint32_t rbtree_count(RBTree *tree);
+size_t rbtree_count(RBTree *tree);
 
 /**
  *\param tree a RBTree

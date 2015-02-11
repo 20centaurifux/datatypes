@@ -27,6 +27,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <string.h>
 
 /*! A function to compare two values. */
 typedef int32_t (*CompareFunc)(const void *a, const void *b);
@@ -35,7 +36,7 @@ typedef bool (*EqualFunc)(const void *a, const void *b);
 /*! A function to free memory. */
 typedef void (*FreeFunc)(void *p);
 
- /*! Compares two strings. Return 0 if values are equal, or a positive integer if the first value comes after the second */
+ /*! Compares two strings. Return 0 if values are equal, or a positive integer if the first value comes after the second. */
 #define str_compare (CompareFunc)strcmp
 
 /**

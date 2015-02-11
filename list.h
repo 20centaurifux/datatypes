@@ -56,7 +56,7 @@ typedef struct
 	/*! Tail of the list. */
 	ListItem *tail;
 	/*! Number of stored items. */
-	uint32_t count;
+	size_t count;
 	/*! A function to compare data of two list items. */
 	EqualFunc equals;
 	/*! A function to free item data. */
@@ -149,7 +149,7 @@ ListItem *list_tail(List *list);
  *
  * Gets the number of items.
  */
-uint32_t list_count(List *list);
+size_t list_count(List *list);
 
 /**
  *\param list a List

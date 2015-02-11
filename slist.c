@@ -113,7 +113,7 @@ _slist_remove(SList *list, SListItem *prev, SListItem *item)
 		free(item);
 	}
 
-	list->count--;
+	--list->count;
 }
 
 /*
@@ -205,7 +205,7 @@ slist_append(SList *list, void *data)
 		list->head = item;
 	}
 
-	list->count++;
+	++list->count;
 
 	return item;
 }
@@ -231,7 +231,7 @@ slist_prepend(SList *list, void *data)
 		list->tail = item;
 	}
 
-	list->count++;
+	++list->count;
 
 	return item;
 }
@@ -291,7 +291,7 @@ slist_insert_sorted(SList *list, void *data, CompareFunc compare)
 		list->tail = item;
 	}
 
-	list->count++;
+	++list->count;
 
 	return item;
 }
@@ -387,7 +387,7 @@ slist_pop(SList *list)
 			free(item);
 		}
 
-		list->count--;
+		--list->count;
 	}
 
 	return data;
@@ -443,7 +443,7 @@ slist_find(SList *list, SListItem *offset, void const *data)
 	return _slist_find(list, offset, data);
 }
 
-inline uint32_t
+inline size_t
 slist_count(SList *list)
 {
 	assert(list != NULL);

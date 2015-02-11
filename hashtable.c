@@ -63,7 +63,7 @@ str_hash(const char *plain)
 }
 
 HashTable *
-hashtable_new(int32_t size, HashFunc hash_func, EqualFunc compare_keys, FreeFunc free_key, FreeFunc free_value)
+hashtable_new(size_t size, HashFunc hash_func, EqualFunc compare_keys, FreeFunc free_key, FreeFunc free_value)
 {
 	HashTable *table;
 
@@ -79,11 +79,11 @@ hashtable_new(int32_t size, HashFunc hash_func, EqualFunc compare_keys, FreeFunc
 }
 
 inline void
-hashtable_init(HashTable *table, int32_t size, HashFunc hash_func, EqualFunc compare_keys, FreeFunc free_key, FreeFunc free_value)
+hashtable_init(HashTable *table, size_t size, HashFunc hash_func, EqualFunc compare_keys, FreeFunc free_key, FreeFunc free_value)
 {
 	assert(table != NULL);
 	assert(size > 0);
-	assert(size < INT32_MAX - 1);
+	assert(size < SIZE_MAX - 1);
 	assert(hash_func != NULL);
 	assert(compare_keys != NULL);
 
@@ -197,7 +197,7 @@ hashtable_clear(HashTable *table)
 void
 hashtable_set(HashTable *table, void * restrict key, void * restrict value, bool overwrite_key)
 {
-	uint32_t index;
+	size_t index;
 	struct _Bucket *head = NULL;
 	struct _Bucket *iter;
 	struct _Bucket *item = NULL;
@@ -249,7 +249,7 @@ hashtable_set(HashTable *table, void * restrict key, void * restrict value, bool
 		item->data = value;
 		table->buckets[index] = item;
 		item->next = head;
-		table->count++;
+		++table->count;
 	}
 }
 
@@ -292,7 +292,7 @@ hashtable_remove(HashTable *table, const void *key)
 				}
 
 				table->allocator->free(table->allocator, iter);
-				table->count--;
+				--table->count;
 
 				break;
 			}
@@ -340,13 +340,15 @@ hashtable_key_exists(HashTable *table, const void *key)
 			{
 				return true;
 			}
+
+			iter = iter->next;
 		}
 	}
 
 	return false;
 }
 
-inline uint32_t
+inline size_t
 hashtable_count(HashTable *table)
 {
 	assert(table != NULL);

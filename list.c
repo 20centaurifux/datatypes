@@ -216,7 +216,7 @@ list_append(List *list, void *data)
 		list->head = item;
 	}
 
-	list->count++;
+	++list->count;
 
 	return item;
 }
@@ -243,7 +243,7 @@ list_prepend(List *list, void *data)
 		list->tail = item;
 	}
 
-	list->count++;
+	++list->count;
 
 	return item;
 }
@@ -303,7 +303,7 @@ list_insert_sorted(List *list, void *data, CompareFunc compare)
 		list->tail = item;
 	}
 
-	list->count++;
+	++list->count;
 
 	return item;
 }
@@ -337,7 +337,7 @@ list_remove(List *list, ListItem *item)
 		free(p);
 	}
 
-	list->count--;
+	--list->count;
 }
 
 void
@@ -408,7 +408,7 @@ list_pop(List *list)
 			free(item);
 		}
 
-		list->count--;
+		--list->count;
 	}
 
 	return data;
@@ -480,7 +480,7 @@ list_tail(List *list)
 	return list->tail;
 }
 
-inline uint32_t
+inline size_t
 list_count(List *list)
 {
 	assert(list != NULL);

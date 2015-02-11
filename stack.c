@@ -44,3 +44,4 @@ stack_pop(Stack *stack, void **data)
 
 	return false;
 }
+

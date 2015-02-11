@@ -48,7 +48,7 @@ typedef struct
 	/*! A function to create a hash from a value. */
 	HashFunc hash;
 	/*! Size of the hash table. */
-	int32_t size;
+	size_t size;
 	/**
 	 *\struct _Bucket
 	 *\brief A singly-linked list implementation storing keys & values.
@@ -66,7 +66,7 @@ typedef struct
 		struct _Bucket *next;
 	} **buckets;
 	/*! Number of stored elements. */
-	uint32_t count;
+	size_t count;
 	/*! Allocator used to create/destroy list elements. */
 	Allocator *allocator;
 } HashTable;
@@ -80,7 +80,7 @@ typedef struct
 	/*! Pointer to the associated HashTable. */
 	HashTable *table;
 	/*! Index of current bucket. */
-	uint32_t offset;
+	size_t offset;
 	/*! Pointer to current list element. */
 	struct _Bucket *liter;
 	/*! true if iteration has been completed. */
@@ -105,7 +105,7 @@ uint32_t str_hash(const char *plain);
  *
  * Creates a new HashTable.
  */
-HashTable *hashtable_new(int32_t size, HashFunc hash_func, EqualFunc compare_keys, FreeFunc free_key, FreeFunc free_value);
+HashTable *hashtable_new(size_t size, HashFunc hash_func, EqualFunc compare_keys, FreeFunc free_key, FreeFunc free_value);
 
 /**
  *\param table a HashTable
@@ -117,7 +117,7 @@ HashTable *hashtable_new(int32_t size, HashFunc hash_func, EqualFunc compare_key
  *
  * Initializes a HashTable.
  */
-void hashtable_init(HashTable *table, int32_t size, HashFunc hash_func, EqualFunc compare_keys, FreeFunc free_key, FreeFunc free_value);
+void hashtable_init(HashTable *table, size_t size, HashFunc hash_func, EqualFunc compare_keys, FreeFunc free_key, FreeFunc free_value);
 
 /**
  *\param table a HashTable
@@ -183,7 +183,7 @@ bool hashtable_key_exists(HashTable *table, const void *key);
  *
  * Gets the number of stored elements.
  */
-uint32_t hashtable_count(HashTable *table);
+size_t hashtable_count(HashTable *table);
 
 /**
  *\param table a HashTable

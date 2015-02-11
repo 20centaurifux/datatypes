@@ -54,7 +54,7 @@ typedef struct _SList
 	/*! Tail of the list. */
 	SListItem *tail;
 	/*! Number of stored items. */
-	uint32_t count;
+	size_t count;
 	/*! A function to compare data of two list items. */
 	EqualFunc equals;
 	/*! A function to free item data. */
@@ -138,7 +138,7 @@ SListItem *slist_head(SList *list);
  *
  * Gets the number of items.
  */
-uint32_t slist_count(SList *list);
+size_t slist_count(SList *list);
 
 /**
  *\param list a SList

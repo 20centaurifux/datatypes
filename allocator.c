@@ -78,6 +78,7 @@ static void *
 _chunk_allocator_alloc(Allocator *alloc)
 {
 	ChunkAllocator *allocator = (ChunkAllocator *)alloc;
+	return malloc(allocator->item_size);
 	struct _MemoryBlock *block;
 	struct _MemoryPtrBlock *pblock;
 	void *item = NULL;
@@ -85,6 +86,8 @@ _chunk_allocator_alloc(Allocator *alloc)
 	/* try to get detached item */
 	if(allocator->free_block)
 	{
+		assert(allocator->free_block->offset > 0);
+
 		item = allocator->free_block->items[--allocator->free_block->offset];
 
 		if(!allocator->free_block->offset)
@@ -96,7 +99,7 @@ _chunk_allocator_alloc(Allocator *alloc)
 
 			if(allocator->free_block)
 			{
-				allocator->free_block->offset--;
+				--allocator->free_block->offset;
 			}
 		}
 
@@ -118,7 +121,7 @@ _chunk_allocator_alloc(Allocator *alloc)
 
 		/* return first item from current block & increment offset */
 		item = allocator->block->items;
-		allocator->block->offset++;
+		++allocator->block->offset;
 	}
 
 	return item;
@@ -127,6 +130,7 @@ _chunk_allocator_alloc(Allocator *alloc)
 static void
 _chunk_allocator_free(Allocator *alloc, void *item)
 {
+	free(item); return;
 	ChunkAllocator *allocator = (ChunkAllocator *)alloc;
 	struct _MemoryPtrBlock *cur;
 
@@ -145,7 +149,7 @@ _chunk_allocator_free(Allocator *alloc, void *item)
 }
 
 ChunkAllocator *
-chunk_allocator_new(int item_size, int block_size)
+chunk_allocator_new(size_t item_size, size_t block_size)
 {
 	ChunkAllocator *allocator;
 
