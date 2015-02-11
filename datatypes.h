@@ -66,5 +66,12 @@ bool str_equal(const void * restrict a, const void * restrict b);
  */
 bool int_equal(const void * restrict a, const void * restrict b);
 
+#include "hashtable.h"
+#include "rbtree.h"
+#include "list.h"
+#include "slist.h"
+#include "queue.h"
+#include "stack.h"
+
 #endif
 
