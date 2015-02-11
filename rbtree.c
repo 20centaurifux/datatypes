@@ -918,3 +918,29 @@ rbtree_iter_next(RBTreeIter *iter)
 	return true;
 }
 
+void inline *
+rbtree_iter_get_key(RBTreeIter *iter)
+{
+	assert(iter != NULL);
+
+	if(iter->sp && iter->sp->node)
+	{
+		return iter->sp->node->key;
+	}
+
+	return NULL;
+}
+
+void inline *
+rbtree_iter_get_value(RBTreeIter *iter)
+{
+	assert(iter != NULL);
+
+	if(iter->sp && iter->sp->node)
+	{
+		return iter->sp->node->value;
+	}
+
+	return NULL;
+}
+

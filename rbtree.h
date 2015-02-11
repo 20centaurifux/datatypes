@@ -239,11 +239,21 @@ void rbtree_iter_reuse(RBTree *tree, RBTreeIter *iter);
  */
 bool rbtree_iter_next(RBTreeIter *iter);
 
-/*! Gets key of the current node. */
-#define rbtree_iter_get_key(iter) iter->sp->node->key
+/**
+ *\param iter a RBTreeIter
+ *\return key of current element
+ *
+ * Retrieves the key of the current element.
+ */
+void *rbtree_iter_get_key(RBTreeIter *iter);
 
-/*! Gets value of the current node. */
-#define rbtree_iter_get_value(iter) iter->sp->node->value
+/**
+ *\param iter a RBTreeIter
+ *\return value of current element
+ *
+ * Retrieves the value of the current element.
+ */
+void *rbtree_iter_get_value(RBTreeIter *iter);
 
 #endif
 
