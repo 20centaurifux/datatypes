@@ -22,14 +22,14 @@
  * \date 26. June 2012
  */
 
+#include "datatypes.h"
+#include "allocator.h"
+
 #ifndef __SLIST_H__
 #define __SLIST_H__
 
 #include <stdint.h>
 #include <stdbool.h>
-
-#include "datatypes.h"
-#include "allocator.h"
 
 /**
  * \struct SListItem
