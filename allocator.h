@@ -61,7 +61,7 @@ typedef struct
 		/*! The allocated memory block. */
 		int8_t *items;
 		/*! Offset of the next available address. */
-		int offset;
+		size_t offset;
 		/*! Pointer to next available memory block or NULL. */
 		struct _MemoryBlock *next;
 	} *block;
