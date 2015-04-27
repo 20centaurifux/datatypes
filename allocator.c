@@ -78,7 +78,6 @@ static void *
 _chunk_allocator_alloc(Allocator *alloc)
 {
 	ChunkAllocator *allocator = (ChunkAllocator *)alloc;
-	return malloc(allocator->item_size);
 	struct _MemoryBlock *block;
 	struct _MemoryPtrBlock *pblock;
 	void *item = NULL;
