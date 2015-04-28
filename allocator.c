@@ -129,7 +129,6 @@ _chunk_allocator_alloc(Allocator *alloc)
 static void
 _chunk_allocator_free(Allocator *alloc, void *item)
 {
-	free(item); return;
 	ChunkAllocator *allocator = (ChunkAllocator *)alloc;
 	struct _MemoryPtrBlock *cur;
 
