@@ -66,6 +66,15 @@ bool str_equal(const void * restrict a, const void * restrict b);
  */
 bool int_equal(const void * restrict a, const void * restrict b);
 
+/**
+ *\param a pointer
+ *\param b pointer
+ *\return true if pointers are equal
+ *
+ * Compares two pointers.
+ */
+bool direct_equal(const void * restrict a, const void * restrict b);
+
 #include "hashtable.h"
 #include "rbtree.h"
 #include "list.h"

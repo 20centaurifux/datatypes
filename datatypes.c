@@ -56,3 +56,9 @@ int_equal(const void * restrict a, const void * restrict b)
 	return (int *)a == (int *)b;
 }
 
+inline bool
+direct_equal(const void * restrict a, const void * restrict b)
+{
+	return a == b;
+}
+
