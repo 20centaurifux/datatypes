@@ -65,7 +65,7 @@ typedef struct _SList
 
 /**
  *\param equals function to compare item data
- *\param free function to free item data OR NULL
+ *\param free function to free item data or NULL
  *\param allocator a user-defined memory allocator for creating/destroying SListItems or NULL
  *\return a new SList
  *

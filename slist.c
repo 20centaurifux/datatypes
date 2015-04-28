@@ -304,7 +304,6 @@ slist_remove(SList *list, SListItem *item)
 
 	assert(list != NULL);
 	assert(list->head != NULL);
-	assert(iter != NULL);
 
 	p = list->head;
 
