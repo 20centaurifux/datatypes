@@ -81,6 +81,7 @@ bool direct_equal(const void * restrict a, const void * restrict b);
 #include "slist.h"
 #include "queue.h"
 #include "stack.h"
+#include "asyncqueue.h"
 
 #endif
 
