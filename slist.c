@@ -138,6 +138,7 @@ slist_new(EqualFunc equals, FreeFunc free, Allocator *allocator)
 void
 slist_init(SList *list, EqualFunc equals, FreeFunc free, Allocator *allocator)
 {
+	assert(list != NULL);
 	assert(equals != NULL);
 
 	memset(list, 0, sizeof(SList));
