@@ -101,7 +101,7 @@ bool stack_pop(Stack *stack, void **data);
  *\param stack a Stack
  *\return number of items
  *
- * Gets the number of items.
+ * Gets the number of stored items.
  */
 #define stack_count(stack) slist_count(stack)
 

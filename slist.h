@@ -80,7 +80,8 @@ SList *slist_new(EqualFunc equals, FreeFunc free, Allocator *allocator);
  *\param allocator a user-defined memory allocator for creating/destroying SListItems or NULL
  *
  * Initializes a new SList.
- */void slist_init(SList *list, EqualFunc equals, FreeFunc free, Allocator *allocator);
+ */
+void slist_init(SList *list, EqualFunc equals, FreeFunc free, Allocator *allocator);
 
 /**
  *\param list a SList

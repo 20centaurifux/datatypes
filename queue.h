@@ -86,7 +86,7 @@ typedef SList QueueItem;
  *\param data location to store data
  *\return true if queue is not empty
  *
- * Removes first element from queue.
+ * Pops data from the queue.
  */
 #define queue_pop(queue, data) stack_pop(queue, data)
 
@@ -101,7 +101,7 @@ typedef SList QueueItem;
  *\param queue a Queue
  *\return number of items
  *
- * Gets the number of items.
+ * Gets the number of stored items.
  */
 #define queue_count(queue) stack_count(queue)
 
