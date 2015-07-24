@@ -9,6 +9,7 @@ datatypes are available:
 * doubly-linked list
 * queue
 * stack
+* asynchronous (message) queue (requires POSIX threads!)
 
 To generate the code documentation please run Doxygen[^1].
 
