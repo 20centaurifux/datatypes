@@ -22,6 +22,8 @@
  * \date 23. July 2015
  */
 
+#ifdef WITH_PTHREAD
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/time.h>
@@ -192,4 +194,6 @@ async_queue_count(AsyncQueue *queue)
 
 	return count;
 }
+
+#endif /* WITH_PTHREAD */
 

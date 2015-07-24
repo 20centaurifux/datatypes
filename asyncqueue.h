@@ -22,6 +22,8 @@
  * \date 23. July 2015
  */
 
+#ifdef WITH_PTHREAD
+
 #ifndef __ASYNCQUEUE_H__
 #define __ASYNCQUEUE_H__
 
@@ -119,5 +121,8 @@ void async_queue_clear(AsyncQueue *queue);
  * Gets the number of stored items.
  */
 size_t async_queue_count(AsyncQueue *queue);
-#endif
+
+#endif /* __ASYNCQUEUE_H__ */
+
+#endif /* WITH_PTHREAD */
 
