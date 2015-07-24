@@ -1,7 +1,7 @@
 /***************************************************************************
     begin........: May 2012
     copyright....: Sebastian Fedrau
-    email........: lord-kefir@arcor.de
+    email........: sebastian.fedrau@gmail.com
  ***************************************************************************/
 
 /***************************************************************************
@@ -17,7 +17,7 @@
 /*!
  * \file rbtree.c
  * \brief A generic balanced binary tree.
- * \author Sebastian Fedrau <lord-kefir@arcor.de>
+ * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
  * \version 0.1.0
  * \date 27. June 2012
  */
@@ -196,7 +196,7 @@ _rbtree_stack_push(RBTree *tree, RBNode *node)
  */
 
 /**
- *\param b a RBNode
+ *\param n a RBNode
  *\return true if node is black
  *
  * Check if node color is black.

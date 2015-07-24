@@ -1,7 +1,7 @@
 /***************************************************************************
     begin........: June 2012
     copyright....: Sebastian Fedrau
-    email........: lord-kefir@arcor.de
+    email........: sebastian.fedrau@gmail.com
  ***************************************************************************/
 
 /***************************************************************************
@@ -17,7 +17,7 @@
 /*!
  * \file queue.h
  * \brief A generic queue.
- * \author Sebastian Fedrau <lord-kefir@arcor.de>
+ * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
  * \version 0.1.0
  * \date 29. June 2012
  */
@@ -28,13 +28,13 @@
 #include "stack.h"
 
 /**
- *\struct Queue
+ *\typedef Queue
  *\brief A generic queue.
  */
 typedef SList Queue;
 
 /**
- *\struct QueueItem
+ *\typedef QueueItem
  *\brief Holds queue item data & pointer to next element.
  */
 typedef SList QueueItem;

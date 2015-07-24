@@ -1,7 +1,7 @@
 /***************************************************************************
     begin........: June 2012
     copyright....: Sebastian Fedrau
-    email........: lord-kefir@arcor.de
+    email........: sebastian.fedrau@gmail.com
  ***************************************************************************/
 
 /***************************************************************************
@@ -17,7 +17,7 @@
 /*!
  * \file stack.h
  * \brief A generic stack.
- * \author Sebastian Fedrau <lord-kefir@arcor.de>
+ * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
  * \version 0.1.0
  * \date 29. June 2012
  */
@@ -28,13 +28,13 @@
 #include "slist.h"
 
 /**
- *\struct Stack
+ *\typedef Stack
  *\brief A generic stack.
  */
 typedef SList Stack;
 
 /**
- *\struct StackItem
+ *\typedef StackItem
  *\brief Holds stack item data & pointer to next element.
  */
 typedef SList StackItem;
