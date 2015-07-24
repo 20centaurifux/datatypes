@@ -47,18 +47,26 @@ async_queue_new(EqualFunc equals, FreeFunc free, Allocator *allocator)
 void
 async_queue_init(AsyncQueue *queue, EqualFunc equals, FreeFunc free, Allocator *allocator)
 {
+	#ifndef NDEBUG
 	int success;
+	#endif
 
 	assert(queue != NULL);
 
 	queue_init(&queue->queue, equals, free, allocator);
 	queue->waiting = 0;
 
-	success = pthread_mutex_init(&queue->mutex, NULL);
+	#ifndef NDEBUG
+	success =
+	#endif
+	          pthread_mutex_init(&queue->mutex, NULL);
 
 	assert(success == 0);
 
-	success = pthread_cond_init(&queue->cond, NULL);
+	#ifndef NDEBUG
+	success =
+	#endif
+	          pthread_cond_init(&queue->cond, NULL);
 
 	assert(success == 0);
 }
