@@ -24,6 +24,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
+#include <assert.h>
 
 #include "datatypes.h"
 
@@ -47,7 +49,10 @@ str_equal(const void * restrict a, const void * restrict b)
 int32_t
 int_compare(const void *a, const void *b)
 {
-	return (int)a - (int)b;
+	assert((size_t)a < UINT32_MAX);
+	assert((size_t)b < UINT32_MAX);
+
+	return (size_t)a - (size_t)b;
 }
 
 inline bool
