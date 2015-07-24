@@ -101,24 +101,18 @@ async_queue_push(AsyncQueue *queue, void *data)
 }
 
 static bool
-_async_queue_pop_unlocked(AsyncQueue *queue, void *data, uint32_t ms)
+_async_queue_pop(AsyncQueue *queue, void *data, uint32_t ms)
 {
-	bool success = true;
+	bool success;
 
 	pthread_mutex_lock(&queue->mutex);
 
-	success = queue_pop(&queue->queue, data);
-
-	pthread_mutex_unlock(&queue->mutex);
-
-	if(success)
+	if((success = queue_pop(&queue->queue, data)))
 	{
-		return true;
+		goto out;
 	}
 
-	pthread_mutex_lock(&queue->mutex);
-
-	queue->waiting++;
+	++queue->waiting;
 
 	if(ms)
 	{
@@ -129,8 +123,6 @@ _async_queue_pop_unlocked(AsyncQueue *queue, void *data, uint32_t ms)
 
 		val.tv_sec = now.tv_sec + (ms / 1000);
 		val.tv_nsec = 0;
-
-		success = false;
 
 		if(!pthread_cond_timedwait(&queue->cond, &queue->mutex, &val))
 		{
@@ -145,8 +137,9 @@ _async_queue_pop_unlocked(AsyncQueue *queue, void *data, uint32_t ms)
 		}
 	}
 
-	queue->waiting--;
+	++queue->waiting;
 
+out:
 	pthread_mutex_unlock(&queue->mutex);
 
 	return success;
@@ -155,13 +148,13 @@ _async_queue_pop_unlocked(AsyncQueue *queue, void *data, uint32_t ms)
 bool
 async_queue_pop(AsyncQueue *queue, void *data)
 {
-	return _async_queue_pop_unlocked(queue, data, 0);
+	return _async_queue_pop(queue, data, 0);
 }
 
 bool
 async_queue_pop_timeout(AsyncQueue *queue, void *data, uint32_t ms)
 {
-	return _async_queue_pop_unlocked(queue, data, ms);
+	return _async_queue_pop(queue, data, ms);
 }
 
 void
