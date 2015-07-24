@@ -30,13 +30,17 @@
 
 /**
  *\struct AsyncQueue
- *\brief Asynchronous queue implementation.
+ *\brief An asynchronous queue.
  */
 typedef struct
 {
+	/*! Mutex to protect the queue. */
 	pthread_mutex_t mutex;
+	/*! Condition to wakeup consumers. */
 	pthread_cond_t cond;
+	/*! The underlying queue. */
 	Queue queue;
+	/*! Number of waiting consumers. */
 	uint32_t waiting;
 } AsyncQueue;
 
