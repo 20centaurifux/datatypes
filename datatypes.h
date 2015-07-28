@@ -40,15 +40,6 @@ typedef void (*FreeFunc)(void *p);
 #define str_compare (CompareFunc)strcmp
 
 /**
- *\param a pointer to an integer
- *\param b pointer to an integer
- *\return 0 if values are equal, or a positive integer if the first value comes after the second
- *
- * Compares to integers.
- */
-int32_t int_compare(const void *a, const void *b);
-
-/**
  *\param a pointer to a string
  *\param b pointer to a string
  *\return true if values are equal
@@ -58,22 +49,22 @@ int32_t int_compare(const void *a, const void *b);
 bool str_equal(const void * restrict a, const void * restrict b);
 
 /**
- *\param a pointer to an integer
- *\param b pointer to an integer
- *\return true if values are equal
+ *\param a a pointer
+ *\param b a pointer
+ *\return a - b
  *
- * Checks if two integers are equal.
+ * Compares to pointers.
  */
-bool int_equal(const void * restrict a, const void * restrict b);
+int32_t direct_compare(const void *a, const void *b);
 
 /**
- *\param a pointer
- *\param b pointer
+ *\param a a pointer
+ *\param ba pointer
  *\return true if pointers are equal
  *
- * Compares two pointers.
+ * Tests if two pointers are equal.
  */
-bool direct_equal(const void * restrict a, const void * restrict b);
+bool direct_equal(const void *a, const void *b);
 
 #include "hashtable.h"
 #include "rbtree.h"

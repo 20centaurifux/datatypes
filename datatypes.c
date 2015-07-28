@@ -47,22 +47,18 @@ str_equal(const void * restrict a, const void * restrict b)
 }
 
 int32_t
-int_compare(const void *a, const void *b)
+direct_compare(const void *a, const void *b)
 {
-	assert((size_t)a < UINT32_MAX);
-	assert((size_t)b < UINT32_MAX);
+	size_t result = (size_t)a - (size_t)b;
 
-	return (size_t)a - (size_t)b;
+	assert(result > INT32_MIN);
+	assert(result < INT32_MAX);
+
+	return (int32_t)result;
 }
 
 inline bool
-int_equal(const void * restrict a, const void * restrict b)
-{
-	return (int *)a == (int *)b;
-}
-
-inline bool
-direct_equal(const void * restrict a, const void * restrict b)
+direct_equal(const void *a, const void *b)
 {
 	return a == b;
 }
