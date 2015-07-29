@@ -95,11 +95,6 @@ _chunk_allocator_alloc(Allocator *alloc)
 			allocator->free_block = pblock->next;
 			free(pblock->items);
 			free(pblock);
-
-			if(allocator->free_block)
-			{
-				--allocator->free_block->offset;
-			}
 		}
 
 		return item;
