@@ -115,6 +115,8 @@ _async_queue_pop(AsyncQueue *queue, void *data, uint32_t ms)
 {
 	bool success;
 
+	assert(queue != NULL);
+
 	pthread_mutex_lock(&queue->mutex);
 
 	if((success = queue_pop(&queue->queue, data)))
