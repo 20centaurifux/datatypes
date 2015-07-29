@@ -30,9 +30,6 @@
 #include "datatypes.h"
 #include "allocator.h"
 
-/*! Specifies the type of the hash function which is passed to hashtable_new() or hashtable_init(). */
-typedef uint32_t (*HashFunc)(const char *plain);
-
 /**
  *\struct HashTable
  *\brief A datatype to create associations between keys and values.

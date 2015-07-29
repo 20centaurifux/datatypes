@@ -46,6 +46,19 @@ str_equal(const void * restrict a, const void * restrict b)
 	return true;
 }
 
+uint32_t inline
+str_hash(const char *plain)
+{
+	uint32_t hash = 0;
+
+	while(*plain)
+	{
+		hash = *plain++ + (hash << 6) + (hash << 16) - hash;
+	}
+
+	return hash;
+}
+
 int32_t
 direct_compare(const void *a, const void *b)
 {

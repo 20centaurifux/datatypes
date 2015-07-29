@@ -49,19 +49,6 @@
  */
 #define HASHTABLE_INDEX(table, key) table->hash(key) % table->size
 
-uint32_t inline
-str_hash(const char *plain)
-{
-	uint32_t hash = 0;
-
-	while(*plain)
-	{
-		hash = *plain++ + (hash << 6) + (hash << 16) - hash;
-	}
-
-	return hash;
-}
-
 HashTable *
 hashtable_new(size_t size, HashFunc hash_func, EqualFunc compare_keys, FreeFunc free_key, FreeFunc free_value)
 {
