@@ -147,7 +147,7 @@ _async_queue_pop(AsyncQueue *queue, void *data, uint32_t ms)
 		}
 	}
 
-	++queue->waiting;
+	--queue->waiting;
 
 out:
 	pthread_mutex_unlock(&queue->mutex);
