@@ -148,6 +148,8 @@ chunk_allocator_new(size_t item_size, size_t block_size)
 
 	assert(item_size > 1);
 	assert(block_size > 1);
+	assert(block_size < SIZE_MAX / item_size);
+	assert(block_size < SIZE_MAX / sizeof(void *));
 
 	if(!(allocator = (ChunkAllocator *)malloc(sizeof(ChunkAllocator))))
 	{
@@ -173,6 +175,8 @@ chunk_allocator_destroy(ChunkAllocator *allocator)
 	struct _MemoryBlock *iter;
 	struct _MemoryPtrBlock *pblock;
 	struct _MemoryPtrBlock *piter;
+
+	assert(allocator != NULL);
 
 	/* free memory blocks & list */
 	iter = allocator->block;
