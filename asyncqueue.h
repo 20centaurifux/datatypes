@@ -1,7 +1,7 @@
 /***************************************************************************
     begin........: June 2012
     copyright....: Sebastian Fedrau
-    email........: lord-kefir@arcor.de
+    email........: sebastian.fedrau@gmail.com
  ***************************************************************************/
 
 /***************************************************************************
@@ -17,7 +17,7 @@
 /*!
  * \file asyncqueue.h
  * \brief An asynchronous queue.
- * \author Sebastian Fedrau <lord-kefir@arcor.de>
+ * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
  * \version 0.1.0
  * \date 23. July 2015
  */
