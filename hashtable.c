@@ -105,7 +105,7 @@ hashtable_free(HashTable *table)
 
 	if(table->free_key || table->free_value)
 	{
-		#ifdef OPENMP
+		#ifdef WITH_OPENMP
 		#pragma omp parallel for private(iter)
 		#endif
 		for(i = 0; i < table->size; ++i)
@@ -128,7 +128,9 @@ hashtable_free(HashTable *table)
 				}
 			}
 		}
+		#ifdef WITH_OPENMP
 		#pragma omp barrier
+		#endif
 	}
 
 	chunk_allocator_destroy((ChunkAllocator *)table->allocator);
@@ -147,7 +149,7 @@ hashtable_clear(HashTable *table)
 	}
 	else
 	{
-		#ifdef OPENMP
+		#ifdef WITH_OPENMP
 		#pragma omp parallel for private(iter)
 		#endif
 		for(i = 0; i < table->size; ++i)
@@ -172,7 +174,9 @@ hashtable_clear(HashTable *table)
 
 			table->buckets[i] = NULL;
 		}
+		#ifdef WITH_OPENMP
 		#pragma omp barrier
+		#endif
 	}
 
 	chunk_allocator_destroy((ChunkAllocator *)table->allocator);
