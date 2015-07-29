@@ -84,6 +84,8 @@ _slist_find(SList *list, SListItem *offset, void const *data)
 static void
 _slist_remove(SList *list, SListItem *prev, SListItem *item)
 {
+	assert(list != NULL);
+
 	if(prev)
 	{
 		prev->next = item->next;
@@ -181,6 +183,8 @@ slist_free(SList *list)
 void
 slist_destroy(SList *list)
 {
+	assert(list != NULL);
+
 	slist_free(list);
 	free(list);
 }
