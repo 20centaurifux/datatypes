@@ -93,7 +93,7 @@ typedef struct
 uint32_t str_hash(const char *plain);
 
 /**
- *\param size size of the hash table
+ *\param size size of the hash table (number of buckets)
  *\param hash_func function to create hash from a key
  *\param compare_keys function to check equality of two keys
  *\param free_key function to free keys or NULL
@@ -106,7 +106,7 @@ HashTable *hashtable_new(size_t size, HashFunc hash_func, EqualFunc compare_keys
 
 /**
  *\param table a HashTable
- *\param size size of the hash table
+ *\param size size of the hash table (number of buckets)
  *\param hash_func function to create hash from a key
  *\param compare_keys function to check equality of two keys
  *\param free_key function to free keys or NULL
