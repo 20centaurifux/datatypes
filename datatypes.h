@@ -22,6 +22,22 @@
  * \date 27. June 2012
  */
 
+/**
+ *\mainpage datatypes
+ *
+ * <p>This library provides some generic and abstract datatypes you might miss in C.
+ * The following datatypes are available:</p>
+ * <ul>
+ * <li>hashtable (with fixed bucket size)</li>
+ * <li>red black tree</li>
+ * <li>singly-linked list</li>
+ * <li>doubly-linked list</li>
+ * <li>queue</li>
+ * <li>stack</li>
+ * <li>asynchronous queue (requires POSIX threads!)</li>
+ * </ul>
+ */
+
 #ifndef __DATATYPES_H__
 #define __DATATYPES_H__
 
