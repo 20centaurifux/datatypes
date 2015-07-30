@@ -28,7 +28,7 @@
 #define __ASYNCQUEUE_H__
 
 #include <pthread.h>
-#include "queue.h"
+#include "datatypes.h"
 
 /**
  *\struct AsyncQueue
