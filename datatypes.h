@@ -62,7 +62,7 @@ int32_t direct_compare(const void *a, const void *b);
 
 /**
  *\param a a pointer
- *\param ba pointer
+ *\param b a pointer
  *\return true if pointers are equal
  *
  * Tests if two pointers are equal.
