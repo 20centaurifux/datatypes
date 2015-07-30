@@ -76,12 +76,10 @@ typedef struct
 	{
 		/*! Array containing freed pointers. */
 		void **items;
-		/*! Offset to detect next index to store a freed pointer. */
+		/*! Offset to find next available position in items array. */
 		size_t offset;
 		/*! Pointer to next chunk or NULL. */
 		struct _MemoryPtrBlock *next;
-		/*! Pointer to previous chunk or NULL. */
-		struct _MemoryPtrBlock *prev;
 	} *free_block;
 	/*! Number of items a memory chunk can hold. */
 	size_t block_size;
@@ -94,14 +92,14 @@ typedef struct
  *\param block_size number of elements a chunk can hold
  *\return a new allocator
  *
- * Creates a new memory allocator.
+ * Creates a new ChunkAllocator.
  */
 ChunkAllocator *chunk_allocator_new(size_t item_size, size_t block_size);
 
 /**
  *\param allocator a memory allocator
  *
- * Destroys the given memory allocator.
+ * Destroys the given ChunkAllocator.
  */
 void chunk_allocator_destroy(ChunkAllocator *allocator);
 

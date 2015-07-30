@@ -1,11 +1,11 @@
 # datatypes - README
 
-This library provides some datatypes you might miss in C. The following
-datatypes are available:
+This library provides some generic and abstract datatypes you might miss
+in C. The following datatypes are available:
 
-* hashtable
+* hashtable (with fixed bucket size)
 * red black tree
-* singly-list
+* singly-linked list
 * doubly-linked list
 * queue
 * stack

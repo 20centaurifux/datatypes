@@ -22,6 +22,22 @@
  * \date 27. June 2012
  */
 
+/**
+ *\mainpage datatypes
+ *
+ * <p>This library provides some generic and abstract datatypes you might miss in C.
+ * The following datatypes are available:</p>
+ * <ul>
+ * <li>hashtable (with fixed bucket size)</li>
+ * <li>red black tree</li>
+ * <li>singly-linked list</li>
+ * <li>doubly-linked list</li>
+ * <li>queue</li>
+ * <li>stack</li>
+ * <li>asynchronous queue (requires POSIX threads!)</li>
+ * </ul>
+ */
+
 #ifndef __DATATYPES_H__
 #define __DATATYPES_H__
 
@@ -36,17 +52,11 @@ typedef bool (*EqualFunc)(const void *a, const void *b);
 /*! A function to free memory. */
 typedef void (*FreeFunc)(void *p);
 
+/*! Specifies the type of the hash function which is passed to hashtable_new() or hashtable_init(). */
+typedef uint32_t (*HashFunc)(const char *plain);
+
  /*! Compares two strings. Return 0 if values are equal, or a positive integer if the first value comes after the second. */
 #define str_compare (CompareFunc)strcmp
-
-/**
- *\param a pointer to an integer
- *\param b pointer to an integer
- *\return 0 if values are equal, or a positive integer if the first value comes after the second
- *
- * Compares to integers.
- */
-int32_t int_compare(const void *a, const void *b);
 
 /**
  *\param a pointer to a string
@@ -58,22 +68,22 @@ int32_t int_compare(const void *a, const void *b);
 bool str_equal(const void * restrict a, const void * restrict b);
 
 /**
- *\param a pointer to an integer
- *\param b pointer to an integer
- *\return true if values are equal
+ *\param a a pointer
+ *\param b a pointer
+ *\return a - b
  *
- * Checks if two integers are equal.
+ * Compares to pointers.
  */
-bool int_equal(const void * restrict a, const void * restrict b);
+int32_t direct_compare(const void *a, const void *b);
 
 /**
- *\param a pointer
- *\param b pointer
+ *\param a a pointer
+ *\param b a pointer
  *\return true if pointers are equal
  *
- * Compares two pointers.
+ * Tests if two pointers are equal.
  */
-bool direct_equal(const void * restrict a, const void * restrict b);
+bool direct_equal(const void *a, const void *b);
 
 #include "hashtable.h"
 #include "rbtree.h"

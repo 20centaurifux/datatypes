@@ -1,7 +1,7 @@
 /***************************************************************************
     begin........: June 2012
     copyright....: Sebastian Fedrau
-    email........: lord-kefir@arcor.de
+    email........: sebastian.fedrau@gmail.com
  ***************************************************************************/
 
 /***************************************************************************
@@ -17,7 +17,7 @@
 /*!
  * \file asyncqueue.c
  * \brief An asynchronous queue.
- * \author Sebastian Fedrau <lord-kefir@arcor.de>
+ * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
  * \version 0.1.0
  * \date 23. July 2015
  */
@@ -115,6 +115,8 @@ _async_queue_pop(AsyncQueue *queue, void *data, uint32_t ms)
 {
 	bool success;
 
+	assert(queue != NULL);
+
 	pthread_mutex_lock(&queue->mutex);
 
 	if((success = queue_pop(&queue->queue, data)))
@@ -147,7 +149,7 @@ _async_queue_pop(AsyncQueue *queue, void *data, uint32_t ms)
 		}
 	}
 
-	++queue->waiting;
+	--queue->waiting;
 
 out:
 	pthread_mutex_unlock(&queue->mutex);

@@ -49,19 +49,6 @@
  */
 #define HASHTABLE_INDEX(table, key) table->hash(key) % table->size
 
-uint32_t inline
-str_hash(const char *plain)
-{
-	uint32_t hash = 0;
-
-	while(*plain)
-	{
-		hash = *plain++ + (hash << 6) + (hash << 16) - hash;
-	}
-
-	return hash;
-}
-
 HashTable *
 hashtable_new(size_t size, HashFunc hash_func, EqualFunc compare_keys, FreeFunc free_key, FreeFunc free_value)
 {
@@ -106,6 +93,8 @@ hashtable_init(HashTable *table, size_t size, HashFunc hash_func, EqualFunc comp
 void
 hashtable_destroy(HashTable *table)
 {
+	assert(table != NULL);
+
 	hashtable_free(table);
 	free(table);
 }
@@ -116,9 +105,11 @@ hashtable_free(HashTable *table)
 	int i;
 	struct _Bucket *iter;
 
+	assert(table != NULL);
+
 	if(table->free_key || table->free_value)
 	{
-		#ifdef OPENMP
+		#ifdef WITH_OPENMP
 		#pragma omp parallel for private(iter)
 		#endif
 		for(i = 0; i < table->size; ++i)
@@ -141,7 +132,9 @@ hashtable_free(HashTable *table)
 				}
 			}
 		}
+		#ifdef WITH_OPENMP
 		#pragma omp barrier
+		#endif
 	}
 
 	chunk_allocator_destroy((ChunkAllocator *)table->allocator);
@@ -154,13 +147,15 @@ hashtable_clear(HashTable *table)
 	int i;
 	struct _Bucket *iter;
 
+	assert(table != NULL);
+
 	if(!table->free_key && !table->free_value)
 	{
 		memset(table->buckets, 0, sizeof(struct _Bucket *) * table->size);
 	}
 	else
 	{
-		#ifdef OPENMP
+		#ifdef WITH_OPENMP
 		#pragma omp parallel for private(iter)
 		#endif
 		for(i = 0; i < table->size; ++i)
@@ -185,7 +180,9 @@ hashtable_clear(HashTable *table)
 
 			table->buckets[i] = NULL;
 		}
+		#ifdef WITH_OPENMP
 		#pragma omp barrier
+		#endif
 	}
 
 	chunk_allocator_destroy((ChunkAllocator *)table->allocator);
@@ -332,6 +329,9 @@ hashtable_key_exists(HashTable *table, const void *key)
 {
 	struct _Bucket *iter;
 
+	assert(table != NULL);
+	assert(key != NULL);
+
 	if((iter = table->buckets[HASHTABLE_INDEX(table, key)]))
 	{
 		while(iter)
@@ -359,6 +359,8 @@ hashtable_count(HashTable *table)
 void
 hashtable_iter_init(HashTable *table, HashTableIter *iter)
 {
+	assert(table != NULL);
+
 	memset(iter, 0, sizeof(HashTableIter));
 	iter->table = table;
 }
@@ -366,6 +368,8 @@ hashtable_iter_init(HashTable *table, HashTableIter *iter)
 static inline bool
 _hashtable_iter_get_next_bucket(HashTableIter *iter)
 {
+	assert(iter != NULL);
+
 	iter->liter = NULL;
 
 	while(!iter->liter && iter->offset < iter->table->size)
@@ -379,12 +383,14 @@ _hashtable_iter_get_next_bucket(HashTableIter *iter)
 bool
 hashtable_iter_next(HashTableIter *iter)
 {
+	assert(iter != NULL);
+
 	if(iter->finished)
 	{
 		return false;
 	}
 
-	for( ;; )
+	for(;;)
 	{
 		if(iter->liter)
 		{

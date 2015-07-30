@@ -57,6 +57,9 @@ _list_item_new(Allocator *allocator, void *data)
 static void
 _list_detach(List *list, ListItem *item)
 {
+	assert(list != NULL);
+	assert(item != NULL);
+
 	/* check if there's a previous list item */
 	if(item->prev)
 	{
@@ -89,6 +92,8 @@ _list_find(List *list, ListItem *offset, void const *data)
 {
 	ListItem *begin;
 	ListItem *end;
+
+	assert(list != NULL);
 
 	if(offset)
 	{
@@ -190,6 +195,8 @@ list_free(List *list)
 void
 list_destroy(List *list)
 {
+	assert(list != NULL);
+
 	list_free(list);
 	free(list);
 }
