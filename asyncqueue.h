@@ -50,7 +50,7 @@ typedef struct
  *\param equals function to compare item data
  *\param free function to free item data or NULL
  *\param allocator a user-defined memory allocator for creating/destroying QueueItems or NULL
- *\return a new Queue
+ *\return a new AsyncQueue
  *
  * Creates a new AsyncQueue.
  */
@@ -115,7 +115,7 @@ bool async_queue_pop_timeout(AsyncQueue *queue, void *data, uint32_t ms);
 void async_queue_clear(AsyncQueue *queue);
 
 /**
- *\param queue a Queue
+ *\param queue an AsyncQueue
  *\return number of items
  *
  * Gets the number of stored items.
