@@ -76,12 +76,8 @@ async_queue_init(AsyncQueue *queue, EqualFunc equals, FreeFunc free, Allocator *
 void
 async_queue_destroy(AsyncQueue *queue)
 {
-	assert(queue != NULL);
-
-	queue_free(&queue->queue);
-
-	pthread_mutex_destroy(&queue->mutex);
-	pthread_cond_destroy(&queue->cond);
+	async_queue_free(queue);
+	free(queue);
 }
 
 void
@@ -89,8 +85,10 @@ async_queue_free(AsyncQueue *queue)
 {
 	assert(queue != NULL);
 
-	async_queue_destroy(queue);
-	free(queue);
+	queue_free(&queue->queue);
+
+	pthread_mutex_destroy(&queue->mutex);
+	pthread_cond_destroy(&queue->cond);
 }
 
 void
