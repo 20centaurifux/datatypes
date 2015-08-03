@@ -34,6 +34,7 @@
  * <li>doubly-linked list</li>
  * <li>queue</li>
  * <li>stack</li>
+ * <li>byte-buffer</li>
  * <li>asynchronous queue (requires POSIX threads!)</li>
  * </ul>
  */
