@@ -15,6 +15,7 @@ all:
 	$(CC) -c rbtree.c -o rbtree.o $(CFLAGS)
 	$(CC) -c slist.c -o slist.o $(CFLAGS)
 	$(CC) -c list.c -o list.o $(CFLAGS)
+	$(CC) -c buffer.c -o buffer.o $(CFLAGS)
 	$(CC) -c asyncqueue.c -o allocator.o $(CFLAGS)
 	$(CC) -c datatypes.c -o datatypes.o $(CFLAGS)
 	$(CC) -c allocator.c -o allocator.o $(CFLAGS)
