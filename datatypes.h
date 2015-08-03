@@ -91,6 +91,7 @@ bool direct_equal(const void *a, const void *b);
 #include "slist.h"
 #include "queue.h"
 #include "stack.h"
+#include "buffer.h"
 #include "asyncqueue.h"
 
 #endif
