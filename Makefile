@@ -1,28 +1,58 @@
-CC=gcc
+# destination paths:
+PREFIX=/usr/local
+INCDIR=$(PREFIX)/include
+LIBDIR=$(PREFIX)/lib64
 
-PTHREAD_LIB=-lpthread
+# compiler:
+CC=gcc
+CFLAGS=-Wall -std=c99 -O2 -fPIC $(OPENMP_CFLAGS) $(PTHREAD_CFLAGS)
+
+# source code & object files:
+SRC=.
+SRCS=$(SRC)/allocator.c $(SRC)/asyncqueue.c $(SRC)/buffer.c $(SRC)/datatypes.c \
+     $(SRC)/hashtable.c $(SRC)/list.c $(SRC)/rbtree.c $(SRC)/slist.c $(SRC)/stack.c
+OBJS=$(SRCS:.c=.o)
+
+# optional libraries (comment assigned values out to disable):
 PTHREAD_CFLAGS=-DWITH_PTHREAD
 OPENMP_CFLAGS=-DWITH_OPENMP -fopenmp
 
-CFLAGS=-Wall -std=c99 -O3 -DNDEBUG $(OPENMP_CFLAGS) -fopenmp $(PTHREAD_CFLAGS)
-
+# version information:
 MAJOR_VERSION=0
 MINOR_VERSION=1
 PATCHLEVEL=0
 
-all:
-	$(CC) -c hashtable.c -o hashtable.o $(CFLAGS)
-	$(CC) -c rbtree.c -o rbtree.o $(CFLAGS)
-	$(CC) -c slist.c -o slist.o $(CFLAGS)
-	$(CC) -c list.c -o list.o $(CFLAGS)
-	$(CC) -c buffer.c -o buffer.o $(CFLAGS)
-	$(CC) -c asyncqueue.c -o allocator.o $(CFLAGS)
-	$(CC) -c datatypes.c -o datatypes.o $(CFLAGS)
-	$(CC) -c allocator.c -o allocator.o $(CFLAGS)
-	ar rcs libdatatypes.a $(OBJS)
-	$(CC) -shared -Wl,-soname,libdatatypes.so.0 -o libdatatypes-$(MAJOR_VERSION).$(MINOR_VERSION).$(PATCHLEVEL).so $(OBJ) $(PTHREAD_LIB)
+# destination library files:
+STATIC_LIB=libdatatypes-$(MAJOR_VERSION).$(MINOR_VERSION).$(PATCHLEVEL).a
+SHARED_LIB=$(STATIC_LIB:.a=.so)
+
+# targets:
+.PHONY: all clean install uninstall
+
+.c.o:
+	$(CC) $(CFLAGS) -c $< -o $@
+
+all: $(OBJS)
+	ar rcs $(SRC)/$(STATIC_LIB) $(OBJS)
+	$(CC) -shared -Wl,-soname,libdatatypes.so.0 -o $(SRC)/$(SHARED_LIB) $(OBJS)
 
 clean:
-	rm -f *.o
-	rm -f libdatatypes.a
-	rm -f ./libdatatypes-$(MAJOR_VERSION).$(MINOR_VERSION).$(PATCHLEVEL).so
+	rm -f $(OBJS)
+	rm -f $(SRC)/$(STATIC_LIB)
+	rm -f $(SRC)/$(SHARED_LIB)
+
+install:
+	test -d "$(INCDIR)/datatypes" || mkdir -p "$(INCDIR)/datatypes"
+	chmod 755 "$(INCDIR)/datatypes"
+	cp $(SRC)/*.h "$(INCDIR)/datatypes"
+	chmod 644 $(INCDIR)/datatypes/*.h
+	test -d "$(LIBDIR)" || mkdir -p "$(LIBDIR)"
+	cp $(SRC)/$(STATIC_LIB) "$(LIBDIR)"
+	chmod 755 $(LIBDIR)/$(STATIC_LIB)
+	cp $(SRC)/$(SHARED_LIB) "$(LIBDIR)"
+	chmod 755 $(LIBDIR)/$(SHARED_LIB)
+
+uninstall:
+	rm -fr "$(INCDIR)/datatypes"
+	rm -f $(LIBDIR)/$(STATIC_LIB)
+	rm -f $(LIBDIR)/$(SHARED_LIB)
