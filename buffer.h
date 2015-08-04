@@ -157,7 +157,7 @@ bool buffer_flush(Buffer *buf, char **dst, size_t *len);
  *
  * Converts the data from the buffer to a string. Returns NULL if buffer is invalid.
  */
-char *buffer_to_string(Buffer *buf);
+char *buffer_to_string(const Buffer *buf);
 
 #endif
 

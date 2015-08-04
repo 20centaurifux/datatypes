@@ -301,7 +301,7 @@ hashtable_remove(HashTable *table, const void *key)
 }
 
 void *
-hashtable_lookup(HashTable *table, const void *key)
+hashtable_lookup(const HashTable *table, const void *key)
 {
 	struct _Bucket *iter;
 
@@ -325,7 +325,7 @@ hashtable_lookup(HashTable *table, const void *key)
 }
 
 bool
-hashtable_key_exists(HashTable *table, const void *key)
+hashtable_key_exists(const HashTable *table, const void *key)
 {
 	struct _Bucket *iter;
 
@@ -349,7 +349,7 @@ hashtable_key_exists(HashTable *table, const void *key)
 }
 
 inline size_t
-hashtable_count(HashTable *table)
+hashtable_count(const HashTable *table)
 {
 	assert(table != NULL);
 
@@ -357,7 +357,7 @@ hashtable_count(HashTable *table)
 }
 
 void
-hashtable_iter_init(HashTable *table, HashTableIter *iter)
+hashtable_iter_init(const HashTable *table, HashTableIter *iter)
 {
 	assert(table != NULL);
 
@@ -416,7 +416,7 @@ hashtable_iter_next(HashTableIter *iter)
 }
 
 void inline *
-hashtable_iter_get_key(HashTableIter *iter)
+hashtable_iter_get_key(const HashTableIter *iter)
 {
 	assert(iter != NULL);
 
@@ -429,7 +429,7 @@ hashtable_iter_get_key(HashTableIter *iter)
 }
 
 void inline *
-hashtable_iter_get_value(HashTableIter *iter)
+hashtable_iter_get_value(const HashTableIter *iter)
 {
 	assert(iter != NULL);
 

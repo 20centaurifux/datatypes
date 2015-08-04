@@ -106,7 +106,7 @@ typedef struct
 typedef struct
 {
 	/*! Pointer to related tree. */
-	RBTree *tree;
+	const RBTree *tree;
 	/*! A stack holding nodes and an iteration state. */
 	RBTreeIterStackItem *stack;
 	/*! The stack pointer. */
@@ -178,7 +178,7 @@ RBTreeInsertResult rbtree_set(RBTree *tree, void * restrict key, void * restrict
  *
  * Gets the number of stored nodes.
  */
-size_t rbtree_count(RBTree *tree);
+size_t rbtree_count(const RBTree *tree);
 
 /**
  *\param tree a RBTree
@@ -187,7 +187,7 @@ size_t rbtree_count(RBTree *tree);
  *
  * Looks up a key in the RBTree and returns its value.
  */
-void *rbtree_lookup(RBTree *tree, const void *key);
+void *rbtree_lookup(const RBTree *tree, const void *key);
 
 /**
  *\param tree a RBTree
@@ -196,7 +196,7 @@ void *rbtree_lookup(RBTree *tree, const void *key);
  *
  * Checks if a key does exist.
  */
-bool rbtree_key_exists(RBTree *tree, const void *key);
+bool rbtree_key_exists(const RBTree *tree, const void *key);
 
 /**
  *\param tree a RBTree
@@ -214,7 +214,7 @@ bool rbtree_remove(RBTree *tree, const void *key);
  * Initializes a key/value pair iterator and associates it with the tree. Modifying the tree while
  * using the iterator might lead to undefined behaviour.
  */
-void rbtree_iter_init(RBTree *tree, RBTreeIter *iter);
+void rbtree_iter_init(const RBTree *tree, RBTreeIter *iter);
 
 /**
  *\param iter a RBTreeIter
@@ -229,7 +229,7 @@ void rbtree_iter_free(RBTreeIter *iter);
  *
  * Reuses an iterator.
  */
-void rbtree_iter_reuse(RBTree *tree, RBTreeIter *iter);
+void rbtree_iter_reuse(const RBTree *tree, RBTreeIter *iter);
 
 /**
  *\param iter a RBTreeIter
@@ -245,7 +245,7 @@ bool rbtree_iter_next(RBTreeIter *iter);
  *
  * Retrieves the key of the current element.
  */
-void *rbtree_iter_get_key(RBTreeIter *iter);
+void *rbtree_iter_get_key(const RBTreeIter *iter);
 
 /**
  *\param iter a RBTreeIter
@@ -253,7 +253,7 @@ void *rbtree_iter_get_key(RBTreeIter *iter);
  *
  * Retrieves the value of the current element.
  */
-void *rbtree_iter_get_value(RBTreeIter *iter);
+void *rbtree_iter_get_value(const RBTreeIter *iter);
 
 #endif
 

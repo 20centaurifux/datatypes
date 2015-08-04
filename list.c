@@ -88,7 +88,7 @@ _list_detach(List *list, ListItem *item)
 }
 
 static ListItem *
-_list_find(List *list, ListItem *offset, void const *data)
+_list_find(const List *list, ListItem *offset, void const *data)
 {
 	ListItem *begin;
 	ListItem *end;
@@ -422,7 +422,7 @@ list_pop(List *list)
 }
 
 bool
-list_contains(List *list, void *data)
+list_contains(const List *list, void *data)
 {
 	assert(list != NULL);
 	assert(list->equals != NULL);
@@ -466,13 +466,13 @@ list_clear(List *list)
 }
 
 ListItem *
-list_find(List *list, ListItem *offset, void const *data)
+list_find(const List *list, ListItem *offset, void const *data)
 {
 	return _list_find(list, offset, data);
 }
 
 inline ListItem *
-list_head(List *list)
+list_head(const List *list)
 {
 	assert(list != NULL);
 
@@ -480,7 +480,7 @@ list_head(List *list)
 }
 
 inline ListItem *
-list_tail(List *list)
+list_tail(const List *list)
 {
 	assert(list != NULL);
 
@@ -488,7 +488,7 @@ list_tail(List *list)
 }
 
 inline size_t
-list_count(List *list)
+list_count(const List *list)
 {
 	assert(list != NULL);
 
@@ -496,7 +496,7 @@ list_count(List *list)
 }
 
 inline bool
-list_empty(List *list)
+list_empty(const List *list)
 {
 	assert(list != NULL);
 

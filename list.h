@@ -133,7 +133,7 @@ ListItem *list_insert_sorted(List *list, void *data, CompareFunc compare);
  *
  * Gets the head of the list.
  */
-ListItem *list_head(List *list);
+ListItem *list_head(const List *list);
 
 /**
  *\param list a List
@@ -141,7 +141,7 @@ ListItem *list_head(List *list);
  *
  * Gets the tail of the list.
  */
-ListItem *list_tail(List *list);
+ListItem *list_tail(const List *list);
 
 /**
  *\param list a List
@@ -149,7 +149,7 @@ ListItem *list_tail(List *list);
  *
  * Gets the number of items.
  */
-size_t list_count(List *list);
+size_t list_count(const List *list);
 
 /**
  *\param list a List
@@ -157,7 +157,7 @@ size_t list_count(List *list);
  *
  * Checks if a list is empty.
  */
-bool list_empty(List *list);
+bool list_empty(const List *list);
 
 /**
  *\param list a List
@@ -191,7 +191,7 @@ void *list_pop(List *list);
  *
  * Tests if list contains given data.
  */
-bool list_contains(List *list, void *data);
+bool list_contains(const List *list, void *data);
 
 /**
  *\param list a List
@@ -208,7 +208,7 @@ void list_clear(List *list);
  *
  * Searches for given data.
  */
-ListItem *list_find(List *list, ListItem *offset, void const *data);
+ListItem *list_find(const List *list, ListItem *offset, void const *data);
 
 /*! Gets next list item. */
 #define list_item_next(item) item->next

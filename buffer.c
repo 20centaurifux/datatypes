@@ -275,7 +275,7 @@ buffer_flush(Buffer *buf, char **dst, size_t *len)
 }
 
 char *
-buffer_to_string(Buffer *buf)
+buffer_to_string(const Buffer *buf)
 {
 	RETURN_VAL_IF_INVALID(buf, NULL);
 

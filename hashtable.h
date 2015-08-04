@@ -75,7 +75,7 @@ typedef struct
 typedef struct
 {
 	/*! Pointer to the associated HashTable. */
-	HashTable *table;
+	const HashTable *table;
 	/*! Index of current bucket. */
 	size_t offset;
 	/*! Pointer to current list element. */
@@ -163,7 +163,7 @@ void hashtable_remove(HashTable *table, const void *key);
  *
  * Looks up a key in the HashTable and returns its value.
  */
-void *hashtable_lookup(HashTable *table, const void *key);
+void *hashtable_lookup(const HashTable *table, const void *key);
 
 /**
  *\param table a HashTable
@@ -172,7 +172,7 @@ void *hashtable_lookup(HashTable *table, const void *key);
  *
  * Checks if a key does exist.
  */
-bool hashtable_key_exists(HashTable *table, const void *key);
+bool hashtable_key_exists(const HashTable *table, const void *key);
 
 /**
  *\param table a HashTable
@@ -180,7 +180,7 @@ bool hashtable_key_exists(HashTable *table, const void *key);
  *
  * Gets the number of stored elements.
  */
-size_t hashtable_count(HashTable *table);
+size_t hashtable_count(const HashTable *table);
 
 /**
  *\param table a HashTable
@@ -189,7 +189,7 @@ size_t hashtable_count(HashTable *table);
  * Initializes a key/value pair iterator and associates it with the table. Modifying the table while
  * using the iterator might lead to undefined behaviour.
  */
-void hashtable_iter_init(HashTable *table, HashTableIter *iter);
+void hashtable_iter_init(const HashTable *table, HashTableIter *iter);
 
 /**
  *\param iter a HashTableIter
@@ -205,7 +205,7 @@ bool hashtable_iter_next(HashTableIter *iter);
  *
  * Retrieves the key of the current element.
  */
-void *hashtable_iter_get_key(HashTableIter *iter);
+void *hashtable_iter_get_key(const HashTableIter *iter);
 
 /**
  *\param iter a HashTableIter
@@ -213,7 +213,7 @@ void *hashtable_iter_get_key(HashTableIter *iter);
  *
  * Retrieves the value of the current element.
  */
-void *hashtable_iter_get_value(HashTableIter *iter);
+void *hashtable_iter_get_value(const HashTableIter *iter);
 
 #endif
 
