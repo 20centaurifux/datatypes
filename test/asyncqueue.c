@@ -54,15 +54,13 @@ main(int argc, char *argv[])
 		pthread_create(&t[i], NULL, _worker, &queues[i]);
 	}
 
-	for(i = 1; i <= 5000000; ++i)
+	for(i = 1; i <= 500000; ++i)
 	{
 		async_queue_push(&queues[i % 2], (void *)i);
 	}
 
 	pthread_mutex_lock(&mutex);
-
 	finished = true;
-
 	pthread_mutex_unlock(&mutex);
 
 	for(i = 0; i < 2; ++i)

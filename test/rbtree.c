@@ -13,6 +13,7 @@ main(int argc, char *argv[])
 	FILE *fp;
 	const char *word;
 	size_t count = 0;
+	size_t v;
 	RBTreeIter iter;
 
 	// initialize tree:
@@ -28,12 +29,12 @@ main(int argc, char *argv[])
 		{
 			if(rbtree_key_exists(tree, word))
 			{
-				int v = (int)rbtree_lookup(tree, word) + 1;
+				v = (size_t)rbtree_lookup(tree, word) + 1;
 				rbtree_set(tree, (void*)word, (void *)(intptr_t)v, false);
 			}
 			else
 			{
-				rbtree_set(tree, strdup(word), (void *)(intptr_t)1, true);
+				rbtree_set(tree, strdup(word), (void *)1, true);
 				++count;
 			}
 		}
@@ -47,9 +48,9 @@ main(int argc, char *argv[])
 
 		while(rbtree_iter_next(&iter))
 		{
-			int v = (int)rbtree_lookup(tree, rbtree_iter_get_key(&iter));
+			v = (size_t)rbtree_lookup(tree, rbtree_iter_get_key(&iter));
 
-			assert(v == (int)rbtree_iter_get_value(&iter));
+			assert(v == (size_t)rbtree_iter_get_value(&iter));
 			assert(v > 0);
 
 			++count;
@@ -85,6 +86,8 @@ main(int argc, char *argv[])
 			++count;
 		}
 
+		rbtree_iter_free(&iter);
+
 		assert(count == 0);
 
 		// close file:
@@ -96,7 +99,7 @@ main(int argc, char *argv[])
 	}
 
 	// cleanup:
-	rbtree_free(tree);
+	rbtree_destroy(tree);
 
 	return 0;
 }
