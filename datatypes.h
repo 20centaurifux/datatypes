@@ -46,6 +46,13 @@
 #include <stdint.h>
 #include <string.h>
 
+/*! Major version. */
+#define DATATYPES_VERSION_MAJOR      0
+/*! Minor version. */
+#define DATATYPES_VERSION_MINOR      1
+/*! Patchlevel. */
+#define DATATYPES_VERSION_PATCHLEVEL 0
+
 /*! A function to compare two values. */
 typedef int32_t (*CompareFunc)(const void *a, const void *b);
 /*! A function to check if two values are equal. */
