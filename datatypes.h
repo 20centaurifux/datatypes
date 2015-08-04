@@ -29,7 +29,7 @@
  * The following datatypes are available:</p>
  * <ul>
  * <li>hashtable (with fixed bucket size)</li>
- * <li>red black tree</li>
+ * <li>red-black tree</li>
  * <li>singly-linked list</li>
  * <li>doubly-linked list</li>
  * <li>queue</li>
