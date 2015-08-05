@@ -26,6 +26,7 @@ PATCHLEVEL=0
 # destination library files:
 STATIC_LIB=libdatatypes-$(MAJOR_VERSION).$(MINOR_VERSION).$(PATCHLEVEL).a
 SHARED_LIB=$(STATIC_LIB:.a=.so)
+SHARED_LIB_SYMLINK=libdatatypes-$(MAJOR_VERSION).$(MINOR_VERSION).so
 
 # targets:
 .PHONY: all clean install uninstall
@@ -52,8 +53,10 @@ install:
 	chmod 755 $(LIBDIR)/$(STATIC_LIB)
 	cp $(SRC)/$(SHARED_LIB) "$(LIBDIR)"
 	chmod 755 $(LIBDIR)/$(SHARED_LIB)
+	ln -fs $(LIBDIR)/$(SHARED_LIB) $(LIBDIR)/$(SHARED_LIB_SYMLINK)
 
 uninstall:
 	rm -fr "$(INCDIR)/datatypes"
 	rm -f $(LIBDIR)/$(STATIC_LIB)
 	rm -f $(LIBDIR)/$(SHARED_LIB)
+	rm -f $(LIBDIR)/$(SHARED_LIB_SYMLINK)
