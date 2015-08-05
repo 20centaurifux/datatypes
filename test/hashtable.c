@@ -15,6 +15,7 @@ main(int argc, char *argv[])
 	FILE *fp;
 	const char *word;
 	size_t count = 0;
+	size_t v;
 	HashTableIter iter;
 
 	// initialize table:
@@ -30,12 +31,12 @@ main(int argc, char *argv[])
 		{
 			if(hashtable_key_exists(table, word))
 			{
-				int v = (int)hashtable_lookup(table, word) + 1;
-				hashtable_set(table, (void*)word, (void *)(intptr_t)v, false);
+				v = (size_t)hashtable_lookup(table, word) + 1;
+				hashtable_set(table, (void*)word, (void *)v, false);
 			}
 			else
 			{
-				hashtable_set(table, strdup(word), (void *)(intptr_t)1, true);
+				hashtable_set(table, strdup(word), (void *)1, true);
 				++count;
 			}
 		}
@@ -49,9 +50,9 @@ main(int argc, char *argv[])
 
 		while(hashtable_iter_next(&iter))
 		{
-			int v = (int)hashtable_lookup(table, hashtable_iter_get_key(&iter));
+			v = (size_t)hashtable_lookup(table, hashtable_iter_get_key(&iter));
 
-			assert(v == (int)hashtable_iter_get_value(&iter));
+			assert(v == (size_t)hashtable_iter_get_value(&iter));
 			assert(v > 0);
 
 			++count;
@@ -98,7 +99,7 @@ main(int argc, char *argv[])
 	}
 
 	// cleanup:
-	hashtable_free(table);
+	hashtable_destroy(table);
 
 	return 0;
 }

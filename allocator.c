@@ -29,7 +29,7 @@
 #include "allocator.h"
 
 static struct _MemoryBlock *
-_chunk_allocator_create_block(ChunkAllocator *allocator)
+_chunk_allocator_create_block(const ChunkAllocator *allocator)
 {
 	struct _MemoryBlock *block;
 
@@ -52,7 +52,7 @@ _chunk_allocator_create_block(ChunkAllocator *allocator)
 }
 
 static struct _MemoryPtrBlock *
-_chunk_allocator_create_ptr_block(ChunkAllocator *allocator)
+_chunk_allocator_create_ptr_block(const ChunkAllocator *allocator)
 {
 	struct _MemoryPtrBlock *block;
 

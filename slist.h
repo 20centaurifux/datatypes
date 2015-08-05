@@ -131,7 +131,7 @@ SListItem *slist_insert_sorted(SList *list, void *data, CompareFunc compare);
  *
  * Gets the head of the list.
  */
-SListItem *slist_head(SList *list);
+SListItem *slist_head(const SList *list);
 
 /**
  *\param list a SList
@@ -139,7 +139,7 @@ SListItem *slist_head(SList *list);
  *
  * Gets the number of items.
  */
-size_t slist_count(SList *list);
+size_t slist_count(const SList *list);
 
 /**
  *\param list a SList
@@ -147,7 +147,7 @@ size_t slist_count(SList *list);
  *
  * Checks if a list is empty.
  */
-bool slist_empty(SList *list);
+bool slist_empty(const SList *list);
 
 /**
  *\param list a SList
@@ -181,7 +181,7 @@ void *slist_pop(SList *list);
  *
  * Test if list contains given data.
  */
-bool slist_contains(SList *list, void *data);
+bool slist_contains(const SList *list, void *data);
 
 /**
  *\param list a SList
@@ -198,7 +198,7 @@ void slist_clear(SList *list);
  *
  * Searches for given data.
  */
-SListItem *slist_find(SList *list, SListItem *offset, void const *data);
+SListItem *slist_find(const SList *list, SListItem *offset, void const *data);
 
 /*! Get next list item. */
 #define slist_item_next(item) item->next

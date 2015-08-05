@@ -142,7 +142,7 @@ rbtree_clear(RBTree *tree)
 }
 
 inline size_t
-rbtree_count(RBTree *tree)
+rbtree_count(const RBTree *tree)
 {
 	assert(tree != NULL);
 
@@ -525,14 +525,14 @@ _rbtree_find_node(RBTree *tree, const void *key, bool build_stack)
 }
 
 void *
-rbtree_lookup(RBTree *tree, const void *key)
+rbtree_lookup(const RBTree *tree, const void *key)
 {
 	const RBNode *node;
 
 	assert(tree != NULL);
 	assert(key != NULL);
 
-	if((node = _rbtree_find_node(tree, key, false)))
+	if((node = _rbtree_find_node((RBTree *)tree, key, false)))
 	{
 		return node->value;
 	}
@@ -541,9 +541,9 @@ rbtree_lookup(RBTree *tree, const void *key)
 }
 
 bool
-rbtree_key_exists(RBTree *tree, const void *key)
+rbtree_key_exists(const RBTree *tree, const void *key)
 {
-	return _rbtree_find_node(tree, key, false) ? true : false;
+	return _rbtree_find_node((RBTree *)tree, key, false) ? true : false;
 }
 
 /*
@@ -790,7 +790,7 @@ rbtree_remove(RBTree *tree, const void *key)
  *	iterator:
  */
 void
-rbtree_iter_init(RBTree *tree, RBTreeIter *iter)
+rbtree_iter_init(const RBTree *tree, RBTreeIter *iter)
 {
 	assert(tree != NULL);
 	assert(iter != NULL);
@@ -823,7 +823,7 @@ rbtree_iter_free(RBTreeIter *iter)
 }
 
 void
-rbtree_iter_reuse(RBTree *tree, RBTreeIter *iter)
+rbtree_iter_reuse(const RBTree *tree, RBTreeIter *iter)
 {
 	assert(tree != NULL);
 	assert(iter != NULL);
@@ -919,7 +919,7 @@ rbtree_iter_next(RBTreeIter *iter)
 }
 
 void inline *
-rbtree_iter_get_key(RBTreeIter *iter)
+rbtree_iter_get_key(const RBTreeIter *iter)
 {
 	assert(iter != NULL);
 
@@ -932,7 +932,7 @@ rbtree_iter_get_key(RBTreeIter *iter)
 }
 
 void inline *
-rbtree_iter_get_value(RBTreeIter *iter)
+rbtree_iter_get_value(const RBTreeIter *iter)
 {
 	assert(iter != NULL);
 

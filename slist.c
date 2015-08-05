@@ -55,7 +55,7 @@ _slist_item_new(Allocator *allocator, void *data)
 }
 
 static SListItem *
-_slist_find(SList *list, SListItem *offset, void const *data)
+_slist_find(const SList *list, SListItem *offset, void const *data)
 {
 	SListItem *p;
 
@@ -398,7 +398,7 @@ slist_pop(SList *list)
 }
 
 bool
-slist_contains(SList *list, void *data)
+slist_contains(const SList *list, void *data)
 {
 	assert(list != NULL);
 	assert(list->equals != NULL);
@@ -442,13 +442,13 @@ slist_clear(SList *list)
 }
 
 SListItem *
-slist_find(SList *list, SListItem *offset, void const *data)
+slist_find(const SList *list, SListItem *offset, void const *data)
 {
 	return _slist_find(list, offset, data);
 }
 
 inline size_t
-slist_count(SList *list)
+slist_count(const SList *list)
 {
 	assert(list != NULL);
 
@@ -456,7 +456,7 @@ slist_count(SList *list)
 }
 
 inline SListItem *
-slist_head(SList *list)
+slist_head(const SList *list)
 {
 	assert(list != NULL);
 
@@ -464,7 +464,7 @@ slist_head(SList *list)
 }
 
 inline bool
-slist_empty(SList *list)
+slist_empty(const SList *list)
 {
 	assert(list != NULL);
 
