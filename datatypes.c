@@ -47,8 +47,9 @@ str_equal(const void * restrict a, const void * restrict b)
 }
 
 uint32_t inline
-str_hash(const char *plain)
+str_hash(const void *ptr)
 {
+	const char *plain = ptr;
 	uint32_t hash = 0;
 
 	while(*plain)

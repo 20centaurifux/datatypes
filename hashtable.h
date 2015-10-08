@@ -85,12 +85,12 @@ typedef struct
 } HashTableIter;
 
 /**
- *\param plain plain text
+ *\param ptr pointer to plain text
  *\return a hash value
  *
  * Hash of the given plain text.
  */
-uint32_t str_hash(const char *plain);
+uint32_t str_hash(const void *ptr);
 
 /**
  *\param size size of the hash table (number of buckets)

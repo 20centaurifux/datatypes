@@ -61,7 +61,7 @@ typedef bool (*EqualFunc)(const void *a, const void *b);
 typedef void (*FreeFunc)(void *p);
 
 /*! Specifies the type of the hash function which is passed to hashtable_new() or hashtable_init(). */
-typedef uint32_t (*HashFunc)(const char *plain);
+typedef uint32_t (*HashFunc)(const void *ptr);
 
  /*! Compares two strings. Return 0 if values are equal, or a positive integer if the first value comes after the second. */
 #define str_compare (CompareFunc)strcmp
