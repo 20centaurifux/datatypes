@@ -42,7 +42,6 @@ typedef struct _Allocator
 /**
  *\struct ChunkAllocator
  *\brief This memory allocator allocates chunks of memory and grows automatically.
- *
  */
 typedef struct
 {
