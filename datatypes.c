@@ -43,7 +43,7 @@ str_equal(const void * restrict a, const void * restrict b)
 		}
 	}
 
-	return true;
+	return *s0 == *s1;
 }
 
 uint32_t inline
