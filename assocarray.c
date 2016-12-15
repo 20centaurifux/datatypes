@@ -23,7 +23,6 @@
  */
 
 #include "assocarray.h"
-
 #include <assert.h>
 #include <string.h>
 
@@ -119,7 +118,7 @@ assoc_array_free(AssocArray *array)
 
 	if(array->free_key || array->free_value)
 	{
-		for(size_t i = 0; i < array->size; ++i)
+		for(size_t i = 0; i < array->count; ++i)
 		{
 			if(array->free_key)
 			{
@@ -207,13 +206,13 @@ assoc_array_set(AssocArray *array, void * restrict key, void * restrict value, b
 					abort();
 				}
 
-				if(!(array->keys = (void **)realloc(array->keys, array->size)))
+				if(!(array->keys = (void **)realloc(array->keys, array->size * (sizeof(void *)))))
 				{
 					fprintf(stderr, "Couldn't allocate memory.\n");
 					abort();
 				}
 
-				if(!(array->values = (void **)realloc(array->values, array->size)))
+				if(!(array->values = (void **)realloc(array->values, array->size * sizeof(void *))))
 				{
 					fprintf(stderr, "Couldn't allocate memory.\n");
 					abort();
