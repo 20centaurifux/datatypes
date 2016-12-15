@@ -10,13 +10,13 @@ CFLAGS=-Wall -std=c99 -O2 -fPIC $(OPENMP_CFLAGS) $(PTHREAD_CFLAGS)
 # source code & object files:
 SRC=.
 SRCS=$(SRC)/allocator.c $(SRC)/asyncqueue.c $(SRC)/buffer.c $(SRC)/datatypes.c \
-     $(SRC)/hashtable.c $(SRC)/list.c $(SRC)/rbtree.c $(SRC)/slist.c $(SRC)/stack.c
+     $(SRC)/hashtable.c $(SRC)/list.c $(SRC)/rbtree.c $(SRC)/slist.c $(SRC)/stack.c $(SRC)/assocarray.c
 OBJS=$(SRCS:.c=.o)
 
 # optional libraries (comment assigned values out to disable):
 PTHREAD_CFLAGS=-DWITH_PTHREAD
 PTHREAD_LIB=-pthread
-OPENMP_CFLAGS=-DWITH_OPENMP -fopenmp
+OPENMP_CFLAGS=
 
 # version information:
 MAJOR_VERSION=0

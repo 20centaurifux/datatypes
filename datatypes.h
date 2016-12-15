@@ -101,6 +101,7 @@ bool direct_equal(const void *a, const void *b);
 #include "stack.h"
 #include "buffer.h"
 #include "asyncqueue.h"
+#include "assocarray.h"
 
 #endif
 
