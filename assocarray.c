@@ -31,7 +31,7 @@ static int
 _assoc_array_binary_search(CompareFunc compare, void **keys, size_t len, const void *key, ssize_t *index)
 {
 	ssize_t begin = 0, end = len  - 1;
-	int32_t result;
+	int32_t result = 0;
 
 	if(len == 1)
 	{
