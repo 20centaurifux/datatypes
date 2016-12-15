@@ -159,7 +159,7 @@ void hashtable_remove(HashTable *table, const void *key);
 /**
  *\param table a HashTable
  *\param key a key
- *\return a key
+ *\return the value associated to the key or NULL
  *
  * Looks up a key in the HashTable and returns its value.
  */
@@ -195,7 +195,7 @@ void hashtable_iter_init(const HashTable *table, HashTableIter *iter);
  *\param iter a HashTableIter
  *\return false if end of the HashTable has been reached
  *
- * Goes to next element of Hashtable.
+ * Goes to next element of the Hashtable.
  */
 bool hashtable_iter_next(HashTableIter *iter);
 

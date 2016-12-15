@@ -235,7 +235,7 @@ void rbtree_iter_reuse(const RBTree *tree, RBTreeIter *iter);
  *\param iter a RBTreeIter
  *\return false if end of the RBTree has been reached
  *
- * Goes to next element of RBTree.
+ * Goes to next element of the RBTree.
  */
 bool rbtree_iter_next(RBTreeIter *iter);
 
