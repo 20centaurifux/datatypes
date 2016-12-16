@@ -8,6 +8,7 @@ CC=gcc
 AR=ar
 CFLAGS=-Wall -std=c99 -O2 -fPIC $(OPENMP_CFLAGS) $(PTHREAD_CFLAGS)
 CPPCHECK=cppcheck
+DOXYGEN=doxygen
 
 # source code & object files:
 SRC=.
@@ -45,6 +46,7 @@ clean:
 	rm -f $(OBJS)
 	rm -f $(SRC)/$(STATIC_LIB)
 	rm -f $(SRC)/$(SHARED_LIB)
+	rm -fr $(SRC)/doc
 
 install:
 	test -d "$(INCDIR)/datatypes" || mkdir -p "$(INCDIR)/datatypes"
@@ -66,3 +68,6 @@ uninstall:
 
 cppcheck:
 	$(CPPCHECK) --enable=style --enable=performance --enable=information --std=c99 --force -j2 --template gcc *.h *.c
+
+doc:
+	$(DOXYGEN) $(SRC)/doxygen_config
