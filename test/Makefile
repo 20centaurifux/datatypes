@@ -1,10 +1,10 @@
 CC=gcc
-CFLAGS=-Wall -std=c99 -O0 -g $(PTHREAD_CFLAGS) -DWITH_PTHREAD
+CFLAGS=-Wall -std=c99 -O0 -g -DWITH_PTHREAD -DWITH_OPENMP
 
 SRCS=$(wildcard *.c)
 
 INC=-I..
-LIB=-L.. -ldatatypes-0.1.0
+LIB=-L.. -ldatatypes-0.1.0 -pthread -fopenmp
 
 .PHONY: all clean
 
