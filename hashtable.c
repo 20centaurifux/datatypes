@@ -102,7 +102,6 @@ hashtable_destroy(HashTable *table)
 void
 hashtable_free(HashTable *table)
 {
-	int i;
 	struct _Bucket *iter;
 
 	assert(table != NULL);
@@ -112,7 +111,7 @@ hashtable_free(HashTable *table)
 		#ifdef WITH_OPENMP
 		#pragma omp parallel for private(iter)
 		#endif
-		for(i = 0; i < table->size; ++i)
+		for(int i = 0; i < table->size; ++i)
 		{
 			if((iter = table->buckets[i]))
 			{
@@ -144,7 +143,6 @@ hashtable_free(HashTable *table)
 void
 hashtable_clear(HashTable *table)
 {
-	int i;
 	struct _Bucket *iter;
 
 	assert(table != NULL);
@@ -158,7 +156,7 @@ hashtable_clear(HashTable *table)
 		#ifdef WITH_OPENMP
 		#pragma omp parallel for private(iter)
 		#endif
-		for(i = 0; i < table->size; ++i)
+		for(int i = 0; i < table->size; ++i)
 		{
 			if((iter = table->buckets[i]))
 			{
@@ -255,7 +253,6 @@ hashtable_remove(HashTable *table, const void *key)
 {
 	struct _Bucket *bucket;
 	struct _Bucket *iter;
-	struct _Bucket *prev = NULL;
 	int32_t index;
 
 	assert(table != NULL);
@@ -265,6 +262,8 @@ hashtable_remove(HashTable *table, const void *key)
 
 	if((iter = bucket = table->buckets[index]))
 	{
+		struct _Bucket *prev = NULL;
+
 		while(iter)
 		{
 			if(table->compare_keys(iter->key, key))

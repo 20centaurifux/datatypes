@@ -153,7 +153,6 @@ void
 slist_free(SList *list)
 {
 	SListItem *iter;
-	SListItem *item;
 
 	assert(list != NULL);
 
@@ -161,7 +160,7 @@ slist_free(SList *list)
 
 	while(iter)
 	{
-		item = iter;
+		SListItem *item = iter;
 		iter = iter->next;
 
 		if(list->free)
@@ -246,7 +245,6 @@ slist_insert_sorted(SList *list, void *data, CompareFunc compare)
 {
 	SListItem *iter;
 	SListItem *item;
-	SListItem *prev = NULL;
 
 	assert(list != NULL);
 	assert(compare != NULL);
@@ -266,6 +264,8 @@ slist_insert_sorted(SList *list, void *data, CompareFunc compare)
 
 		/* insert list item into list */
 		item = _slist_item_new(list->allocator, data);
+
+		SListItem *prev = NULL;
 
 		while(iter)
 		{

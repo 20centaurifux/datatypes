@@ -171,9 +171,7 @@ chunk_allocator_new(size_t item_size, size_t block_size)
 void
 chunk_allocator_destroy(ChunkAllocator *allocator)
 {
-	struct _MemoryBlock *block;
 	struct _MemoryBlock *iter;
-	struct _MemoryPtrBlock *pblock;
 	struct _MemoryPtrBlock *piter;
 
 	assert(allocator != NULL);
@@ -183,6 +181,8 @@ chunk_allocator_destroy(ChunkAllocator *allocator)
 
 	while(iter)
 	{
+		struct _MemoryBlock *block;
+
 		block = iter;
 		iter = iter->next;
 		free(block->items);
@@ -194,6 +194,8 @@ chunk_allocator_destroy(ChunkAllocator *allocator)
 
 	while(piter)
 	{
+		struct _MemoryPtrBlock *pblock;
+
 		pblock = piter;
 		piter = piter->next;
 		free(pblock->items);

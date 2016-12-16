@@ -165,7 +165,6 @@ void
 list_free(List *list)
 {
 	ListItem *iter;
-	ListItem *item;
 
 	assert(list != NULL);
 
@@ -173,7 +172,8 @@ list_free(List *list)
 
 	while(iter)
 	{
-		item = iter;
+		ListItem *item = iter;
+
 		iter = iter->next;
 
 		if(list->free)

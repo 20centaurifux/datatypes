@@ -155,14 +155,14 @@ rbtree_count(const RBTree *tree)
 static inline bool
 _rbtree_stack_push(RBTree *tree, RBNode *node)
 {
-	int sp;
-
 	if(!tree->sp)
 	{
 		tree->sp = tree->stack;
 	}
 	else
 	{
+		int sp;
+
 		if((sp = tree->sp - tree->stack) >= tree->stack_size - 1)
 		{
 			/* resize stack size */
@@ -285,7 +285,6 @@ _rbtree_insert_case2_to_6(RBTree *tree)
 	RBNode *node;
 	RBNode *parent;
 	RBNode *grandparent;
-	RBNode *great_grandparent = NULL;
 	RBNode *uncle;
 
 	node = *tree->sp;
@@ -340,6 +339,8 @@ _rbtree_insert_case2_to_6(RBTree *tree)
 		}
 
 		/* case 5 */
+		RBNode *great_grandparent = NULL;
+
 		if(tree->sp >= tree->stack + 3)
 		{
 			great_grandparent = *(tree->sp - 3);
@@ -392,7 +393,6 @@ rbtree_set(RBTree *tree, void * restrict key, void * restrict value, bool overwr
 {
 	RBNode *node;
 	RBNode *new_node = NULL;
-	int32_t result;
 
 	assert(tree != NULL);
 	assert(key != NULL);
@@ -419,6 +419,8 @@ rbtree_set(RBTree *tree, void * restrict key, void * restrict value, bool overwr
 		}
 
 		/* compare keys */
+		int32_t result;
+
 		if(!(result = tree->compare_keys(key, node->key)))
 		{
 			/* equal keys => replace item */
@@ -491,7 +493,6 @@ static inline RBNode *
 _rbtree_find_node(RBTree *tree, const void *key, bool build_stack)
 {
 	RBNode *node;
-	int32_t result;
 
 	assert(tree->compare_keys != NULL);
 
@@ -503,6 +504,8 @@ _rbtree_find_node(RBTree *tree, const void *key, bool build_stack)
 		{
 			_rbtree_stack_push(tree, node);
 		}
+
+		int32_t result;
 
 		if(!(result = tree->compare_keys(key, node->key)))
 		{
@@ -653,7 +656,6 @@ _rbtree_remove_case2(RBTree *tree)
 	RBNode *node;
 	RBNode *sibling;
 	RBNode *parent = NULL;
-	RBNode *grandparent = NULL;
 
 	/* check if node has red sibling */
 	node = *tree->sp;
@@ -672,6 +674,8 @@ _rbtree_remove_case2(RBTree *tree)
 	{
 		parent->black = 0;
 		sibling->black = 1;
+
+		RBNode *grandparent = NULL;
 
 		if(tree->sp >= tree->stack + 2)
 		{

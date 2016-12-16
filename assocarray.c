@@ -163,7 +163,6 @@ assoc_array_clear(AssocArray *array)
 void
 assoc_array_set(AssocArray *array, void * restrict key, void * restrict value, bool overwrite_key)
 {
-	int result;
 	ssize_t offset;
 
 	assert(array != NULL);
@@ -171,7 +170,7 @@ assoc_array_set(AssocArray *array, void * restrict key, void * restrict value, b
 
 	if(array->count)
 	{
-		result = _assoc_array_binary_search(array->compare_keys, array->keys, array->count, key, &offset);
+		int result = _assoc_array_binary_search(array->compare_keys, array->keys, array->count, key, &offset);
 
 		if(result == 0)
 		{
