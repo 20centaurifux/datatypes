@@ -3,10 +3,11 @@ PREFIX=/usr/local
 INCDIR=$(PREFIX)/include
 LIBDIR=$(PREFIX)/lib64
 
-# compiler:
+# compiler & tools:
 CC=gcc
 AR=ar
 CFLAGS=-Wall -std=c99 -O2 -fPIC $(OPENMP_CFLAGS) $(PTHREAD_CFLAGS)
+CPPCHECK=cppcheck
 
 # source code & object files:
 SRC=.
@@ -18,7 +19,7 @@ OBJS=$(SRCS:.c=.o)
 PTHREAD_CFLAGS=-DWITH_PTHREAD
 PTHREAD_LIB=-pthread
 
-OPENMP_CFLAGS=-DWITH_OPENMP -fopenmp
+#OPENMP_CFLAGS=-DWITH_OPENMP -fopenmp
 
 # version information:
 MAJOR_VERSION=0
@@ -62,3 +63,6 @@ uninstall:
 	rm -f $(LIBDIR)/$(STATIC_LIB)
 	rm -f $(LIBDIR)/$(SHARED_LIB)
 	rm -f $(LIBDIR)/$(SHARED_LIB_SYMLINK)
+
+cppcheck:
+	$(CPPCHECK) --enable=style --enable=performance --enable=information --std=c99 --force -j2 --template gcc *.h *.c
