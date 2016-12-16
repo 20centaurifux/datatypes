@@ -16,7 +16,8 @@ OBJS=$(SRCS:.c=.o)
 # optional libraries (comment assigned values out to disable):
 PTHREAD_CFLAGS=-DWITH_PTHREAD
 PTHREAD_LIB=-pthread
-OPENMP_CFLAGS=-DWITH_OPENMP -fopenmp
+OPENMP_CFLAGS=-DWITH_OPENMP
+OPENMP_LIB=-fopenmp
 
 # version information:
 MAJOR_VERSION=0
@@ -36,7 +37,7 @@ SHARED_LIB_SYMLINK=libdatatypes-$(MAJOR_VERSION).$(MINOR_VERSION).so
 
 all: $(OBJS)
 	ar rcs $(SRC)/$(STATIC_LIB) $(OBJS)
-	$(CC) -shared -Wl,-soname,libdatatypes.so.0 -o $(SRC)/$(SHARED_LIB) $(OBJS) $(PTHREAD_LIB)
+	$(CC) -shared -Wl,-soname,libdatatypes.so.0 -o $(SRC)/$(SHARED_LIB) $(OBJS) $(PTHREAD_LIB) $(OPENMP_LIB)
 
 clean:
 	rm -f $(OBJS)
