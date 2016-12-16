@@ -212,6 +212,14 @@ SListItem *slist_find(const SList *list, SListItem *offset, void const *data);
 /**
  *\param list a SList
  *\param item a SListItem
+ *
+ * Sets the associated list item to NULL and frees memory.
+ */
+void slist_item_free_data(const SList *list, SListItem *item);
+
+/**
+ *\param list a SList
+ *\param item a SListItem
  *\param compare function to compare list item data
  *
  * Arrange given SListItem in order using the given comparison function to determine its position.

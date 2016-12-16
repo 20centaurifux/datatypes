@@ -220,7 +220,16 @@ ListItem *list_find(const List *list, ListItem *offset, void const *data);
 #define list_item_get_data(item) item->data
 
 /*! Sets data of the specified ListItem. */
+ListItem *list_item_set_data(ListItem *list, void *data);
 #define list_item_set_data(item, value) item->data = value
+
+/**
+ *\param list a List
+ *\param item a ListItem
+ *
+ * Sets the associated list item to NULL and frees memory.
+ */
+void list_item_free_data(const List *list, ListItem *item);
 
 /**
  *\param list a List

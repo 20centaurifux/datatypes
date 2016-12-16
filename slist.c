@@ -468,7 +468,21 @@ slist_empty(const SList *list)
 {
 	assert(list != NULL);
 
-	return list->head ? true : false;
+	return list->head ? false : true;
+}
+
+void
+slist_item_free_data(const SList *list, SListItem *item)
+{
+	assert(list != NULL);
+	assert(item != NULL);
+
+	if(list->free)
+	{
+		list->free(item->data);
+	}
+
+	item->data = NULL;
 }
 
 void

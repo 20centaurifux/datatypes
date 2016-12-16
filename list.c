@@ -500,7 +500,21 @@ list_empty(const List *list)
 {
 	assert(list != NULL);
 
-	return list->head ? true : false;
+	return list->head ? false : true;
+}
+
+void
+list_item_free_data(const List *list, ListItem *item)
+{
+	assert(list != NULL);
+	assert(item != NULL);
+
+	if(list->free)
+	{
+		list->free(item->data);
+	}
+
+	item->data = NULL;
 }
 
 void
