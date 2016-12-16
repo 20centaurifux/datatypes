@@ -5,6 +5,7 @@ LIBDIR=$(PREFIX)/lib64
 
 # compiler:
 CC=gcc
+AR=ar
 CFLAGS=-Wall -std=c99 -O2 -fPIC $(OPENMP_CFLAGS) $(PTHREAD_CFLAGS)
 
 # source code & object files:
@@ -17,8 +18,7 @@ OBJS=$(SRCS:.c=.o)
 PTHREAD_CFLAGS=-DWITH_PTHREAD
 PTHREAD_LIB=-pthread
 
-OPENMP_CFLAGS=-DWITH_OPENMP
-OPENMP_LIB=-fopenmp
+OPENMP_CFLAGS=-DWITH_OPENMP -fopenmp
 
 # version information:
 MAJOR_VERSION=0
@@ -37,8 +37,8 @@ SHARED_LIB_SYMLINK=libdatatypes-$(MAJOR_VERSION).$(MINOR_VERSION).so
 	$(CC) $(CFLAGS) -c $< -o $@
 
 all: $(OBJS)
-	ar rcs $(SRC)/$(STATIC_LIB) $(OBJS)
-	$(CC) -shared -Wl,-soname,libdatatypes.so.0 -o $(SRC)/$(SHARED_LIB) $(OBJS) $(PTHREAD_LIB) $(OPENMP_LIB)
+	$(AR) rcs $(SRC)/$(STATIC_LIB) $(OBJS)
+	$(CC) $(CFLAGS) -shared -Wl,-soname,libdatatypes.so.0 -o $(SRC)/$(SHARED_LIB) $(OBJS) $(PTHREAD_LIB)
 
 clean:
 	rm -f $(OBJS)
