@@ -314,7 +314,12 @@ assoc_array_key_exists(const AssocArray *array, const void *key)
 	assert(array != NULL);
 	assert(key != NULL);
 
-	return _assoc_array_binary_search(array->compare_keys, array->keys, array->count, key, &offset) == 0;
+	if(array->count)
+	{
+		return _assoc_array_binary_search(array->compare_keys, array->keys, array->count, key, &offset) == 0;
+	}
+
+	return false;
 }
 
 size_t
