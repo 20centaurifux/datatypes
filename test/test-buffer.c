@@ -6,8 +6,9 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <string.h>
+#include <datatypes.h>
 
-#include "datatypes.h"
+#define BUFFER_SIZE 4096
 
 int
 main(int argc, char *argv[])
@@ -21,7 +22,7 @@ main(int argc, char *argv[])
 	char *dst = NULL;
 
 	// initialize tree:
-	buf = buffer_new(4096);
+	buf = buffer_new(BUFFER_SIZE);
 
 	assert(buf != NULL);
 	assert(buffer_is_valid(buf));
@@ -29,7 +30,8 @@ main(int argc, char *argv[])
 
 	if((fd = open("bible.txt", O_RDONLY)) >= 0)
 	{
-		for(i = 0; i < 10; ++i)
+		// read lines from bible.txt & test state until buffer is filled completely:
+		for(i = 0; i < BUFFER_SIZE / 256 ; ++i)
 		{
 			result = buffer_fill_from_fd(buf, fd, 256);
 
@@ -39,11 +41,19 @@ main(int argc, char *argv[])
 			assert(buffer_len(buf) == (i + 1) * 256);
 		}
 
+		result = buffer_fill_from_fd(buf, fd, 256);
+
+		assert(result == 0);
+		assert(buffer_is_valid(buf) == false);
+		assert(!buffer_is_empty(buf));
+		assert(buffer_len(buf) == 0);
+
 		buffer_clear(buf);
 
 		assert(buffer_is_valid(buf));
 		assert(buffer_is_empty(buf));
 
+		// fill buffer with single read operation:
 		result = buffer_fill_from_fd(buf, fd, 4096);
 
 		assert(result == 4096);
@@ -51,18 +61,13 @@ main(int argc, char *argv[])
 		assert(buffer_is_valid(buf));
 		assert(!buffer_is_empty(buf));
 
-		success = buffer_fill(buf, "foobar", 6);
-
-		assert(!success);
-		assert(!buffer_is_valid(buf));
-		assert(buffer_len(buf) == 0);
-
 		buffer_clear(buf);
 
 		assert(buffer_is_valid(buf));
 		assert(buffer_is_empty(buf));
 		assert(buffer_len(buf) == 0);
 
+		// write multiple lines to buffer:
 		success = buffer_fill(buf, "foo\nbar", 7);
 
 		assert(success == true);

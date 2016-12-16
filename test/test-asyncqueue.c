@@ -1,9 +1,10 @@
-#include "datatypes.h"
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include <assert.h>
+#include <datatypes.h>
 
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 static bool finished = false;
@@ -42,7 +43,7 @@ _worker(void *arg)
 int
 main(int argc, char *argv[])
 {
-	AsyncQueue queues[2];
+	AsyncQueue *queues[2];
 	pthread_t t[2];
 	size_t sum;
 	size_t result = 0;
@@ -50,13 +51,13 @@ main(int argc, char *argv[])
 
 	for(i = 0; i < 2; ++i)
 	{
-		async_queue_init(&queues[i], direct_equal, NULL, NULL);
-		pthread_create(&t[i], NULL, _worker, &queues[i]);
+		queues[i] = async_queue_new(direct_equal, NULL, NULL);
+		pthread_create(&t[i], NULL, _worker, queues[i]);
 	}
 
 	for(i = 1; i <= 500000; ++i)
 	{
-		async_queue_push(&queues[i % 2], (void *)i);
+		async_queue_push(queues[i % 2], (void *)i);
 	}
 
 	pthread_mutex_lock(&mutex);
@@ -67,10 +68,10 @@ main(int argc, char *argv[])
 	{
 		pthread_join(t[i], (void *)&sum);
 		result += sum;
-		async_queue_destroy(&queues[i]);
+		async_queue_destroy(queues[i]);
 	}
 
-	printf("result: %zu\n", result);
+	assert(result == 500001);
 
 	return 0;
 }
