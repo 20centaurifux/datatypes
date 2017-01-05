@@ -1,12 +1,19 @@
 # destination paths:
-PREFIX=/usr/local
+PREFIX=/usr
 INCDIR=$(PREFIX)/include
+
+LIBDIR=$(PREFIX)/lib
+
+MACHINE:=$(shell uname -m)
+
+ifeq ($(MACHINE), x86_64)
 LIBDIR=$(PREFIX)/lib64
+endif
 
 # compiler & tools:
 CC=gcc
 AR=ar
-CFLAGS=-Wall -std=c99 -O2 -fPIC $(OPENMP_CFLAGS) $(PTHREAD_CFLAGS)
+CFLAGS=-Wall -std=c11 -O2 -fPIC $(OPENMP_CFLAGS) $(PTHREAD_CFLAGS)
 CPPCHECK=cppcheck
 DOXYGEN=doxygen
 
@@ -22,15 +29,18 @@ PTHREAD_LIB=-pthread
 
 #OPENMP_CFLAGS=-DWITH_OPENMP -fopenmp
 
+LIBS=$(PTHREAD_LIB)
+
 # version information:
 MAJOR_VERSION=0
 MINOR_VERSION=1
-PATCHLEVEL=0
+PATCHLEVEL=1
 
 # destination library files:
 STATIC_LIB=libdatatypes-$(MAJOR_VERSION).$(MINOR_VERSION).$(PATCHLEVEL).a
 SHARED_LIB=$(STATIC_LIB:.a=.so)
-SHARED_LIB_SYMLINK=libdatatypes-$(MAJOR_VERSION).$(MINOR_VERSION).so
+STATIC_LIB_SYMLINK=libdatatypes-$(MAJOR_VERSION).$(MINOR_VERSION).a
+SHARED_LIB_SYMLINK=$(STATIC_LIB_SYMLINK:.a=.so)
 
 # targets:
 .PHONY: all clean install uninstall
@@ -40,7 +50,7 @@ SHARED_LIB_SYMLINK=libdatatypes-$(MAJOR_VERSION).$(MINOR_VERSION).so
 
 all: $(OBJS)
 	$(AR) rcs $(SRC)/$(STATIC_LIB) $(OBJS)
-	$(CC) $(CFLAGS) -shared -Wl,-soname,libdatatypes.so.0 -o $(SRC)/$(SHARED_LIB) $(OBJS) $(PTHREAD_LIB)
+	$(CC) $(CFLAGS) $(LDFLAGS) -shared -Wl,-soname,libdatatypes.so.0 -o $(SRC)/$(SHARED_LIB) $(OBJS) $(LIBS)
 
 clean:
 	rm -f $(OBJS)
@@ -49,22 +59,24 @@ clean:
 	rm -fr $(SRC)/doc
 
 install:
-	test -d "$(INCDIR)/datatypes" || mkdir -p "$(INCDIR)/datatypes"
-	chmod 755 "$(INCDIR)/datatypes"
-	cp $(SRC)/*.h "$(INCDIR)/datatypes"
-	chmod 644 $(INCDIR)/datatypes/*.h
-	test -d "$(LIBDIR)" || mkdir -p "$(LIBDIR)"
-	cp $(SRC)/$(STATIC_LIB) "$(LIBDIR)"
-	chmod 755 $(LIBDIR)/$(STATIC_LIB)
-	cp $(SRC)/$(SHARED_LIB) "$(LIBDIR)"
-	chmod 755 $(LIBDIR)/$(SHARED_LIB)
-	ln -fs $(LIBDIR)/$(SHARED_LIB) $(LIBDIR)/$(SHARED_LIB_SYMLINK)
+	test -d $(DESTDIR)$(INCDIR)/datatypes || mkdir -p $(DESTDIR)$(INCDIR)/datatypes
+	chmod 755 $(DESTDIR)$(INCDIR)/datatypes
+	cp $(SRC)/*.h $(DESTDIR)$(INCDIR)/datatypes
+	chmod 644 $(DESTDIR)$(INCDIR)/datatypes/*.h
+	test -d $(DESTDIR)$(LIBDIR) || mkdir -p $(DESTDIR)$(LIBDIR)
+	cp $(SRC)/$(STATIC_LIB) $(DESTDIR)$(LIBDIR)
+	chmod 755 $(DESTDIR)$(LIBDIR)/$(STATIC_LIB)
+	cp $(SRC)/$(SHARED_LIB) $(DESTDIR)$(LIBDIR)
+	chmod 755 $(DESTDIR)$(LIBDIR)/$(SHARED_LIB)
+	ln -fs $(DESTDIR)$(LIBDIR)/$(STATIC_LIB) $(DESTDIR)$(LIBDIR)/$(STATIC_LIB_SYMLINK)
+	ln -fs $(DESTDIR)$(LIBDIR)/$(SHARED_LIB) $(DESTDIR)$(LIBDIR)/$(SHARED_LIB_SYMLINK)
 
 uninstall:
-	rm -fr "$(INCDIR)/datatypes"
-	rm -f $(LIBDIR)/$(STATIC_LIB)
-	rm -f $(LIBDIR)/$(SHARED_LIB)
-	rm -f $(LIBDIR)/$(SHARED_LIB_SYMLINK)
+	rm -fr $(DESTDIR)$(INCDIR)/datatypes
+	rm -f $(DESTDIR)$(LIBDIR)/$(STATIC_LIB)
+	rm -f $(DESTDIR)$(LIBDIR)/$(SHARED_LIB)
+	rm -f $(DESTDIR)$(LIBDIR)/$(STATIC_LIB_SYMLINK)
+	rm -f $(DESTDIR)$(LIBDIR)/$(SHARED_LIB_SYMLINK)
 
 cppcheck:
 	$(CPPCHECK) --enable=style --enable=performance --enable=information --std=c99 --force -j2 --template gcc *.h *.c
