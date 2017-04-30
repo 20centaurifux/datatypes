@@ -14,19 +14,16 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
     General Public License v3 for more details.
  ***************************************************************************/
-/*!
+/**
  * \file slist.h
  * \brief A singly-linked list.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
- * \version 0.1.0
- * \date 26. June 2012
  */
-
 #include "datatypes.h"
 #include "allocator.h"
 
-#ifndef __SLIST_H__
-#define __SLIST_H__
+#ifndef SLIST_H
+#define SLIST_H
 
 #include <stdint.h>
 #include <stdbool.h>

@@ -14,16 +14,13 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
     General Public License v3 for more details.
  ***************************************************************************/
-/*!
+/**
  * \file rbtree.h
  * \brief A generic balanced binary tree.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
- * \version 0.1.0
- * \date 26. June 2012
  */
-
-#ifndef __RBTREE_H__
-#define __RBTREE_H__
+#ifndef RBTREE_H
+#define RBTREE_H
 
 #include <stdbool.h>
 #include <stdint.h>

@@ -14,16 +14,13 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
     General Public License v3 for more details.
  ***************************************************************************/
-/*!
+/**
  * \file stack.h
  * \brief A generic stack.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
- * \version 0.1.0
- * \date 29. June 2012
  */
-
-#ifndef __STACK_H__
-#define __STACK_H__
+#ifndef STACK_H
+#define STACK_H
 
 #include "slist.h"
 

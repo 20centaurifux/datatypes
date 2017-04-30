@@ -14,16 +14,13 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
     General Public License v3 for more details.
  ***************************************************************************/
-/*!
+/**
  * \file hashtable.h
  * \brief A generic hashtable.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
- * \version 0.1.0
- * \date 26. June 2012
  */
-
-#ifndef __HASHTABLE_H__
-#define __HASHTABLE_H__
+#ifndef HASHTABLE_H
+#define HASHTABLE_H
 
 #include <stdbool.h>
 

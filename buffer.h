@@ -18,18 +18,15 @@
  * \file buffer.h
  * \brief A byte buffer.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
- * \version 0.1.0
- * \date 3. August 2015
  */
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <unistd.h>
 
-#ifndef __BUFFER_H__
-#define __BUFFER_H__
+#ifndef BUFFER_H
+#define BUFFER_H
 
 /**
  *\struct Buffer

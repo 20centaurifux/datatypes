@@ -14,16 +14,13 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
     General Public License v3 for more details.
  ***************************************************************************/
-/*!
+/**
  * \file list.h
  * \brief A doubly-linked list.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
- * \version 0.1.0
- * \date 26. June 2012
  */
-
-#ifndef __LIST_H__
-#define __LIST_H__
+#ifndef LIST_H
+#define LIST_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -220,7 +217,6 @@ ListItem *list_find(const List *list, ListItem *offset, void const *data);
 #define list_item_get_data(item) item->data
 
 /*! Sets data of the specified ListItem. */
-ListItem *list_item_set_data(ListItem *list, void *data);
 #define list_item_set_data(item, value) item->data = value
 
 /**

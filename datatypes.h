@@ -14,33 +14,13 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
     General Public License v3 for more details.
  ***************************************************************************/
-/*!
+/**
  * \file datatypes.h
  * \brief General declarations.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
- * \version 0.1.0
- * \date 27. June 2012
  */
-
-/**
- *\mainpage datatypes
- *
- * <p>This library provides some generic and abstract datatypes you might miss in C.
- * The following datatypes are available:</p>
- * <ul>
- * <li>hashtable (with fixed bucket size)</li>
- * <li>red-black tree</li>
- * <li>singly-linked list</li>
- * <li>doubly-linked list</li>
- * <li>queue</li>
- * <li>stack</li>
- * <li>byte-buffer</li>
- * <li>asynchronous queue (requires POSIX threads!)</li>
- * </ul>
- */
-
-#ifndef __DATATYPES_H__
-#define __DATATYPES_H__
+#ifndef DATATYPES_H
+#define DATATYPES_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -51,7 +31,7 @@
 /*! Minor version. */
 #define DATATYPES_VERSION_MINOR      1
 /*! Patchlevel. */
-#define DATATYPES_VERSION_PATCHLEVEL 0
+#define DATATYPES_VERSION_PATCHLEVEL 2
 
 /*! A function to compare two values. */
 typedef int32_t (*CompareFunc)(const void *a, const void *b);

@@ -14,16 +14,13 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
     General Public License v3 for more details.
  ***************************************************************************/
-/*!
+/**
  * \file assocarray.h
  * \brief A generic associative array.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
- * \version 0.1.0
- * \date 14. December 2016
  */
-
-#ifndef __ASSOCARRAY_H__
-#define __ASSOCARRAY_H__
+#ifndef ASSOCARRAY_H
+#define ASSOCARRAY_H
 
 #include <stdbool.h>
 

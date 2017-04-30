@@ -14,16 +14,13 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
     General Public License v3 for more details.
  ***************************************************************************/
-/*!
+/**
  * \file queue.h
  * \brief A generic queue.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
- * \version 0.1.0
- * \date 29. June 2012
  */
-
-#ifndef __QUEUE_H__
-#define __QUEUE_H__
+#ifndef QUEUE_H
+#define QUEUE_H
 
 #include "stack.h"
 

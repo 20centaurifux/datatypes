@@ -14,14 +14,11 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
     General Public License v3 for more details.
  ***************************************************************************/
-/*!
+/**
  * \file stack.c
  * \brief A generic stack.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
- * \version 0.1.0
- * \date 29. June 2012
  */
-
 #include <stdlib.h>
 #include <assert.h>
 

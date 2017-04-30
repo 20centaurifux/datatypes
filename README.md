@@ -29,25 +29,19 @@ disable this feature in the related section of the Makefile.
 If you want to build the library on a Debian based distribution enter the following
 commands:
 
-```
-$ sudo apt-get install build-essential git
-$ git clone https://github.com/20centaurifux/datatypes.git
-$ cd datatypes
-```
+    $ sudo apt-get install build-essential git
+    $ git clone https://github.com/20centaurifux/datatypes.git
+    $ cd datatypes
 
 On a x86 system open the Makefile and change the value of the *LIBDIR* setting
 to
 
-```
-LIBDIR=$(PREFIX)/lib
-```
+    LIBDIR=$(PREFIX)/lib
 
 Now build and install the library:
 
-```
-$ make
-$ sudo make install && ldconfig
-```
+    $ make
+    sudo make install && ldconfig
 
 ## Documentation
 

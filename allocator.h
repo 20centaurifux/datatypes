@@ -14,16 +14,13 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
     General Public License v3 for more details.
  ***************************************************************************/
-/*!
+/**
  * \file allocator.h
  * \brief Allocate chunks of memory.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
- * \version 0.1.0
- * \date 27. June 2012
  */
-
-#ifndef __ALLOCATOR_H__
-#define __ALLOCATOR_H__
+#ifndef ALLOCATOR_H
+#define ALLOCATOR_H
 
 #include <stdint.h>
 

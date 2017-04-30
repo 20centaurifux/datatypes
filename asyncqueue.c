@@ -14,14 +14,11 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
     General Public License v3 for more details.
  ***************************************************************************/
-/*!
+/**
  * \file asyncqueue.c
  * \brief An asynchronous queue.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
- * \version 0.1.0
- * \date 23. July 2015
  */
-
 #ifdef WITH_PTHREAD
 
 #include <stdlib.h>

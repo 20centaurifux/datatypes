@@ -14,14 +14,11 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
     General Public License v3 for more details.
  ***************************************************************************/
-/*!
+/**
  * \file assocarray.c
  * \brief A generic associative array.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
- * \version 0.1.0
- * \date 14. December 2016
  */
-
 #include "assocarray.h"
 #include <assert.h>
 #include <string.h>
