@@ -31,7 +31,7 @@
 /*! Minor version. */
 #define DATATYPES_VERSION_MINOR      1
 /*! Patchlevel. */
-#define DATATYPES_VERSION_PATCHLEVEL 2
+#define DATATYPES_VERSION_PATCHLEVEL 3
 
 /*! A function to compare two values. */
 typedef int32_t (*CompareFunc)(const void *a, const void *b);

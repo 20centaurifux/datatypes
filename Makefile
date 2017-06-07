@@ -34,7 +34,7 @@ LIBS=$(PTHREAD_LIB)
 # version information:
 MAJOR_VERSION=0
 MINOR_VERSION=1
-PATCHLEVEL=2
+PATCHLEVEL=3
 
 # destination library files:
 STATIC_LIB=libdatatypes-$(MAJOR_VERSION).$(MINOR_VERSION).$(PATCHLEVEL).a
