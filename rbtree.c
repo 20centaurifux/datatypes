@@ -18,10 +18,7 @@
  * \file rbtree.c
  * \brief A generic balanced binary tree.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
- * \version 0.1.0
- * \date 27. June 2012
  */
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
