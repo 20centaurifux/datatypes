@@ -83,6 +83,15 @@ typedef SList StackItem;
  *\param data location to store data
  *\return true if stack is not empty
  *
+ * Gets first element from stack without removing it.
+ */
+bool stack_head(Stack *stack, void **data);
+
+/**
+ *\param stack a Stack
+ *\param data location to store data
+ *\return true if stack is not empty
+ *
  * Removes first element from stack.
  */
 bool stack_pop(Stack *stack, void **data);

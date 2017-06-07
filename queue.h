@@ -88,6 +88,15 @@ typedef SList QueueItem;
 #define queue_pop(queue, data) stack_pop(queue, data)
 
 /**
+ *\param stack a Stack
+ *\param data location to store data
+ *\return true if stack is not empty
+ *
+ * Gets first element from queue without removing it.
+ */
+#define queue_head(queue, data) stack_head(queue, data)
+
+/**
  *\param queue a Queue
  *
  * Clears a queue.
