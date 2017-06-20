@@ -88,7 +88,7 @@ typedef SList QueueItem;
 #define queue_pop(queue, data) stack_pop(queue, data)
 
 /**
- *\param stack a Stack
+ *\param queue a Queue
  *\param data location to store data
  *\return true if stack is not empty
  *
