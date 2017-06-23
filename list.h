@@ -55,7 +55,7 @@ typedef struct
 	/*! Number of stored items. */
 	size_t count;
 	/*! A function to compare data of two list items. */
-	EqualFunc equals;
+	CompareFunc compare;
 	/*! A function to free item data. */
 	FreeFunc free;
 	/*! A memory allocator. */
@@ -63,24 +63,24 @@ typedef struct
 } List;
 
 /**
- *\param equals function to compare item data
+ *\param compare function to compare item data
  *\param free function to free item data or NULL
  *\param allocator a user-defined memory allocator for creating/destroying ListItems or NULL
  *\return a new List
  *
  * Creates a new List.
  */
-List *list_new(EqualFunc equals, FreeFunc free, Allocator *allocator);
+List *list_new(CompareFunc compare, FreeFunc free, Allocator *allocator);
 
 /**
  *\param list a List
- *\param equals function to compare item data
+ *\param compare function to compare item data
  *\param free function to free item data or NULL
  *\param allocator a user-defined memory allocator for creating/destroying ListItems or NULL
  *
  * Initializes a List.
  */
-void list_init(List *list, EqualFunc equals, FreeFunc free, Allocator *allocator);
+void list_init(List *list, CompareFunc compare, FreeFunc free, Allocator *allocator);
 
 /**
  *\param list a List
@@ -117,12 +117,11 @@ ListItem *list_prepend(List *list, void *data);
 /**
  *\param list a List
  *\param data data to insert
- *\param compare function to compare list item data
  *\return a new ListItem
  *
  * Inserts data into list using the given comparison function to determine its position.
  */
-ListItem *list_insert_sorted(List *list, void *data, CompareFunc compare);
+ListItem *list_insert_sorted(List *list, void *data);
 
 /**
  *\param list a List
@@ -230,11 +229,10 @@ void list_item_free_data(const List *list, ListItem *item);
 /**
  *\param list a List
  *\param item a ListItem
- *\param compare function to compare list item data
  *
  * Arrange given ListItem in order using the given comparison function to determine its position.
  */
-void list_reorder(List *list, ListItem *item, CompareFunc compare);
+void list_reorder(List *list, ListItem *item);
 
 #endif
 

@@ -16,7 +16,7 @@ main(int argc, char *argv[])
 	char *ptr;
 
 	// initialize lists:
-	list = list_new(str_equal, &free, NULL);
+	list = list_new(str_compare, &free, NULL);
 
 	assert(list != NULL);
 	assert(list_empty(list) == true);
@@ -104,15 +104,15 @@ main(int argc, char *argv[])
 	assert(list_count(list) == 0);
 
 	// insert sorted:
-	list_insert_sorted(list, strdup("d"), str_compare);
-	list_insert_sorted(list, strdup("b"), str_compare);
-	list_insert_sorted(list, strdup("c"), str_compare);
+	list_insert_sorted(list, strdup("d"));
+	list_insert_sorted(list, strdup("b"));
+	list_insert_sorted(list, strdup("c"));
 	
 	item = list_prepend(list, strdup("e"));
-	list_reorder(list, item, str_compare);
+	list_reorder(list, item);
 
 	item = list_append(list, strdup("a"));
-	list_reorder(list, item, str_compare);
+	list_reorder(list, item);
 
 	item = list_head(list);
 	prev = NULL;
