@@ -19,9 +19,8 @@ DOXYGEN=doxygen
 
 # source code & object files:
 SRC=.
-#SRCS=$(SRC)/allocator.c $(SRC)/asyncqueue.c $(SRC)/buffer.c $(SRC)/datatypes.c \
-#     $(SRC)/hashtable.c $(SRC)/list.c $(SRC)/rbtree.c $(SRC)/slist.c $(SRC)/stack.c $(SRC)/assocarray.c
-SRCS=$(SRC)/allocator.c $(SRC)/list.c $(SRC)/datatypes.c
+SRCS=$(SRC)/allocator.c $(SRC)/asyncqueue.c $(SRC)/buffer.c $(SRC)/datatypes.c \
+     $(SRC)/hashtable.c $(SRC)/list.c $(SRC)/rbtree.c $(SRC)/slist.c $(SRC)/stack.c $(SRC)/assocarray.c
 OBJS=$(SRCS:.c=.o)
 
 # optional libraries (comment assigned values out to disable):

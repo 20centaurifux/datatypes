@@ -549,7 +549,11 @@ slist_reorder(SList *list, SListItem *item)
 
 	if(!inserted)
 	{
-		list->tail->next = item;
+		if(list->tail)
+		{
+			list->tail->next = item;
+		}
+
 		list->tail = item;
 		item->next = NULL;
 	}

@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <stddef.h>
 #include <assert.h>
 
 #include "datatypes.h"
@@ -31,6 +32,9 @@ str_equal(const void * restrict a, const void * restrict b)
 {
 	const char *s0 = (const char *)a;
 	const char *s1 = (const char *)b;
+
+	assert(a != NULL);
+	assert(b != NULL);
 
 	while(*s0 && *s1)
 	{
@@ -43,11 +47,13 @@ str_equal(const void * restrict a, const void * restrict b)
 	return *s0 == *s1;
 }
 
-uint32_t inline
+inline uint32_t
 str_hash(const void *ptr)
 {
 	const char *plain = ptr;
 	uint32_t hash = 0;
+
+	assert(ptr != NULL);
 
 	while(*plain)
 	{
@@ -60,10 +66,21 @@ str_hash(const void *ptr)
 int32_t
 direct_compare(const void *a, const void *b)
 {
-	size_t result = (size_t)a - (size_t)b;
+	ptrdiff_t result = a - b;
 
-	assert(result > INT32_MIN);
-	assert(result < INT32_MAX);
+	assert(a != NULL);
+	assert(b != NULL);
+
+	if(result > INT32_MAX)
+	{
+		fprintf(stderr, "%s: warning, integer overflow.\n", __func__);
+		result = INT32_MAX;
+	}
+	else if(result < INT32_MIN)
+	{
+		fprintf(stderr, "%s: warning, integer underflow.\n", __func__);
+		result = INT32_MIN;
+	}
 
 	return (int32_t)result;
 }
@@ -71,6 +88,9 @@ direct_compare(const void *a, const void *b)
 inline bool
 direct_equal(const void *a, const void *b)
 {
+	assert(a != NULL);
+	assert(b != NULL);
+
 	return a == b;
 }
 

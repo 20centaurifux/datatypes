@@ -160,7 +160,9 @@ _rbtree_stack_push(RBTree *tree, RBNode *node)
 	{
 		int sp;
 
-		if((sp = tree->sp - tree->stack) >= tree->stack_size - 1)
+		sp = tree->sp - tree->stack;
+
+		if(sp >= 0 && (size_t)sp >= tree->stack_size - 1)
 		{
 			/* resize stack size */
 			if(tree->stack_size > (INT32_MAX / 2))
@@ -253,6 +255,9 @@ _rbnode_rotate_left(RBTree *tree, RBNode *node, RBNode *parent)
 	RBNode *right;
 
 	right = node->right;
+
+	assert(right != NULL);
+
 	_rbnode_replace(tree, node, parent, right);
 	node->right = right->left;
 
@@ -587,6 +592,8 @@ _rbtree_remove_case3_to_6(RBTree *tree)
 		sibling = parent->right;
 	}
 
+	assert(sibling != NULL);
+
 	if(_rbnode_is_black(sibling) && _rbnode_is_black(sibling->left) && _rbnode_is_black(sibling->right))
 	{
 		if(_rbnode_is_black(parent))
@@ -919,7 +926,7 @@ rbtree_iter_next(RBTreeIter *iter)
 	return true;
 }
 
-void inline *
+inline void *
 rbtree_iter_get_key(const RBTreeIter *iter)
 {
 	assert(iter != NULL);
@@ -932,7 +939,7 @@ rbtree_iter_get_key(const RBTreeIter *iter)
 	return NULL;
 }
 
-void inline *
+inline void *
 rbtree_iter_get_value(const RBTreeIter *iter)
 {
 	assert(iter != NULL);

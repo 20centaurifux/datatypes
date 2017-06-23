@@ -108,7 +108,7 @@ hashtable_free(HashTable *table)
 		#ifdef WITH_OPENMP
 		#pragma omp parallel for private(iter)
 		#endif
-		for(int i = 0; i < table->size; ++i)
+		for(size_t i = 0; i < table->size; ++i)
 		{
 			if((iter = table->buckets[i]))
 			{
@@ -153,7 +153,7 @@ hashtable_clear(HashTable *table)
 		#ifdef WITH_OPENMP
 		#pragma omp parallel for private(iter)
 		#endif
-		for(int i = 0; i < table->size; ++i)
+		for(size_t i = 0; i < table->size; ++i)
 		{
 			if((iter = table->buckets[i]))
 			{
@@ -411,7 +411,7 @@ hashtable_iter_next(HashTableIter *iter)
 	}
 }
 
-void inline *
+inline void *
 hashtable_iter_get_key(const HashTableIter *iter)
 {
 	assert(iter != NULL);
@@ -424,7 +424,7 @@ hashtable_iter_get_key(const HashTableIter *iter)
 	return NULL;
 }
 
-void inline *
+inline void *
 hashtable_iter_get_value(const HashTableIter *iter)
 {
 	assert(iter != NULL);

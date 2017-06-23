@@ -19,9 +19,12 @@
  * \brief A generic associative array.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
  */
+#define _GNU_SOURCE
+
 #include "assocarray.h"
 #include <assert.h>
 #include <string.h>
+#include <limits.h>
 
 static int
 _assoc_array_binary_search(CompareFunc compare, void **keys, size_t len, const void *key, ssize_t *index)
@@ -198,7 +201,13 @@ assoc_array_set(AssocArray *array, void * restrict key, void * restrict value, b
 
 				if(array->size <= array->count)
 				{
-					fprintf(stderr, "Integer overflow.");
+					fprintf(stderr, "Integer overflow.\n");
+					abort();
+				}
+
+				if(array->size > SSIZE_MAX)
+				{
+					fprintf(stderr, "Array exceeds maximum size.\n");
 					abort();
 				}
 
@@ -229,7 +238,7 @@ assoc_array_set(AssocArray *array, void * restrict key, void * restrict value, b
 				/* insert key & value after offset */
 				++offset;
 
-				if(offset < array->count)
+				if((size_t)offset < array->count)
 				{
 					memmove(&array->keys[offset + 1], &array->keys[offset], (array->count - offset) * sizeof(void *));
 					memmove(&array->values[offset + 1], &array->values[offset], (array->count - offset) * sizeof(void *));
@@ -272,7 +281,7 @@ assoc_array_remove(AssocArray *array, const void *key)
 				array->free_value(array->values[offset]);
 			}
 
-			if(offset < array->count - 1)
+			if((size_t)offset < array->count - 1)
 			{
 				memmove(&array->keys[offset], &array->keys[offset + 1], (array->count - 1 - offset) * sizeof(void *));
 				memmove(&array->values[offset], &array->values[offset + 1], (array->count - 1 - offset) * sizeof(void *));
@@ -351,7 +360,7 @@ assoc_array_iter_next(AssocArrayIter *iter)
 
 	++iter->offset;
 
-	return iter->offset < iter->array->count;
+	return (size_t)iter->offset < iter->array->count;
 }
 
 void *

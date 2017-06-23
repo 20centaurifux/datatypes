@@ -30,6 +30,8 @@ main(int argc, char *argv[])
 			slist_append(list, strdup(word));
 			++count;
 		}
+
+		fclose(fp);
 	}
 
 	assert(slist_count(list) == count);
