@@ -53,7 +53,7 @@ typedef struct _SList
 	/*! Number of stored items. */
 	size_t count;
 	/*! A function to compare data of two list items. */
-	EqualFunc equals;
+	CompareFunc compare;
 	/*! A function to free item data. */
 	FreeFunc free;
 	/*! A memory allocator. */
@@ -61,24 +61,24 @@ typedef struct _SList
 } SList;
 
 /**
- *\param equals function to compare item data
+ *\param compare function to compare item data
  *\param free function to free item data or NULL
  *\param allocator a user-defined memory allocator for creating/destroying SListItems or NULL
  *\return a new SList
  *
  * Creates a new SList.
  */
-SList *slist_new(EqualFunc equals, FreeFunc free, Allocator *allocator);
+SList *slist_new(CompareFunc compare, FreeFunc free, Allocator *allocator);
 
 /**
  *\param list a SList
- *\param equals function to compare item data
+ *\param compare function to compare item data
  *\param free function to free item data OR NULL
  *\param allocator a user-defined memory allocator for creating/destroying SListItems or NULL
  *
  * Initializes a new SList.
  */
-void slist_init(SList *list, EqualFunc equals, FreeFunc free, Allocator *allocator);
+void slist_init(SList *list, CompareFunc compare, FreeFunc free, Allocator *allocator);
 
 /**
  *\param list a SList
@@ -115,12 +115,11 @@ SListItem *slist_prepend(SList *list, void *data);
 /**
  *\param list a List
  *\param data data to insert
- *\param compare function to compare list item data
  *\return a new ListItem
  *
  * Inserts data into list using the given comparison function to determine its position.
  */
-SListItem *slist_insert_sorted(SList *list, void *data, CompareFunc compare);
+SListItem *slist_insert_sorted(SList *list, void *data);
 
 /**
  *\param list a SList
@@ -217,10 +216,9 @@ void slist_item_free_data(const SList *list, SListItem *item);
 /**
  *\param list a SList
  *\param item a SListItem
- *\param compare function to compare list item data
  *
  * Arrange given SListItem in order using the given comparison function to determine its position.
  */
-void slist_reorder(SList *list, SListItem *item, CompareFunc compare);
+void slist_reorder(SList *list, SListItem *item);
 #endif
 
