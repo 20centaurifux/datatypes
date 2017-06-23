@@ -16,7 +16,7 @@
  ***************************************************************************/
 /*!
  * \file rbtree.c
- * \brief A generic balanced binary tree.
+ * \brief A generic red-black tree.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
  */
 #include <stdlib.h>

@@ -33,16 +33,12 @@ commands:
     $ git clone https://github.com/20centaurifux/datatypes.git
     $ cd datatypes
 
-On a x86 system open the Makefile and change the value of the *LIBDIR* setting
-to
-
-    LIBDIR=$(PREFIX)/lib
-
 Now build and install the library:
 
     $ make
-    sudo make install && ldconfig
+    $ sudo make install && ldconfig
 
 ## Documentation
 
-To generate the code documentation please run Doxygen.
+To generate the code documentation please run Doxygen. You find example code in the
+"test" directory.
