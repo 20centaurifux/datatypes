@@ -19,8 +19,9 @@ DOXYGEN=doxygen
 
 # source code & object files:
 SRC=.
-SRCS=$(SRC)/allocator.c $(SRC)/asyncqueue.c $(SRC)/buffer.c $(SRC)/datatypes.c \
-     $(SRC)/hashtable.c $(SRC)/list.c $(SRC)/rbtree.c $(SRC)/slist.c $(SRC)/stack.c $(SRC)/assocarray.c
+#SRCS=$(SRC)/allocator.c $(SRC)/asyncqueue.c $(SRC)/buffer.c $(SRC)/datatypes.c \
+#     $(SRC)/hashtable.c $(SRC)/list.c $(SRC)/rbtree.c $(SRC)/slist.c $(SRC)/stack.c $(SRC)/assocarray.c
+SRCS=$(SRC)/allocator.c $(SRC)/list.c $(SRC)/datatypes.c
 OBJS=$(SRCS:.c=.o)
 
 # optional libraries (comment assigned values out to disable):
@@ -33,8 +34,8 @@ LIBS=$(PTHREAD_LIB)
 
 # version information:
 MAJOR_VERSION=0
-MINOR_VERSION=1
-PATCHLEVEL=3
+MINOR_VERSION=2
+PATCHLEVEL=0
 
 # destination library files:
 STATIC_LIB=libdatatypes-$(MAJOR_VERSION).$(MINOR_VERSION).$(PATCHLEVEL).a
