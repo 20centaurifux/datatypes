@@ -44,24 +44,24 @@ typedef struct
 } AsyncQueue;
 
 /**
- *\param equals function to compare item data
+ *\param compare function to compare item data
  *\param free function to free item data or NULL
  *\param allocator a user-defined memory allocator for creating/destroying QueueItems or NULL
  *\return a new AsyncQueue
  *
  * Creates a new AsyncQueue.
  */
-AsyncQueue *async_queue_new(EqualFunc equals, FreeFunc free, Allocator *allocator);
+AsyncQueue *async_queue_new(CompareFunc compare, FreeFunc free, Allocator *allocator);
 
 /**
  *\param queue an AsyncQueue
- *\param equals function to compare item data
+ *\param compare function to compare item data
  *\param free function to free item data or NULL
  *\param allocator a user-defined memory allocator for creating/destroying QueueItems or NULL
  *
  * Initializes an AsyncQueue.
  */
-void async_queue_init(AsyncQueue *queue, EqualFunc equals, FreeFunc free, Allocator *allocator);
+void async_queue_init(AsyncQueue *queue, CompareFunc compare, FreeFunc free, Allocator *allocator);
 
 /**
  *\param queue an AsyncQueue

@@ -51,7 +51,7 @@ main(int argc, char *argv[])
 
 	for(i = 0; i < 2; ++i)
 	{
-		queues[i] = async_queue_new(direct_equal, NULL, NULL);
+		queues[i] = async_queue_new(direct_compare, NULL, NULL);
 		pthread_create(&t[i], NULL, _worker, queues[i]);
 	}
 

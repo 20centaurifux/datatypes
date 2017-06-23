@@ -28,7 +28,7 @@
 #include "asyncqueue.h"
 
 AsyncQueue *
-async_queue_new(EqualFunc equals, FreeFunc free, Allocator *allocator)
+async_queue_new(CompareFunc compare, FreeFunc free, Allocator *allocator)
 {
 	AsyncQueue *queue;
 
@@ -38,21 +38,22 @@ async_queue_new(EqualFunc equals, FreeFunc free, Allocator *allocator)
 		abort();
 	}
 
-	async_queue_init(queue, equals, free, allocator);
+	async_queue_init(queue, compare, free, allocator);
 
 	return queue;
 }
 
 void
-async_queue_init(AsyncQueue *queue, EqualFunc equals, FreeFunc free, Allocator *allocator)
+async_queue_init(AsyncQueue *queue, CompareFunc compare, FreeFunc free, Allocator *allocator)
 {
 	#ifndef NDEBUG
 	int success;
 	#endif
 
 	assert(queue != NULL);
+	assert(compare != NULL);
 
-	queue_init(&queue->queue, equals, free, allocator);
+	queue_init(&queue->queue, compare, free, allocator);
 	queue->waiting = 0;
 
 	#ifndef NDEBUG
