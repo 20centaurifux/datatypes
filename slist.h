@@ -117,7 +117,7 @@ SListItem *slist_prepend(SList *list, void *data);
  *\param data data to insert
  *\return a new ListItem
  *
- * Inserts data into list using the given comparison function to determine its position.
+ * Inserts data into list using the associated compare function to determine its position.
  */
 SListItem *slist_insert_sorted(SList *list, void *data);
 
@@ -217,7 +217,7 @@ void slist_item_free_data(const SList *list, SListItem *item);
  *\param list a SList
  *\param item a SListItem
  *
- * Arrange given SListItem in order using the given comparison function to determine its position.
+ * Arrange given SListItem in order using the associated compare function to determine its position.
  */
 void slist_reorder(SList *list, SListItem *item);
 #endif

@@ -31,7 +31,10 @@
 #include "hashtable.h"
 
 /*! Memory allocator block size. */
-#define HASHTABLE_LIST_ALLOCATOR_BLOCK_SIZE   512
+#define HASHTABLE_LIST_ALLOCATOR_BLOCK_SIZE 512
+
+/*! Initial hashtable size when resizing automatically. */
+#define HASHTABLE_INITIAL_SIZE              128
 
 /*
  *	public:
@@ -65,14 +68,14 @@ hashtable_new(size_t size, HashFunc hash_func, EqualFunc compare_keys, FreeFunc 
 inline void
 hashtable_init(HashTable *table, size_t size, HashFunc hash_func, EqualFunc compare_keys, FreeFunc free_key, FreeFunc free_value)
 {
-	size_t table_size = 8;
+	size_t table_size = HASHTABLE_INITIAL_SIZE;
 
 	assert(table != NULL);
 	assert(size < SIZE_MAX - 1);
 	assert(hash_func != NULL);
 	assert(compare_keys != NULL);
 
-	if(size != HASHTABLE_AUTO_SIZE)
+	if(size != HASHTABLE_AUTO_RESIZE)
 	{
 		table_size = size;
 	}
@@ -90,7 +93,7 @@ hashtable_init(HashTable *table, size_t size, HashFunc hash_func, EqualFunc comp
 	table->free_value = free_value;
 
 	table->size = table_size;
-	table->grow = size == HASHTABLE_AUTO_SIZE;
+	table->grow = size == HASHTABLE_AUTO_RESIZE;
 	table->hash = hash_func;
 	table->count = 0;
 }

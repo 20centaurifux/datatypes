@@ -34,7 +34,7 @@
  */
 typedef struct _ListItem
 {
-	/*! Store data. */
+	/*! Stored data. */
 	void *data;
 	/*! Pointer to next list item. */
 	struct _ListItem *next;
@@ -119,7 +119,7 @@ ListItem *list_prepend(List *list, void *data);
  *\param data data to insert
  *\return a new ListItem
  *
- * Inserts data into list using the given comparison function to determine its position.
+ * Inserts data into list using the associated compare function to determine its position.
  */
 ListItem *list_insert_sorted(List *list, void *data);
 
@@ -230,7 +230,7 @@ void list_item_free_data(const List *list, ListItem *item);
  *\param list a List
  *\param item a ListItem
  *
- * Arrange given ListItem in order using the given comparison function to determine its position.
+ * Arrange given ListItem in order using the associated compare function to determine its position.
  */
 void list_reorder(List *list, ListItem *item);
 

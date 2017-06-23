@@ -86,13 +86,13 @@ typedef enum
 
 /**
  *\struct RBTreeIterStackItem
- *\brief Structure holding a node and an interation state.
+ *\brief Structure holding a node and the iteration state.
  */
 typedef struct
 {
 	/*! A node. */
 	RBNode *node;
-	/*! An interation state. */
+	/*! Iteration state. */
 	int state;
 } RBTreeIterStackItem;
 
@@ -104,7 +104,7 @@ typedef struct
 {
 	/*! Pointer to related tree. */
 	const RBTree *tree;
-	/*! A stack holding nodes and an iteration state. */
+	/*! A stack holding nodes and iteration state. */
 	RBTreeIterStackItem *stack;
 	/*! The stack pointer. */
 	RBTreeIterStackItem *sp;
@@ -164,8 +164,8 @@ void rbtree_clear(RBTree *tree);
  *\param replace_key true to overwrite exisiting key
  *\return RBTREE_INSERT_RESULT_NEW or RBTREE_INSERT_RESULT_REPLACED
  *
- * Inserts a new key and value in the RBTree. If replace_key has been set an exisiting key will be
- * freed using the specified free_key function and then get replaced.
+ * Inserts a new key and value in the RBTree. If replace_key is set an existing key will be
+ * freed using the specified free_key function before it gets replaced.
  */
 RBTreeInsertResult rbtree_set(RBTree *tree, void * restrict key, void * restrict value, bool replace_key);
 

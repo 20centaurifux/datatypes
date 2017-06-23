@@ -1,11 +1,14 @@
-# datatypes
+# libdatatypes
 
 ## Introduction
 
-**datatypes** provides various abstract data types you might miss in C.
-The following types are available:
+**libdatatypes** is a library providing various abstract data types in plain C (C11).
+It's fast, has a small memory footprint and is well-documented. The library
+has been tested under GCC and Clang.
 
-* hash table (with fixed but user-definable bucket size)
+The following data types are available:
+
+* hash table
 * red-black tree
 * associated array
 * singly-linked list

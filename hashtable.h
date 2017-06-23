@@ -27,8 +27,8 @@
 #include "datatypes.h"
 #include "allocator.h"
 
-/*! Used to enable auto-resizing of HashTable instances. */
-#define HASHTABLE_AUTO_SIZE 0
+/*! Used to enable auto-resize. */
+#define HASHTABLE_AUTO_RESIZE 0
 
 /**
  *\struct HashTable
@@ -46,7 +46,7 @@ typedef struct
 	HashFunc hash;
 	/*! Size of the hash table. */
 	size_t size;
-	/*! Grow automatically. */
+	/*! Enable/disable auto-resize. */
 	bool grow;
 	/**
 	 *\struct _Bucket
@@ -145,8 +145,8 @@ void hashtable_clear(HashTable *table);
  *\param value the value to associate with the key
  *\param overwrite_key true to overwrite already exisiting keys
  *
- * Inserts a new key and value in the HashTable. If overwrite_key has been set an exisiting key will be
- * freed using the specified free_key function and then get replaced.
+ * Inserts a new key and value in the HashTable. If overwrite_key is set an existing key will be
+ * freed using the specified free_key function before it gets replaced.
  */
 void hashtable_set(HashTable *table, void * restrict key, void * restrict value, bool overwrite_key);
 
@@ -197,7 +197,7 @@ void hashtable_iter_init(const HashTable *table, HashTableIter *iter);
  *\param iter a HashTableIter
  *\return false if end of the HashTable has been reached
  *
- * Goes to next element of the Hashtable.
+ * Goes to next element of the HashTable.
  */
 bool hashtable_iter_next(HashTableIter *iter);
 

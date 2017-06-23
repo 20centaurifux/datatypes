@@ -108,8 +108,8 @@ void assoc_array_clear(AssocArray *array);
  *\param value the value to associate with the key
  *\param overwrite_key true to overwrite already exisiting keys
  *
- * Inserts a new key and value in the AssocArray. If overwrite_key has been set an exisiting key will be
- * freed using the specified free_key function and then get replaced.
+ * Inserts a new key and value in the AssocArray. If overwrite_key is set an existing key will be
+ * freed using the specified free_key function before it gets replaced.
  */
 void assoc_array_set(AssocArray *array, void * restrict key, void * restrict value, bool overwrite_key);
 
