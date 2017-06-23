@@ -198,16 +198,13 @@ static void
 _hashtable_resize(HashTable *table)
 {
 	size_t old_size;
-	struct _Bucket **old_buckets;
-	Allocator *old_allocator;
+	struct _Bucket **buckets;
 
 	assert(table != NULL);
 
 	/* resize table */
 	old_size = table->size;
-
 	table->size *= 2;
-	table->count = 0;
 
 	if(old_size > table->size || table->size == SIZE_MAX - 1)
 	{
@@ -215,11 +212,8 @@ _hashtable_resize(HashTable *table)
 		abort();
 	}
 
-	/* create new bucket list & allocator */
-	old_buckets = table->buckets;
-	old_allocator = table->allocator;
-
-	table->allocator = (Allocator *)chunk_allocator_new(sizeof(struct _Bucket), HASHTABLE_LIST_ALLOCATOR_BLOCK_SIZE);
+	/* create new bucket list */
+	buckets = table->buckets;
 
 	if(!(table->buckets = (struct _Bucket **)calloc(table->size, sizeof(struct _Bucket *))))
 	{
@@ -227,21 +221,33 @@ _hashtable_resize(HashTable *table)
 		abort();
 	}
 
-	/* copy values to new table */
+	/* copy items to new bucket array */
 	for(size_t i = 0; i < old_size; ++i)
 	{
-		struct _Bucket *iter = old_buckets[i];
+		struct _Bucket *iter = buckets[i];
 
 		while(iter)
 		{
-			hashtable_set(table, iter->key, iter->data, false);
-			iter = iter->next;
+			struct _Bucket *next = iter->next;
+
+			size_t index = HASHTABLE_INDEX(table, iter->key);
+
+			if(table->buckets[index])
+			{
+				iter->next = table->buckets[index];
+				table->buckets[index] = iter;
+			}
+			else
+			{
+				iter->next = NULL;
+				table->buckets[index] = iter;
+			}
+
+			iter = next;
 		}
 	}
 
-	/* delete old allocator & bucket list */
-	chunk_allocator_destroy((ChunkAllocator *)old_allocator);
-	free(old_buckets);
+	free(buckets);
 }
 
 void
