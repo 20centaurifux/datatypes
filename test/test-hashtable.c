@@ -19,7 +19,7 @@ main(int argc, char *argv[])
 	char word[32];
 
 	// initialize table:
-	table = hashtable_new(TABLE_SIZE, &str_hash, &str_equal, &free, NULL);
+	table = hashtable_new(0, &str_hash, &str_equal, &free, NULL);
 
 	assert(table != NULL);
 

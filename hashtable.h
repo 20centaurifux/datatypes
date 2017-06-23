@@ -27,6 +27,9 @@
 #include "datatypes.h"
 #include "allocator.h"
 
+/*! Used to enable auto-resizing of HashTable instances. */
+#define HASHTABLE_AUTO_SIZE 0
+
 /**
  *\struct HashTable
  *\brief A datatype to create associations between keys and values.
@@ -43,6 +46,8 @@ typedef struct
 	HashFunc hash;
 	/*! Size of the hash table. */
 	size_t size;
+	/*! Grow automatically. */
+	bool grow;
 	/**
 	 *\struct _Bucket
 	 *\brief A singly-linked list implementation storing keys & values.
@@ -90,7 +95,7 @@ typedef struct
 uint32_t str_hash(const void *ptr);
 
 /**
- *\param size size of the hash table (number of buckets)
+ *\param size size of the hash table (number of buckets), 0 to grow automatically
  *\param hash_func function to create hash from a key
  *\param compare_keys function to check equality of two keys
  *\param free_key function to free keys or NULL
@@ -103,7 +108,7 @@ HashTable *hashtable_new(size_t size, HashFunc hash_func, EqualFunc compare_keys
 
 /**
  *\param table a HashTable
- *\param size size of the hash table (number of buckets)
+ *\param size size of the hash table (number of buckets), 0 to grow automatically
  *\param hash_func function to create hash from a key
  *\param compare_keys function to check equality of two keys
  *\param free_key function to free keys or NULL
