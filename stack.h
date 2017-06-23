@@ -37,24 +37,24 @@ typedef SList Stack;
 typedef SList StackItem;
 
 /**
- *\param equals function to compare item data
+ *\param compare function to compare item data
  *\param free function to free item data or NULL
  *\param allocator a user-defined memory allocator for creating/destroying StackItems or NULL
  *\return a new Stack
  *
  * Creates a new Stack.
  */
-#define stack_new(equals, free, allocator) slist_new(equals, free, allocator)
+#define stack_new(compare, free, allocator) slist_new(compare, free, allocator)
 
 /**
  *\param stack a Stack
- *\param equals function to compare item data
+ *\param compare function to compare item data
  *\param free function to free item data or NULL
  *\param allocator a user-defined memory allocator for creating/destroying StackItems or NULL
  *
  * Initializes a Stack.
  */
-#define stack_init(stack, equals, free, allocator) slist_init(stack, equals, free, allocator)
+#define stack_init(stack, compare, free, allocator) slist_init(stack, compare, free, allocator)
 
 /**
  *\param stack a Stack
