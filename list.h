@@ -30,7 +30,7 @@
 
 /**
  * \struct ListItem
- * \brief Structure holding list item data.
+ * \brief Structure holding a list item.
  */
 typedef struct _ListItem
 {
@@ -85,14 +85,14 @@ void list_init(List *list, CompareFunc compare, FreeFunc free, Allocator *alloca
 /**
  *\param list a List
  *
- * Destroys all items in the list. Frees also memory allocated for the List instance.
+ * Frees all items in the list and the list pointer.
  */
 void list_destroy(List *list);
 
 /**
  *\param list a List
  *
- * Destroys all items in the list.
+ * Frees all items in the list without freeing the list pointer.
  */
 void list_free(List *list);
 
@@ -159,7 +159,7 @@ bool list_empty(const List *list);
  *\param list a List
  *\param item a ListItem
  *
- * Removes an item from the list.
+ * Removes a list item from the list.
  */
 void list_remove(List *list, ListItem *item);
 
@@ -168,7 +168,7 @@ void list_remove(List *list, ListItem *item);
  *\param data data
  *\param remove_all true to remove all items with associated data
  *
- * Removes first item (or all items) with associated data from the list.
+ * Removes first list item (or all items) with associated data from the list.
  */
 void list_remove_by_data(List *list, void *data, bool remove_all);
 
@@ -185,7 +185,7 @@ void *list_pop(List *list);
  *\param data data
  *\return true if data exists in list
  *
- * Tests if list contains given data.
+ * Tests if a list contains the specified data.
  */
 bool list_contains(const List *list, void *data);
 
@@ -202,7 +202,7 @@ void list_clear(List *list);
  *\param data data to search
  *\return found ListItem or NULL
  *
- * Searches for given data.
+ * Searches for the specified data.
  */
 ListItem *list_find(const List *list, ListItem *offset, void const *data);
 

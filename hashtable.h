@@ -27,7 +27,7 @@
 #include "datatypes.h"
 #include "allocator.h"
 
-/*! Used to enable auto-resize. */
+/*! HashTable size used to enable auto-resizing. */
 #define HASHTABLE_AUTO_RESIZE 0
 
 /**
@@ -53,7 +53,7 @@ typedef struct
 	 *\brief A singly-linked list implementation storing keys & values.
 	 *
 	 *\var buckets
-	 *\brief An array containing pointers to lists.
+	 *\brief An array containing pointers to buckets.
 	 */
 	struct _Bucket
 	{
@@ -82,7 +82,7 @@ typedef struct
 	size_t offset;
 	/*! Pointer to current list element. */
 	struct _Bucket *liter;
-	/*! true if iteration has been completed. */
+		/*! true if iteration is completed. */
 	bool finished;
 } HashTableIter;
 
@@ -90,12 +90,12 @@ typedef struct
  *\param ptr pointer to plain text
  *\return a hash value
  *
- * Hash of the given plain text.
+ * Calculates the hash of the specified plain text.
  */
 uint32_t str_hash(const void *ptr);
 
 /**
- *\param size size of the hash table (number of buckets), 0 to grow automatically
+ *\param size size of the hash table (number of buckets), HASHTABLE_AUTO_RESIZE to grow automatically
  *\param hash_func function to create hash from a key
  *\param compare_keys function to check equality of two keys
  *\param free_key function to free keys or NULL
@@ -108,7 +108,7 @@ HashTable *hashtable_new(size_t size, HashFunc hash_func, EqualFunc compare_keys
 
 /**
  *\param table a HashTable
- *\param size size of the hash table (number of buckets), 0 to grow automatically
+ *\param size size of the hash table (number of buckets), HASHTABLE_AUTO_RESIZE to grow automatically
  *\param hash_func function to create hash from a key
  *\param compare_keys function to check equality of two keys
  *\param free_key function to free keys or NULL
@@ -121,14 +121,14 @@ void hashtable_init(HashTable *table, size_t size, HashFunc hash_func, EqualFunc
 /**
  *\param table a HashTable
  *
- * Destroys all keys and values in the HashTable. Frees also memory allocated for the HashTable instance.
+ * Frees all keys, values and the table pointer.
  */
 void hashtable_destroy(HashTable *table);
 
 /**
  *\param table a HashTable
  *
- * Destroys all keys and values in the HashTable.
+ * Frees all keys and values without freeing the table pointer.
  */
 void hashtable_free(HashTable *table);
 
@@ -145,14 +145,14 @@ void hashtable_clear(HashTable *table);
  *\param value the value to associate with the key
  *\param overwrite_key true to overwrite already exisiting keys
  *
- * Inserts a new key and value in the HashTable. If overwrite_key is set an existing key will be
+ * Inserts a new key and value in the HashTable. If overwrite_key is set an existing key is
  * freed using the specified free_key function before it gets replaced.
  */
 void hashtable_set(HashTable *table, void * restrict key, void * restrict value, bool overwrite_key);
 
 /**
  *\param table a HashTable
- *\param key a key
+ *\param key key of the element to remove
  *
  * Removes an element from the HashTable.
  */

@@ -59,14 +59,14 @@ typedef SList StackItem;
 /**
  *\param stack a Stack
  *
- * Destroys all items in the stack. Frees also memory allocated for the Stack instance.
+ * Frees all items in the stack and the stack pointer.
  */
 #define stack_destroy(stack) slist_destroy(stack)
 
 /**
  *\param stack a Stack
  *
- * Destroys all items in the stack.
+ * Frees all items in the stack without freeing the stack pointer.
  */
 #define stack_free(stack) slist_free(stack)
 
@@ -92,7 +92,7 @@ bool stack_head(Stack *stack, void **data);
  *\param data location to store data
  *\return true if stack is not empty
  *
- * Removes first element from stack.
+ * Pops the first element from the stack.
  */
 bool stack_pop(Stack *stack, void **data);
 

@@ -26,11 +26,11 @@
 #include <stdint.h>
 #include <string.h>
 
-/*! Major version. */
+/*! Major version of libdatatypes. */
 #define DATATYPES_VERSION_MAJOR      0
-/*! Minor version. */
+/*! Minor version of libdatatypes. */
 #define DATATYPES_VERSION_MINOR      2
-/*! Patchlevel. */
+/*! Patchlevel of libdatatypes. */
 #define DATATYPES_VERSION_PATCHLEVEL 0
 
 /*! A function to compare two values. */
@@ -60,7 +60,7 @@ bool str_equal(const void * restrict a, const void * restrict b);
  *\param b a pointer
  *\return a - b
  *
- * Compares to pointers.
+ * Compares two pointers.
  */
 int32_t direct_compare(const void *a, const void *b);
 

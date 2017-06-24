@@ -110,7 +110,7 @@ typedef struct
 	RBTreeIterStackItem *sp;
 	/*! Size of the stack. */
 	size_t stack_size;
-	/*! true if iteration has been finished. */
+	/*! true if iteration is finished. */
 	bool finished;
 } RBTreeIter;
 
@@ -164,7 +164,7 @@ void rbtree_clear(RBTree *tree);
  *\param replace_key true to overwrite exisiting key
  *\return RBTREE_INSERT_RESULT_NEW or RBTREE_INSERT_RESULT_REPLACED
  *
- * Inserts a new key and value in the RBTree. If replace_key is set an existing key will be
+ * Inserts a new key and value in the RBTree. If replace_key is set an existing key is
  * freed using the specified free_key function before it gets replaced.
  */
 RBTreeInsertResult rbtree_set(RBTree *tree, void * restrict key, void * restrict value, bool replace_key);
@@ -197,7 +197,7 @@ bool rbtree_key_exists(const RBTree *tree, const void *key);
 
 /**
  *\param tree a RBTree
- *\param key a key
+ *\param key key of the element to remove
  *\return true if node has been removed
  *
  * Removes an element from the RBTree.
@@ -224,7 +224,7 @@ void rbtree_iter_free(RBTreeIter *iter);
  *\param tree a RBTree
  *\param iter an already initialized RBTreeIter
  *
- * Reuses an iterator.
+ * Reuses (reinitializes) an iterator.
  */
 void rbtree_iter_reuse(const RBTree *tree, RBTreeIter *iter);
 

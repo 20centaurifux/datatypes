@@ -66,14 +66,14 @@ void async_queue_init(AsyncQueue *queue, CompareFunc compare, FreeFunc free, All
 /**
  *\param queue an AsyncQueue
  *
- * Destroys all items in the queue. Frees also memory allocated for the AsyncQueue instance.
+ * Frees all items and the queue pointer.
  */
 void async_queue_destroy(AsyncQueue *queue);
 
 /**
  *\param queue an AsyncQueue
  *
- * Destroys all items in the queue.
+ * Frees all items without freeing the queue pointer.
  */
 void async_queue_free(AsyncQueue *queue);
 

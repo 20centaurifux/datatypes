@@ -84,14 +84,14 @@ void assoc_array_init(AssocArray *array, CompareFunc compare_keys, FreeFunc free
 /**
  *\param array an AssocArray
  *
- * Destroys all keys and values in the AssocArray. Frees also memory allocated for the AssocArray instance.
+ * Frees all keys, values and the array pointer.
  */
 void assoc_array_destroy(AssocArray *array);
 
 /**
  *\param array an AssocArray
  *
- * Destroys all keys and values in the AssocArray.
+ * Frees all keys and values without freeing the array pointer.
  */
 void assoc_array_free(AssocArray *array);
 
@@ -108,14 +108,14 @@ void assoc_array_clear(AssocArray *array);
  *\param value the value to associate with the key
  *\param overwrite_key true to overwrite already exisiting keys
  *
- * Inserts a new key and value in the AssocArray. If overwrite_key is set an existing key will be
+ * Inserts a new key and value in the AssocArray. If overwrite_key is set an existing key is
  * freed using the specified free_key function before it gets replaced.
  */
 void assoc_array_set(AssocArray *array, void * restrict key, void * restrict value, bool overwrite_key);
 
 /**
  *\param array an AssocArray
- *\param key a key
+ *\param key key of the element to remove
  *
  * Removes an element from the AssocArray.
  */

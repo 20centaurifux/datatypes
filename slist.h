@@ -30,7 +30,7 @@
 
 /**
  * \struct SListItem
- * \brief Structure holding list item data.
+ * \brief Structure holding a list item.
  */
 typedef struct _SListItem
 {
@@ -83,14 +83,14 @@ void slist_init(SList *list, CompareFunc compare, FreeFunc free, Allocator *allo
 /**
  *\param list a SList
  *
- * Destroys all items in the list. Frees also memory allocated for the SList instance.
+ * Frees all items in the list and the list pointer.
  */
 void slist_destroy(SList *list);
 
 /**
  *\param list a SList
  *
- * Destroys all items in the list.
+ * Frees all items in the list without freeing the list pointer.
  */
 void slist_free(SList *list);
 
@@ -117,7 +117,7 @@ SListItem *slist_prepend(SList *list, void *data);
  *\param data data to insert
  *\return a new ListItem
  *
- * Inserts data into list using the associated compare function to determine its position.
+ * Inserts data into the list using the associated compare function to determine its position.
  */
 SListItem *slist_insert_sorted(SList *list, void *data);
 
@@ -149,7 +149,7 @@ bool slist_empty(const SList *list);
  *\param list a SList
  *\param item a SListItem
  *
- * Removes an item from the list.
+ * Removes a list item from the list.
  */
 void slist_remove(SList *list, SListItem *item);
 
@@ -158,7 +158,7 @@ void slist_remove(SList *list, SListItem *item);
  *\param data data
  *\param remove_all true to remove all items with associated data
  *
- * Removes first item (or all items) with associated data from the list.
+ * Removes first list item (or all items) with associated data from the list.
  */
 void slist_remove_by_data(SList *list, void *data, bool remove_all);
 
@@ -175,7 +175,7 @@ void *slist_pop(SList *list);
  *\param data data to search
  *\return true if data exists in list
  *
- * Test if list contains given data.
+ * Tests if a list contains the specified data.
  */
 bool slist_contains(const SList *list, void *data);
 
@@ -192,7 +192,7 @@ void slist_clear(SList *list);
  *\param data data to search
  *\return found SListItem or NULL
  *
- * Searches for given data.
+ * Searches for an element in the list.
  */
 SListItem *slist_find(const SList *list, SListItem *offset, void const *data);
 

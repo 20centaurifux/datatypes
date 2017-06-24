@@ -18,7 +18,7 @@ The following data types are available:
 * byte-buffer
 * asynchronous (message) queue
 
-All data types are generic. Compare and memory allocation functions are fully
+All data types are generic. Compare and memory allocation functions are
 customizable.
 
 ## Building

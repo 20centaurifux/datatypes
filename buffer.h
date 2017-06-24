@@ -66,14 +66,14 @@ void buffer_init(Buffer *buf, size_t max_size);
 /**
  *\param buf Buffer to free
  *
- * Frees a buffer.
+ * Frees a buffer without freeing the buf pointer.
  */
 void buffer_free(Buffer *buf);
 
 /**
  *\param buf Buffer to free
  *
- * Frees a buffer and also the memory allocated for the Buffer instance.
+ * Frees a buffer and the buf pointer.
  */
 void buffer_destroy(Buffer *buf);
 
@@ -88,7 +88,7 @@ void buffer_clear(Buffer *buf);
  *\param buf a Buffer
  *\return length of the buffer
  *
- * Returns length of the buffer (or 0 if buffer is empty).
+ * Gets the length of the buffer.
  */
 size_t buffer_len(const Buffer *buf);
 
@@ -122,7 +122,7 @@ bool buffer_fill(Buffer *buf, const char *data, size_t len);
  *\param buf a Buffer
  *\param fd a file descriptor
  *\param count bytes to read from the file descriptor
- *\return number of bytes read from the file and written to the buffer
+ *\return number of bytes read from the file descriptor and written to the buffer
  *
  * Reads bytes from a file and writes the data to the buffer.
  */
@@ -150,7 +150,7 @@ bool buffer_flush(Buffer *buf, char **dst, size_t *len);
 
 /**
  *\param buf a Buffer
- *\return a new allocated string
+ *\return a newly-allocated string
  *
  * Converts the data from the buffer to a string. Returns NULL if buffer is invalid.
  */
