@@ -29,7 +29,7 @@ PTHREAD_LIB=-pthread
 
 #OPENMP_CFLAGS=-DWITH_OPENMP -fopenmp
 
-LIBS=$(PTHREAD_LIB)
+LDFLAGS=$(PTHREAD_LIB)
 
 # version information:
 MAJOR_VERSION=0
@@ -50,7 +50,7 @@ SHARED_LIB_SYMLINK=$(STATIC_LIB_SYMLINK:.a=.so)
 
 all: $(OBJS)
 	$(AR) rcs $(SRC)/$(STATIC_LIB) $(OBJS)
-	$(CC) $(CFLAGS) $(LDFLAGS) -shared -Wl,-soname,libdatatypes.so.0 -o $(SRC)/$(SHARED_LIB) $(OBJS) $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -shared -Wl,-soname,libdatatypes.so.0 -o $(SRC)/$(SHARED_LIB) $(OBJS) $(LDFLAGS)
 
 clean:
 	rm -f $(OBJS)
