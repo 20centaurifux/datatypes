@@ -1,21 +1,21 @@
 # destination paths:
-PREFIX=/usr
-INCDIR=$(PREFIX)/include
-
-LIBDIR=$(PREFIX)/lib
+PREFIX?=/usr
+INCDIR?=$(PREFIX)/include
 
 MACHINE:=$(shell uname -m)
 
 ifeq ($(MACHINE), x86_64)
-LIBDIR=$(PREFIX)/lib64
+	LIBDIR?=$(PREFIX)/lib64
+else
+	LIBDIR?=$(PREFIX)/lib
 endif
 
 # compiler & tools:
-CC=gcc
-AR=ar
+CC?=gcc
+AR?=ar
 CFLAGS=-Wall -std=c11 -O2 -fPIC $(OPENMP_CFLAGS) $(PTHREAD_CFLAGS)
-CPPCHECK=cppcheck
-DOXYGEN=doxygen
+CPPCHECK?=cppcheck
+DOXYGEN?=doxygen
 
 # source code & object files:
 SRC=.
