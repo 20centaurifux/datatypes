@@ -43,7 +43,7 @@ main(int argc, char *argv[])
 
 		result = buffer_fill_from_fd(buf, fd, 256);
 
-		assert(result == 0);
+		assert(result == -1);
 		assert(buffer_is_valid(buf) == false);
 		assert(!buffer_is_empty(buf));
 		assert(buffer_len(buf) == 0);

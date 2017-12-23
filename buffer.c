@@ -30,14 +30,17 @@
 /*! @cond INTERNAL */
 #define RETURN_IF_INVALID(b) if(!buffer_is_valid(b)) return
 #define RETURN_VAL_IF_INVALID(b, v) if(!buffer_is_valid(b)) return v
+#define BUFFER_LIMIT (SIZE_MAX / 2)
+#define EXCEEDS_BUFFER_LIMIT(buf, len) BUFFER_LIMIT - buf->len < len
+#define EXCEEDS_BUFFER_MAX_SIZE(buf, len) buf->max_size - buf->len < len
 /*! @endcond */
 
 Buffer *
 buffer_new(size_t max_size)
 {
-	Buffer *buf;
+	Buffer *buf = (Buffer *)malloc(sizeof(Buffer));
 
-	if(!(buf = (Buffer *)malloc(sizeof(Buffer))))
+	if(!buf)
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
 		abort();
@@ -51,20 +54,21 @@ buffer_new(size_t max_size)
 void
 buffer_init(Buffer *buf, size_t max_size)
 {
-	memset(buf, 0, sizeof(Buffer));
+	assert(buf != NULL);
+	assert(max_size > 0 && max_size <= BUFFER_LIMIT);
 
-	assert(max_size > 0);
+	memset(buf, 0, sizeof(Buffer));
 
 	buf->max_size = max_size;
 	buf->msize = 64;
 	buf->valid = true;
+	buf->data = (char *)malloc(buf->msize);
 
-	if(!(buf->data = (char *)malloc(buf->msize)))
+	if(!buf->data)
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
 		abort();
 	}
-
 }
 
 void
@@ -78,6 +82,8 @@ buffer_free(Buffer *buf)
 void
 buffer_destroy(Buffer *buf)
 {
+	assert(buf != NULL);
+
 	buffer_free(buf);
 	free(buf);
 }
@@ -118,14 +124,11 @@ buffer_is_empty(const Buffer *buf)
 static size_t
 _buffer_new_realloc_size(size_t from, size_t to)
 {
-	/* new buffer size should be a power of 2 - I know there are a faster solutions but
-	   this very simple one should work well on different platforms and is easy to
-	   understand :) */
-	do
+	while(from < to)
 	{
-		assert(from < SIZE_MAX / 2);
 		from *= 2;
-	} while(from < to);
+		assert(from <= BUFFER_LIMIT);
+	}
 
 	return from;
 }
@@ -137,47 +140,34 @@ buffer_fill(Buffer *buf, const char *data, size_t len)
 
 	assert(data != NULL);
 
-	/* test maximum buffer length */
-	assert(SIZE_MAX - len > buf->len);
-
-	if(buf->len + len > buf->max_size)
+	if(EXCEEDS_BUFFER_LIMIT(buf, len))
 	{
-		fprintf(stderr, "buffer exceeds maximum size\n");
+		fprintf(stderr, "Buffer size exceeds supported limit.\n");
+		buf->valid = false;
+	}
+	else if(EXCEEDS_BUFFER_MAX_SIZE(buf, len))
+	{
+		fprintf(stderr, "Buffer exceeds allowed maximum size.\n");
 		buf->valid = false;
 	}
 	else
 	{
-		/* test if string exceeds allocated memory block */
-		assert(SIZE_MAX - len > buf->msize);
-
 		if(len > buf->msize - buf->len)
 		{
-			/* resize buffer */
 			size_t new_size = _buffer_new_realloc_size(buf->msize, buf->msize + len);
 
-			if(new_size < buf->msize)
-			{
-				fprintf(stderr, "overflow in buf->msize calculation\n");
-				buf->valid = false;
-
-				return false;
-			}
-
 			buf->msize = new_size;
+			buf->data = (char *)realloc(buf->data, new_size);
 
-			if(!(buf->data = (char *)realloc(buf->data, buf->msize)))
+			if(!buf->data)
 			{
 				fprintf(stderr, "Couldn't resize buffer.\n");
 				abort();
 			}
 		}
 
-		/* copy data to buffer */
-		if(buf->valid)
-		{
-			memcpy(buf->data + buf->len, data, len);
-			buf->len += len;
-		}
+		memcpy(buf->data + buf->len, data, len);
+		buf->len += len;
 	}
 
 	return buf->valid;
@@ -197,7 +187,7 @@ buffer_fill_from_fd(Buffer *buf, int fd, size_t count)
 	{
 		if(!buffer_fill(buf, data, bytes))
 		{
-			bytes = 0;
+			bytes = -1;
 		}
 	}
 
@@ -205,17 +195,19 @@ buffer_fill_from_fd(Buffer *buf, int fd, size_t count)
 }
 
 static void
-_buffer_copy_to(Buffer *buf, size_t count, char **dst, size_t *len)
+_buffer_copy_to_string(Buffer *buf, size_t count, char **dst, size_t *len)
 {
 	assert(buf != NULL);
 	assert(dst != NULL);
 	assert(len != NULL);
+	assert(count <= buf->len);
 
 	if(count + 1 > *len)
 	{
 		*len = count;
+		*dst = (char *)realloc(*dst, count + 1);
 
-		if(!(*dst = (char *)realloc(*dst, count + 1)))
+		if(!dst)
 		{
 			fprintf(stderr, "Couldn't resize dst.\n");
 			abort();
@@ -236,15 +228,12 @@ buffer_read_line(Buffer *buf, char **dst, size_t *len)
 	assert(dst != NULL);
 	assert(len != NULL);
 
-	/* find line-break */
 	if((ptr = memchr(buf->data, '\n', buf->len)))
 	{
 		size_t slen = ptr - buf->data;
 
-		/* copy found line to destination */
-		_buffer_copy_to(buf, slen, dst, len);
+		_buffer_copy_to_string(buf, slen, dst, len);
 
-		/* update buffer length & content */
 		buf->len -= slen + 1;
 		memmove(buf->data, ptr + 1, buf->len);
 
@@ -267,7 +256,7 @@ buffer_flush(Buffer *buf, char **dst, size_t *len)
 		return false;
 	}
 
-	_buffer_copy_to(buf, buf->len, dst, len);
+	_buffer_copy_to_string(buf, buf->len, dst, len);
 
 	return true;
 }
@@ -277,9 +266,13 @@ buffer_to_string(const Buffer *buf)
 {
 	RETURN_VAL_IF_INVALID(buf, NULL);
 
+	char *str = NULL;
+
 	if(buf->len)
 	{
-		char *str = (char *)malloc(buf->len + 1);
+		assert(buf->len <= BUFFER_LIMIT);
+
+		str = (char *)malloc(buf->len + 1);
 
 		if(!str)
 		{
@@ -293,6 +286,6 @@ buffer_to_string(const Buffer *buf)
 		return str;
 	}
 
-	return NULL;
+	return str;
 }
 
