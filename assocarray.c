@@ -163,7 +163,7 @@ assoc_array_clear(AssocArray *array)
 void
 assoc_array_set(AssocArray *array, void * restrict key, void * restrict value, bool overwrite_key)
 {
-	ssize_t offset;
+	ssize_t offset = 0;
 
 	assert(array != NULL);
 	assert(key != NULL);
@@ -262,7 +262,7 @@ assoc_array_set(AssocArray *array, void * restrict key, void * restrict value, b
 void
 assoc_array_remove(AssocArray *array, const void *key)
 {
-	ssize_t offset;
+	ssize_t offset = 0;
 
 	assert(array != NULL);
 	assert(key != NULL);
@@ -295,7 +295,7 @@ assoc_array_remove(AssocArray *array, const void *key)
 void *
 assoc_array_lookup(const AssocArray *array, const void *key)
 {
-	ssize_t offset;
+	ssize_t offset = 0;
 
 	assert(array != NULL);
 	assert(key != NULL);
