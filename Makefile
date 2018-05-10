@@ -33,7 +33,7 @@ LDFLAGS=$(PTHREAD_LIB)
 
 # version information:
 MAJOR_VERSION=0
-MINOR_VERSION=2
+MINOR_VERSION=3
 PATCHLEVEL=0
 
 # destination library files:

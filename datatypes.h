@@ -29,7 +29,7 @@
 /*! Major version of libdatatypes. */
 #define DATATYPES_VERSION_MAJOR      0
 /*! Minor version of libdatatypes. */
-#define DATATYPES_VERSION_MINOR      2
+#define DATATYPES_VERSION_MINOR      3
 /*! Patchlevel of libdatatypes. */
 #define DATATYPES_VERSION_PATCHLEVEL 0
 
