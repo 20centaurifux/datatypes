@@ -30,7 +30,7 @@
 
 #include "hashtable.h"
 
-/*! Memory allocator block size. */
+/*! Memory pool block size. */
 #define HASHTABLE_LIST_ALLOCATOR_BLOCK_SIZE 512
 
 /*! Initial hashtable size when resizing automatically. */
@@ -86,7 +86,7 @@ hashtable_init(HashTable *table, size_t size, HashFunc hash_func, EqualFunc comp
 		abort();
 	}
 
-	table->allocator = (Allocator *)chunk_allocator_new(sizeof(struct _Bucket), HASHTABLE_LIST_ALLOCATOR_BLOCK_SIZE);
+	table->pool = (Pool *)memory_pool_new(sizeof(struct _Bucket), HASHTABLE_LIST_ALLOCATOR_BLOCK_SIZE);
 
 	table->compare_keys = compare_keys;
 	table->free_key = free_key;
@@ -144,7 +144,7 @@ hashtable_free(HashTable *table)
 		#endif
 	}
 
-	chunk_allocator_destroy((ChunkAllocator *)table->allocator);
+	memory_pool_destroy((MemoryPool *)table->pool);
 	free(table->buckets);
 }
 
@@ -191,8 +191,8 @@ hashtable_clear(HashTable *table)
 		#endif
 	}
 
-	chunk_allocator_destroy((ChunkAllocator *)table->allocator);
-	table->allocator = (Allocator *)chunk_allocator_new(sizeof(struct _Bucket), HASHTABLE_LIST_ALLOCATOR_BLOCK_SIZE);
+	memory_pool_destroy((MemoryPool *)table->pool);
+	table->pool = (Pool *)memory_pool_new(sizeof(struct _Bucket), HASHTABLE_LIST_ALLOCATOR_BLOCK_SIZE);
 
 	table->count = 0;
 }
@@ -311,7 +311,7 @@ hashtable_set(HashTable *table, void * restrict key, void * restrict value, bool
 	else
 	{
 		/* insert new item */
-		item = (struct _Bucket *)table->allocator->alloc(table->allocator);
+		item = (struct _Bucket *)table->pool->alloc(table->pool);
 		item->key = key;
 		item->data = value;
 		table->buckets[index] = item;
@@ -359,7 +359,7 @@ hashtable_remove(HashTable *table, const void *key)
 					table->buckets[index] = iter->next;
 				}
 
-				table->allocator->free(table->allocator, iter);
+				table->pool->free(table->pool, iter);
 				--table->count;
 
 				break;

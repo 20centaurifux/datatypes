@@ -25,10 +25,11 @@
 #include <stdio.h>
 #include <sys/time.h>
 #include <assert.h>
+
 #include "asyncqueue.h"
 
 AsyncQueue *
-async_queue_new(CompareFunc compare, FreeFunc free, Allocator *allocator)
+async_queue_new(CompareFunc compare, FreeFunc free, Pool *pool)
 {
 	AsyncQueue *queue;
 
@@ -38,13 +39,13 @@ async_queue_new(CompareFunc compare, FreeFunc free, Allocator *allocator)
 		abort();
 	}
 
-	async_queue_init(queue, compare, free, allocator);
+	async_queue_init(queue, compare, free, pool);
 
 	return queue;
 }
 
 void
-async_queue_init(AsyncQueue *queue, CompareFunc compare, FreeFunc free, Allocator *allocator)
+async_queue_init(AsyncQueue *queue, CompareFunc compare, FreeFunc free, Pool *pool)
 {
 	#ifndef NDEBUG
 	int success;
@@ -53,7 +54,7 @@ async_queue_init(AsyncQueue *queue, CompareFunc compare, FreeFunc free, Allocato
 	assert(queue != NULL);
 	assert(compare != NULL);
 
-	queue_init(&queue->queue, compare, free, allocator);
+	queue_init(&queue->queue, compare, free, pool);
 	queue->waiting = 0;
 
 	#ifndef NDEBUG

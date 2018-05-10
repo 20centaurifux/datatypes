@@ -26,7 +26,7 @@
 #include <stdbool.h>
 
 #include "datatypes.h"
-#include "allocator.h"
+#include "pool.h"
 
 /**
  * \struct ListItem
@@ -58,29 +58,29 @@ typedef struct
 	CompareFunc compare;
 	/*! A function to free item data. */
 	FreeFunc free;
-	/*! A memory allocator. */
-	Allocator *allocator;
+	/*! A memory pool. */
+	Pool *pool;
 } List;
 
 /**
  *\param compare function to compare item data
  *\param free function to free item data or NULL
- *\param allocator a user-defined memory allocator for creating/destroying ListItems or NULL
+ *\param pool a user-defined memory pool for creating/destroying ListItems or NULL
  *\return a new List
  *
  * Creates a new List.
  */
-List *list_new(CompareFunc compare, FreeFunc free, Allocator *allocator);
+List *list_new(CompareFunc compare, FreeFunc free, Pool *pool);
 
 /**
  *\param list a List
  *\param compare function to compare item data
  *\param free function to free item data or NULL
- *\param allocator a user-defined memory allocator for creating/destroying ListItems or NULL
+ *\param pool a user-defined memory pool for creating/destroying ListItems or NULL
  *
  * Initializes a List.
  */
-void list_init(List *list, CompareFunc compare, FreeFunc free, Allocator *allocator);
+void list_init(List *list, CompareFunc compare, FreeFunc free, Pool *pool);
 
 /**
  *\param list a List

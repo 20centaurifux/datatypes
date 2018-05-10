@@ -25,7 +25,6 @@
 #include <stdbool.h>
 
 #include "datatypes.h"
-#include "allocator.h"
 
 /**
  *\struct AssocArray

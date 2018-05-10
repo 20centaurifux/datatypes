@@ -39,22 +39,22 @@ typedef SList QueueItem;
 /**
  *\param compare function to compare item data
  *\param free function to free item data or NULL
- *\param allocator a user-defined memory allocator for creating/destroying QueueItems or NULL
+ *\param pool a user-defined memory pool for creating/destroying QueueItems or NULL
  *\return a new Queue
  *
  * Creates a new Queue.
  */
-#define queue_new(compare, free, allocator) stack_new(compare, free, allocator)
+#define queue_new(compare, free, pool) stack_new(compare, free, pool)
 
 /**
  *\param queue a Queue
  *\param compare function to compare item data
  *\param free function to free item data or NULL
- *\param allocator a user-defined memory allocator for creating/destroying QueueItems or NULL
+ *\param pool a user-defined memory pool for creating/destroying QueueItems or NULL
  *
  * Initializes a Queue.
  */
-#define queue_init(queue, compare, free, allocator) stack_init(queue, compare, free, allocator)
+#define queue_init(queue, compare, free, pool) stack_init(queue, compare, free, pool)
 
 /**
  *\param queue a Queue

@@ -20,7 +20,7 @@
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
  */
 #include "datatypes.h"
-#include "allocator.h"
+#include "pool.h"
 
 #ifndef SLIST_H
 #define SLIST_H
@@ -56,29 +56,29 @@ typedef struct _SList
 	CompareFunc compare;
 	/*! A function to free item data. */
 	FreeFunc free;
-	/*! A memory allocator. */
-	Allocator *allocator;
+	/*! A memory pool. */
+	Pool *pool;
 } SList;
 
 /**
  *\param compare function to compare item data
  *\param free function to free item data or NULL
- *\param allocator a user-defined memory allocator for creating/destroying SListItems or NULL
+ *\param pool a user-defined memory pool for creating/destroying SListItems or NULL
  *\return a new SList
  *
  * Creates a new SList.
  */
-SList *slist_new(CompareFunc compare, FreeFunc free, Allocator *allocator);
+SList *slist_new(CompareFunc compare, FreeFunc free, Pool *pool);
 
 /**
  *\param list a SList
  *\param compare function to compare item data
  *\param free function to free item data OR NULL
- *\param allocator a user-defined memory allocator for creating/destroying SListItems or NULL
+ *\param pool a user-defined memory pool for creating/destroying SListItems or NULL
  *
  * Initializes a new SList.
  */
-void slist_init(SList *list, CompareFunc compare, FreeFunc free, Allocator *allocator);
+void slist_init(SList *list, CompareFunc compare, FreeFunc free, Pool *pool);
 
 /**
  *\param list a SList

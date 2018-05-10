@@ -15,39 +15,39 @@
     General Public License v3 for more details.
  ***************************************************************************/
 /**
- * \file allocator.h
- * \brief Allocate chunks of memory.
+ * \file pool.h
+ * \brief Allocate memory blocks of same sizes.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
  */
-#ifndef ALLOCATOR_H
-#define ALLOCATOR_H
+#ifndef POOL_H
+#define POOL_H
 
 #include <stdint.h>
 
 /**
- *\struct Allocator
- *\brief A memory allocator.
+ *\struct Pool
+ *\brief A memory pool.
  */
-typedef struct _Allocator
+typedef struct _Pool
 {
 	/*! Function to allocate memory. */
-	void *(*alloc)(struct _Allocator *allocator);
+	void *(*alloc)(struct _Pool *pool);
 	/*! Function to free memory. */
-	void (*free)(struct _Allocator *allocator, void *ptr);
-} Allocator;
+	void (*free)(struct _Pool *pool, void *ptr);
+} Pool;
 
 /**
- *\struct ChunkAllocator
- *\brief This memory allocator allocates chunks of memory and grows automatically.
+ *\struct MemoryPool
+ *\brief This memory pool allocates memorys of memory and grows automatically.
  */
 typedef struct
 {
 	/*! Padding.*/
-	Allocator padding;
+	Pool padding;
 
 	/**
 	 *\struct _MemoryBlock
-	 *\brief Chunks of memory are stored in a singly-linked list.
+	 *\brief Memorys of memory are stored in a singly-linked list.
 	 *
 	 *\var block
 	 *\brief First memory block.
@@ -63,7 +63,7 @@ typedef struct
 	} *block;
 	/**
 	 *\struct _MemoryPtrBlock
-	 *\brief Freed pointers are stored in chunks holding addresses.
+	 *\brief Freed pointers are stored in memorys holding addresses.
 	 *
 	 *\var free_block
 	 *\brief First pointer block.
@@ -74,30 +74,30 @@ typedef struct
 		void **items;
 		/*! Offset to find next available position in items array. */
 		size_t offset;
-		/*! Pointer to next chunk or NULL. */
+		/*! Pointer to next memory or NULL. */
 		struct _MemoryPtrBlock *next;
 	} *free_block;
-	/*! Number of items a memory chunk can hold. */
+	/*! Number of items a memory memory can hold. */
 	size_t block_size;
 	/*! Size of an allocated item. */
 	size_t item_size;
-} ChunkAllocator;
+} MemoryPool;
 
 /**
  *\param item_size size of allocated items
- *\param block_size number of elements a chunk can hold
- *\return a new allocator
+ *\param block_size number of elements a memory can hold
+ *\return a new pool
  *
- * Creates a new ChunkAllocator.
+ * Creates a new MemoryPool.
  */
-ChunkAllocator *chunk_allocator_new(size_t item_size, size_t block_size);
+MemoryPool *memory_pool_new(size_t item_size, size_t block_size);
 
 /**
- *\param allocator a memory allocator
+ *\param pool a memory pool
  *
- * Destroys the given ChunkAllocator.
+ * Destroys the given MemoryPool.
  */
-void chunk_allocator_destroy(ChunkAllocator *allocator);
+void memory_pool_destroy(MemoryPool *pool);
 
 #endif
 

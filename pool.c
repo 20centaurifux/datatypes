@@ -15,18 +15,18 @@
     General Public License v3 for more details.
  ***************************************************************************/
 /**
- * \file allocator.c
- * \brief Allocate chunks of memory.
+ * \file pool.c
+ * \brief Allocate memory blocks of same sizes.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
  */
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
 
-#include "allocator.h"
+#include "pool.h"
 
 static struct _MemoryBlock *
-_chunk_allocator_create_block(const ChunkAllocator *allocator)
+_memory_pool_create_block(const MemoryPool *pool)
 {
 	struct _MemoryBlock *block;
 
@@ -36,7 +36,7 @@ _chunk_allocator_create_block(const ChunkAllocator *allocator)
 		abort();
 	}
 
-	if(!(block->items = malloc(allocator->item_size * allocator->block_size)))
+	if(!(block->items = malloc(pool->item_size * pool->block_size)))
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
 		abort();
@@ -49,7 +49,7 @@ _chunk_allocator_create_block(const ChunkAllocator *allocator)
 }
 
 static struct _MemoryPtrBlock *
-_chunk_allocator_create_ptr_block(const ChunkAllocator *allocator)
+_memory_pool_create_ptr_block(const MemoryPool *pool)
 {
 	struct _MemoryPtrBlock *block;
 
@@ -59,7 +59,7 @@ _chunk_allocator_create_ptr_block(const ChunkAllocator *allocator)
 		abort();
 	}
 
-	if(!(block->items = (void **)malloc(allocator->block_size * sizeof(void *))))
+	if(!(block->items = (void **)malloc(pool->block_size * sizeof(void *))))
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
 		abort();
@@ -72,24 +72,24 @@ _chunk_allocator_create_ptr_block(const ChunkAllocator *allocator)
 }
 
 static void *
-_chunk_allocator_alloc(Allocator *alloc)
+_memory_pool_alloc(Pool *alloc)
 {
-	ChunkAllocator *allocator = (ChunkAllocator *)alloc;
+	MemoryPool *pool = (MemoryPool *)alloc;
 	struct _MemoryBlock *block;
 	struct _MemoryPtrBlock *pblock;
 	void *item = NULL;
 
 	/* try to get detached item */
-	if(allocator->free_block)
+	if(pool->free_block)
 	{
-		assert(allocator->free_block->offset > 0);
+		assert(pool->free_block->offset > 0);
 
-		item = allocator->free_block->items[--allocator->free_block->offset];
+		item = pool->free_block->items[--pool->free_block->offset];
 
-		if(!allocator->free_block->offset)
+		if(!pool->free_block->offset)
 		{
-			pblock = allocator->free_block;
-			allocator->free_block = pblock->next;
+			pblock = pool->free_block;
+			pool->free_block = pblock->next;
 			free(pblock->items);
 			free(pblock);
 		}
@@ -98,83 +98,83 @@ _chunk_allocator_alloc(Allocator *alloc)
 	}
 
 	/* test if we have reached end of the current block */
-	if(allocator->block->offset < allocator->block_size)
+	if(pool->block->offset < pool->block_size)
 	{
 		/* end not reached => return current item & increment offset */
-		item = allocator->block->items + (allocator->item_size * allocator->block->offset++);
+		item = pool->block->items + (pool->item_size * pool->block->offset++);
 	}
 	else
 	{
 		/* end reached => create a new block & prepend it to our list */
-		block = _chunk_allocator_create_block(allocator);
-		block->next = allocator->block;
-		allocator->block = block;
+		block = _memory_pool_create_block(pool);
+		block->next = pool->block;
+		pool->block = block;
 
 		/* return first item from current block & increment offset */
-		item = allocator->block->items;
-		++allocator->block->offset;
+		item = pool->block->items;
+		++pool->block->offset;
 	}
 
 	return item;
 }
 
 static void
-_chunk_allocator_free(Allocator *alloc, void *item)
+_memory_pool_free(Pool *alloc, void *item)
 {
-	ChunkAllocator *allocator = (ChunkAllocator *)alloc;
+	MemoryPool *pool = (MemoryPool *)alloc;
 	struct _MemoryPtrBlock *cur;
 
-	if(!(cur = allocator->free_block))
+	if(!(cur = pool->free_block))
 	{
-		allocator->free_block = cur = _chunk_allocator_create_ptr_block(allocator);
+		pool->free_block = cur = _memory_pool_create_ptr_block(pool);
 	}
-	else if(cur->offset == allocator->block_size)
+	else if(cur->offset == pool->block_size)
 	{
-		cur = _chunk_allocator_create_ptr_block(allocator);
-		cur->next = allocator->free_block;
-		allocator->free_block = cur;
+		cur = _memory_pool_create_ptr_block(pool);
+		cur->next = pool->free_block;
+		pool->free_block = cur;
 	}
 
 	cur->items[cur->offset++] = item;
 }
 
-ChunkAllocator *
-chunk_allocator_new(size_t item_size, size_t block_size)
+MemoryPool *
+memory_pool_new(size_t item_size, size_t block_size)
 {
-	ChunkAllocator *allocator;
+	MemoryPool *pool;
 
 	assert(item_size > 1);
 	assert(block_size > 1);
 	assert(block_size < SIZE_MAX / item_size);
 	assert(block_size < SIZE_MAX / sizeof(void *));
 
-	if(!(allocator = (ChunkAllocator *)malloc(sizeof(ChunkAllocator))))
+	if(!(pool = (MemoryPool *)malloc(sizeof(MemoryPool))))
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
 		abort();
 	}
 
-	allocator->free_block = NULL;
-	allocator->item_size = item_size;
-	allocator->block_size = block_size;
-	allocator->block = _chunk_allocator_create_block(allocator);
+	pool->free_block = NULL;
+	pool->item_size = item_size;
+	pool->block_size = block_size;
+	pool->block = _memory_pool_create_block(pool);
 
-	((Allocator *)allocator)->alloc = _chunk_allocator_alloc;
-	((Allocator *)allocator)->free = _chunk_allocator_free;
+	((Pool *)pool)->alloc = _memory_pool_alloc;
+	((Pool *)pool)->free = _memory_pool_free;
 
-	return allocator;
+	return pool;
 }
 
 void
-chunk_allocator_destroy(ChunkAllocator *allocator)
+memory_pool_destroy(MemoryPool *pool)
 {
 	struct _MemoryBlock *iter;
 	struct _MemoryPtrBlock *piter;
 
-	assert(allocator != NULL);
+	assert(pool != NULL);
 
 	/* free memory blocks & list */
-	iter = allocator->block;
+	iter = pool->block;
 
 	while(iter)
 	{
@@ -187,7 +187,7 @@ chunk_allocator_destroy(ChunkAllocator *allocator)
 	}
 
 	/* free list containing free items */
-	piter = allocator->free_block;
+	piter = pool->free_block;
 
 	while(piter)
 	{
@@ -199,6 +199,6 @@ chunk_allocator_destroy(ChunkAllocator *allocator)
 		free(pblock);
 	}
 
-	free(allocator);
+	free(pool);
 }
 

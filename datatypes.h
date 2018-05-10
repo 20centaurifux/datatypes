@@ -73,6 +73,7 @@ int32_t direct_compare(const void *a, const void *b);
  */
 bool direct_equal(const void *a, const void *b);
 
+#include "pool.h"
 #include "hashtable.h"
 #include "rbtree.h"
 #include "list.h"

@@ -30,13 +30,13 @@
  *	helpers:
  */
 static inline ListItem *
-_list_item_new(Allocator *allocator, void *data)
+_list_item_new(Pool *pool, void *data)
 {
 	ListItem *item = NULL;
 
-	if(allocator)
+	if(pool)
 	{
-		item = (ListItem *)allocator->alloc(allocator);
+		item = (ListItem *)pool->alloc(pool);
 	}
 
 	if(!item && !(item = (ListItem *)malloc(sizeof(ListItem))))
@@ -132,7 +132,7 @@ _list_find(const List *list, ListItem *offset, void const *data)
  *	public:
  */
 List *
-list_new(CompareFunc compare, FreeFunc free, Allocator *allocator)
+list_new(CompareFunc compare, FreeFunc free, Pool *pool)
 {
 	List *list;
 
@@ -142,20 +142,20 @@ list_new(CompareFunc compare, FreeFunc free, Allocator *allocator)
 		abort();
 	}
 
-	list_init(list, compare, free, allocator);
+	list_init(list, compare, free, pool);
 
 	return list;
 }
 
 void
-list_init(List *list, CompareFunc compare, FreeFunc free, Allocator *allocator)
+list_init(List *list, CompareFunc compare, FreeFunc free, Pool *pool)
 {
 	assert(compare != NULL);
 
 	memset(list, 0, sizeof(List));
 	list->compare = compare;
 	list->free = free;
-	list->allocator = allocator;
+	list->pool = pool;
 }
 
 void
@@ -178,9 +178,9 @@ list_free(List *list)
 			list->free(item->data);
 		}
 
-		if(list->allocator)
+		if(list->pool)
 		{
-			list->allocator->free(list->allocator, item);
+			list->pool->free(list->pool, item);
 		}
 		else
 		{
@@ -205,7 +205,7 @@ list_append(List *list, void *data)
 
 	assert(list != NULL);
 
-	item = _list_item_new(list->allocator, data);
+	item = _list_item_new(list->pool, data);
 
 	if(list->tail)
 	{
@@ -232,7 +232,7 @@ list_prepend(List *list, void *data)
 
 	assert(list != NULL);
 
-	item = _list_item_new(list->allocator, data);
+	item = _list_item_new(list->pool, data);
 
 	if(list->head)
 	{
@@ -275,7 +275,7 @@ list_insert_sorted(List *list, void *data)
 		}
 
 		/* insert list item into list */
-		item = _list_item_new(list->allocator, data);
+		item = _list_item_new(list->pool, data);
 
 		while(iter)
 		{
@@ -302,7 +302,7 @@ list_insert_sorted(List *list, void *data)
 	else
 	{
 		/* insert head */
-		item = _list_item_new(list->allocator, data);
+		item = _list_item_new(list->pool, data);
 		list->head = item;
 		list->tail = item;
 	}
@@ -332,9 +332,9 @@ list_remove(List *list, ListItem *item)
 		list->free(p->data);
 	}
 
-	if(list->allocator)
+	if(list->pool)
 	{
-		list->allocator->free(list->allocator, p);
+		list->pool->free(list->pool, p);
 	}
 	else
 	{
@@ -403,9 +403,9 @@ list_pop(List *list)
 
 		data = item->data;
 
-		if(list->allocator)
+		if(list->pool)
 		{
-			list->allocator->free(list->allocator, item);
+			list->pool->free(list->pool, item);
 		}
 		else
 		{
@@ -446,9 +446,9 @@ list_clear(List *list)
 			list->free(iter->data);
 		}
 
-		if(list->allocator)
+		if(list->pool)
 		{
-			list->allocator->free(list->allocator, iter);
+			list->pool->free(list->pool, iter);
 		}
 		else
 		{

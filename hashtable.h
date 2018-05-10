@@ -25,7 +25,7 @@
 #include <stdbool.h>
 
 #include "datatypes.h"
-#include "allocator.h"
+#include "pool.h"
 
 /*! HashTable size used to enable auto-resizing. */
 #define HASHTABLE_AUTO_RESIZE 0
@@ -66,8 +66,8 @@ typedef struct
 	} **buckets;
 	/*! Number of stored elements. */
 	size_t count;
-	/*! Allocator used to create/destroy list elements. */
-	Allocator *allocator;
+	/*! Pool used to create/destroy list elements. */
+	Pool *pool;
 } HashTable;
 
 /**

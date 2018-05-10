@@ -30,7 +30,7 @@
 #define RBTREE_INITIAL_BLOCK_SIZE 4
 
 RBTree *
-rbtree_new(CompareFunc compare_keys, FreeFunc free_key, FreeFunc free_value, Allocator *allocator)
+rbtree_new(CompareFunc compare_keys, FreeFunc free_key, FreeFunc free_value, Pool *pool)
 {
 	RBTree *tree;
 
@@ -40,13 +40,13 @@ rbtree_new(CompareFunc compare_keys, FreeFunc free_key, FreeFunc free_value, All
 		abort();
 	}
 
-	rbtree_init(tree, compare_keys, free_key, free_value, allocator);
+	rbtree_init(tree, compare_keys, free_key, free_value, pool);
 
 	return tree;
 }
 
 inline void
-rbtree_init(RBTree *tree, CompareFunc compare_keys, FreeFunc free_key, FreeFunc free_value, Allocator *allocator)
+rbtree_init(RBTree *tree, CompareFunc compare_keys, FreeFunc free_key, FreeFunc free_value, Pool *pool)
 {
 	assert(tree != NULL);
 	assert(compare_keys != NULL);
@@ -63,7 +63,7 @@ rbtree_init(RBTree *tree, CompareFunc compare_keys, FreeFunc free_key, FreeFunc 
 	tree->free_key = free_key;
 	tree->free_value = free_value;
 	tree->stack_size = RBTREE_INITIAL_BLOCK_SIZE;
-	tree->allocator = allocator;
+	tree->pool = pool;
 }
 
 static void
@@ -91,9 +91,9 @@ _rbtree_destroy_node(RBTree *tree, RBNode *node)
 		tree->free_value(node->value);
 	}
 
-	if(tree->allocator)
+	if(tree->pool)
 	{
-		tree->allocator->free(tree->allocator, node);
+		tree->pool->free(tree->pool, node);
 	}
 	else
 	{
@@ -203,13 +203,13 @@ _rbtree_stack_push(RBTree *tree, RBNode *node)
 #define _rbnode_is_black(n) (n == NULL ? 1 : n->black)
 
 static inline RBNode *
-_rbnode_create_new(Allocator *allocator, void *key, void *value, int black, RBNode *left, RBNode *right)
+_rbnode_create_new(Pool *pool, void *key, void *value, int black, RBNode *left, RBNode *right)
 {
 	RBNode *node;
 
-	if(allocator)
+	if(pool)
 	{
-		node = (RBNode *)allocator->alloc(allocator);
+		node = (RBNode *)pool->alloc(pool);
 	}
 	else if(!(node = (RBNode *)malloc(sizeof(RBNode))))
 	{
@@ -405,7 +405,7 @@ rbtree_set(RBTree *tree, void * restrict key, void * restrict value, bool overwr
 	if(!tree->root)
 	{
 		/* insert root node */
-		tree->root = _rbnode_create_new(tree->allocator, key, value, 1, NULL, NULL);
+		tree->root = _rbnode_create_new(tree->pool, key, value, 1, NULL, NULL);
 		++tree->count;
 		return RBTREE_INSERT_RESULT_NEW;
 	}
@@ -454,7 +454,7 @@ rbtree_set(RBTree *tree, void * restrict key, void * restrict value, bool overwr
 			}
 			else
 			{
-				new_node = _rbnode_create_new(tree->allocator, key, value, 0, NULL, NULL);
+				new_node = _rbnode_create_new(tree->pool, key, value, 0, NULL, NULL);
 				node->left = new_node;
 				break;
 			}
@@ -467,7 +467,7 @@ rbtree_set(RBTree *tree, void * restrict key, void * restrict value, bool overwr
 			}
 			else
 			{
-				new_node = _rbnode_create_new(tree->allocator, key, value, 0, NULL, NULL);
+				new_node = _rbnode_create_new(tree->pool, key, value, 0, NULL, NULL);
 				node->right = new_node;
 				break;
 			}
@@ -782,9 +782,9 @@ rbtree_remove(RBTree *tree, const void *key)
 		child->black = 1;
 	}
 
-	if(tree->allocator)
+	if(tree->pool)
 	{
-		tree->allocator->free(tree->allocator, node);
+		tree->pool->free(tree->pool, node);
 	}
 	else
 	{

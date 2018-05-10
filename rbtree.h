@@ -26,7 +26,7 @@
 #include <stdint.h>
 
 #include "datatypes.h"
-#include "allocator.h"
+#include "pool.h"
 
 /**
  *\struct RBNode
@@ -66,8 +66,8 @@ typedef struct
 	RBNode **sp;
 	/*! Size of the stack. */
 	size_t stack_size;
-	/*! An optional allocator to create nodes. */
-	Allocator *allocator;
+	/*! An optional pool to create nodes. */
+	Pool *pool;
 	/*! Number of stored items. */
 	size_t count;
 } RBTree;
@@ -118,23 +118,23 @@ typedef struct
  *\param compare_keys function to compare two keys
  *\param free_key function to free a key
  *\param free_value function to free a value
- *\param allocator an optional memory allocator for creating/destroying RBNodes or NULL
+ *\param pool an optional memory pool for creating/destroying RBNodes or NULL
  *\return a new RBTree
  *
  * Creates a new RBTree.
  */
-RBTree *rbtree_new(CompareFunc compare_keys, FreeFunc free_key, FreeFunc free_value, Allocator *allocator);
+RBTree *rbtree_new(CompareFunc compare_keys, FreeFunc free_key, FreeFunc free_value, Pool *pool);
 
 /**
  *\param tree an uninitialized RBTree
  *\param compare_keys function to compare two keys
  *\param free_key function to free a key
  *\param free_value function to free a value
- *\param allocator an optional memory allocator for creating/destroying RBNodes or NULL
+ *\param pool an optional memory pool for creating/destroying RBNodes or NULL
  *
  * Initializes a RBTree.
  */
-void rbtree_init(RBTree *tree, CompareFunc compare_keys, FreeFunc free_key, FreeFunc free_value, Allocator *allocator);
+void rbtree_init(RBTree *tree, CompareFunc compare_keys, FreeFunc free_key, FreeFunc free_value, Pool *pool);
 
 /**
  *\param tree a RBTree

@@ -46,22 +46,22 @@ typedef struct
 /**
  *\param compare function to compare item data
  *\param free function to free item data or NULL
- *\param allocator a user-defined memory allocator for creating/destroying QueueItems or NULL
+ *\param pool a user-defined memory pool for creating/destroying QueueItems or NULL
  *\return a new AsyncQueue
  *
  * Creates a new AsyncQueue.
  */
-AsyncQueue *async_queue_new(CompareFunc compare, FreeFunc free, Allocator *allocator);
+AsyncQueue *async_queue_new(CompareFunc compare, FreeFunc free, Pool *pool);
 
 /**
  *\param queue an AsyncQueue
  *\param compare function to compare item data
  *\param free function to free item data or NULL
- *\param allocator a user-defined memory allocator for creating/destroying QueueItems or NULL
+ *\param pool a user-defined memory pool for creating/destroying QueueItems or NULL
  *
  * Initializes an AsyncQueue.
  */
-void async_queue_init(AsyncQueue *queue, CompareFunc compare, FreeFunc free, Allocator *allocator);
+void async_queue_init(AsyncQueue *queue, CompareFunc compare, FreeFunc free, Pool *pool);
 
 /**
  *\param queue an AsyncQueue
