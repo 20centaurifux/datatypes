@@ -4,7 +4,7 @@ CFLAGS=-Wall -std=c99 -O0 -g -DWITH_PTHREAD
 SRCS=$(wildcard *.c)
 
 INC=-I..
-LIB=-L.. -ldatatypes-0.2.0 -pthread
+LIB=-L.. -ldatatypes-0.3.0 -pthread
 
 .PHONY: all clean
 

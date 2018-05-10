@@ -6,8 +6,6 @@
 #include <stdint.h>
 #include <datatypes.h>
 
-#define TABLE_SIZE 81920
-
 int
 main(int argc, char *argv[])
 {
