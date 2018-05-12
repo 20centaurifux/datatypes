@@ -398,6 +398,36 @@ hashtable_lookup(HashTable *table, const void *key)
 	return NULL;
 }
 
+void *
+hashtable_pair_get_key(const HashTablePair *pair)
+{
+	assert(pair != NULL);
+	assert(pair->bucket != NULL);
+	assert(pair->bucket->key != NULL);
+
+	if(pair && pair->bucket)
+	{
+		return pair->bucket->key;
+	}
+
+	return NULL;
+}
+
+void *
+hashtable_pair_get_value(const HashTablePair *pair)
+{
+	assert(pair != NULL);
+	assert(pair->bucket != NULL);
+	assert(pair->bucket->key != NULL);
+
+	if(pair && pair->bucket)
+	{
+		return pair->bucket->data;
+	}
+
+	return NULL;
+}
+
 void
 hashtable_pair_set_value(HashTablePair *pair, void *value)
 {

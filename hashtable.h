@@ -178,11 +178,27 @@ void hashtable_remove(HashTable *table, const void *key);
  */
 HashTablePair *hashtable_lookup(HashTable *table, const void *key);
 
-/*! Returns a pointer to the key of a key-value pair. */
-#define hashtable_pair_get_key(p) p->bucket->key
+/**
+ *\param pair a key-value pair
+ *\return key of the pair
+ *
+ * Retrieves the key of a key-value pair.
+ */
+void *hashtable_pair_get_key(const HashTablePair *pair);
 
-/*! Returns a pointer to the value of a key-value pair. */
-#define hashtable_pair_get_value(p) p->bucket->data
+/*! Access the key of a key-value pair directly. */
+#define hashtable_pair_key(p) p->bucket->key
+
+/**
+ *\param pair a key-value pair
+ *\return value of the pair
+ *
+ * Retrieves the value of a key-value pair.
+ */
+void *hashtable_pair_get_value(const HashTablePair *pair);
+
+/*! Access the value of a key-value pair directly. */
+#define hashtable_pair_value(p) p->bucket->data
 
 /**
  *\param pair a HashTablePair
@@ -234,6 +250,9 @@ bool hashtable_iter_next(HashTableIter *iter);
  */
 void *hashtable_iter_get_key(const HashTableIter *iter);
 
+/*! Access the key of the current element directly. */
+#define hashtable_iter_key(iter) iter.liter->key
+
 /**
  *\param iter a HashTableIter
  *\return value of current element
@@ -241,6 +260,9 @@ void *hashtable_iter_get_key(const HashTableIter *iter);
  * Retrieves the value of the current element.
  */
 void *hashtable_iter_get_value(const HashTableIter *iter);
+
+/*! Access the value of the current element directly. */
+#define hashtable_iter_value(iter) iter.liter->data
 
 #endif
 
