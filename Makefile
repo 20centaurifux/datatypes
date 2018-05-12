@@ -13,7 +13,7 @@ endif
 # compiler & tools:
 CC?=gcc
 AR?=ar
-CFLAGS=-Wall -std=c11 -O2 -fPIC $(OPENMP_CFLAGS) $(PTHREAD_CFLAGS)
+CFLAGS=-Wall -std=c11 -O2 -DNDEBUG -fPIC $(OPENMP_CFLAGS) $(PTHREAD_CFLAGS)
 CPPCHECK?=cppcheck
 DOXYGEN?=doxygen
 
