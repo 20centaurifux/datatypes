@@ -91,11 +91,12 @@ hashtable_init(HashTable *table, size_t size, HashFunc hash_func, EqualFunc comp
 	table->compare_keys = compare_keys;
 	table->free_key = free_key;
 	table->free_value = free_value;
-
 	table->size = table_size;
 	table->grow = size == HASHTABLE_AUTO_RESIZE;
 	table->hash = hash_func;
 	table->count = 0;
+	table->pair.free_value = free_value;
+	table->pair.bucket = NULL;
 }
 
 void
@@ -371,8 +372,8 @@ hashtable_remove(HashTable *table, const void *key)
 	}
 }
 
-void *
-hashtable_lookup(const HashTable *table, const void *key)
+HashTablePair *
+hashtable_lookup(HashTable *table, const void *key)
 {
 	struct _Bucket *iter;
 
@@ -385,7 +386,9 @@ hashtable_lookup(const HashTable *table, const void *key)
 		{
 			if(table->compare_keys(iter->key, key))
 			{
-				return iter->data;
+				table->pair.bucket = iter;
+
+				return &table->pair;
 			}
 
 			iter = iter->next;
@@ -393,6 +396,21 @@ hashtable_lookup(const HashTable *table, const void *key)
 	}
 
 	return NULL;
+}
+
+void
+hashtable_pair_set_value(HashTablePair *pair, void *value)
+{
+	assert(pair != NULL);
+	assert(pair->bucket != NULL);
+	assert(pair->bucket->key != NULL);
+
+	if(pair->free_value)
+	{
+		pair->free_value(pair->bucket->data);
+	}
+
+	pair->bucket->data = value;
 }
 
 bool

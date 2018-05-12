@@ -34,7 +34,7 @@
  *\struct HashTable
  *\brief A datatype to create associations between keys and values.
  */
-typedef struct
+typedef struct _HashTable
 {
 	/*! A function to check equality of two keys. */
 	EqualFunc compare_keys;
@@ -68,7 +68,18 @@ typedef struct
 	size_t count;
 	/*! Pool used to create/destroy list elements. */
 	Pool *pool;
+	/*! A Found key-value pair. */
+	struct _HashTablePair
+	{
+		/*! A function to free the associated value. */
+		FreeFunc free_value;
+		/*! Bucket containing the found key-value pair. */
+		struct _Bucket *bucket;
+	} pair;
 } HashTable;
+
+/*! A found key-value pair. */
+typedef struct _HashTablePair HashTablePair;
 
 /**
  *\struct HashTableIter
@@ -143,7 +154,7 @@ void hashtable_clear(HashTable *table);
  *\param table a HashTable
  *\param key a key to insert
  *\param value the value to associate with the key
- *\param overwrite_key true to overwrite already exisiting keys
+ *\param overwrite_key true to overwrite already existing keys
  *
  * Inserts a new key and value in the HashTable. If overwrite_key is set an existing key is
  * freed using the specified free_key function before it gets replaced.
@@ -161,11 +172,25 @@ void hashtable_remove(HashTable *table, const void *key);
 /**
  *\param table a HashTable
  *\param key a key
- *\return the value associated to the key or NULL
+ *\return the found key-value pair or NULL
  *
- * Looks up a key in the HashTable and returns its value.
+ * Looks up a key-value pair in the HashTable.
  */
-void *hashtable_lookup(const HashTable *table, const void *key);
+HashTablePair *hashtable_lookup(HashTable *table, const void *key);
+
+/*! Returns a pointer to the key of a key-value pair. */
+#define hashtable_pair_get_key(p) p->bucket->key
+
+/*! Returns a pointer to the value of a key-value pair. */
+#define hashtable_pair_get_value(p) p->bucket->data
+
+/**
+ *\param pair a HashTablePair
+ *\param value new value to set
+ *
+ * Overwrites the value of a key-value pair.
+ */
+void hashtable_pair_set_value(HashTablePair *pair, void *value);
 
 /**
  *\param table a HashTable
