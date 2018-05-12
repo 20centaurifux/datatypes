@@ -24,21 +24,13 @@
 #include <string.h>
 #include <assert.h>
 
-#ifdef OPENMP
-#include <omp.h>
-#endif
-
 #include "hashtable.h"
 
 /*! Memory pool block size. */
-#define HASHTABLE_LIST_ALLOCATOR_BLOCK_SIZE 512
+#define HASHTABLE_BUCKET_POOL_BLOCK_SIZE 64
 
 /*! Initial hashtable size when resizing automatically. */
-#define HASHTABLE_INITIAL_SIZE              128
-
-/*
- *	public:
- */
+#define HASHTABLE_INITIAL_SIZE           256
 
 /**
  *\param table a HashTable
@@ -71,7 +63,6 @@ hashtable_init(HashTable *table, size_t size, HashFunc hash_func, EqualFunc comp
 	size_t table_size = HASHTABLE_INITIAL_SIZE;
 
 	assert(table != NULL);
-	assert(size < SIZE_MAX - 1);
 	assert(hash_func != NULL);
 	assert(compare_keys != NULL);
 
@@ -86,7 +77,7 @@ hashtable_init(HashTable *table, size_t size, HashFunc hash_func, EqualFunc comp
 		abort();
 	}
 
-	table->pool = (Pool *)memory_pool_new(sizeof(struct _Bucket), HASHTABLE_LIST_ALLOCATOR_BLOCK_SIZE);
+	table->pool = (Pool *)memory_pool_new(sizeof(struct _Bucket), HASHTABLE_BUCKET_POOL_BLOCK_SIZE);
 
 	table->compare_keys = compare_keys;
 	table->free_key = free_key;
@@ -117,9 +108,6 @@ hashtable_free(HashTable *table)
 
 	if(table->free_key || table->free_value)
 	{
-		#ifdef WITH_OPENMP
-		#pragma omp parallel for private(iter)
-		#endif
 		for(size_t i = 0; i < table->size; ++i)
 		{
 			if((iter = table->buckets[i]))
@@ -140,9 +128,6 @@ hashtable_free(HashTable *table)
 				}
 			}
 		}
-		#ifdef WITH_OPENMP
-		#pragma omp barrier
-		#endif
 	}
 
 	memory_pool_destroy((MemoryPool *)table->pool);
@@ -162,9 +147,6 @@ hashtable_clear(HashTable *table)
 	}
 	else
 	{
-		#ifdef WITH_OPENMP
-		#pragma omp parallel for private(iter)
-		#endif
 		for(size_t i = 0; i < table->size; ++i)
 		{
 			if((iter = table->buckets[i]))
@@ -187,13 +169,10 @@ hashtable_clear(HashTable *table)
 
 			table->buckets[i] = NULL;
 		}
-		#ifdef WITH_OPENMP
-		#pragma omp barrier
-		#endif
 	}
 
 	memory_pool_destroy((MemoryPool *)table->pool);
-	table->pool = (Pool *)memory_pool_new(sizeof(struct _Bucket), HASHTABLE_LIST_ALLOCATOR_BLOCK_SIZE);
+	table->pool = (Pool *)memory_pool_new(sizeof(struct _Bucket), HASHTABLE_BUCKET_POOL_BLOCK_SIZE);
 
 	table->count = 0;
 }
@@ -208,9 +187,9 @@ _hashtable_resize(HashTable *table)
 
 	/* resize table */
 	old_size = table->size;
-	table->size *= 2;
+	table->size *= (table->size >= 0x400000) ? 2 : 4;
 
-	if(old_size > table->size || table->size == SIZE_MAX - 1)
+	if(old_size > table->size)
 	{
 		fprintf(stderr, "%s: integer overflow.\n", __func__);
 		abort();
@@ -266,7 +245,7 @@ hashtable_set(HashTable *table, void * restrict key, void * restrict value, bool
 	assert(key != NULL);
 
 	/* resize table */
-	if(table->size == table->count && table->grow)
+	if(table->grow && table->size == table->count)
 	{
 		_hashtable_resize(table);
 	}
@@ -496,7 +475,7 @@ _hashtable_iter_get_next_bucket(HashTableIter *iter)
 		iter->liter = iter->table->buckets[iter->offset++];
 	}
 
-	return iter->liter ? true : false;
+	return iter->liter != NULL;
 }
 
 bool
