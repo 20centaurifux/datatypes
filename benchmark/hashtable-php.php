@@ -1,7 +1,10 @@
 <?php
+
+ini_set('memory_limit', '2G');
+
 function assoc(&$m, $word)
 {
-	if(array_key_exists($word, $m))
+	if(isset($m[$word]))
 	{
 		$m[$word]++;
 	}
