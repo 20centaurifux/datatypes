@@ -13,7 +13,7 @@ endif
 # compiler & tools:
 CC?=gcc
 AR?=ar
-CFLAGS=-Wall -std=c11 -O2 -DNDEBUG -fPIC $(OPENMP_CFLAGS) $(PTHREAD_CFLAGS)
+CFLAGS=-Wall -Wextra -Wno-unused-parameter -std=c11 -O2 -DNDEBUG -fPIC $(PTHREAD_CFLAGS)
 CPPCHECK?=cppcheck
 DOXYGEN?=doxygen
 
@@ -26,8 +26,6 @@ OBJS=$(SRCS:.c=.o)
 # optional libraries (comment assigned values out to disable):
 PTHREAD_CFLAGS=-DWITH_PTHREAD
 PTHREAD_LIB=-pthread
-
-#OPENMP_CFLAGS=-DWITH_OPENMP -fopenmp
 
 LDFLAGS=$(PTHREAD_LIB)
 
