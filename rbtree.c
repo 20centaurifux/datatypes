@@ -64,6 +64,8 @@ rbtree_init(RBTree *tree, CompareFunc compare_keys, FreeFunc free_key, FreeFunc 
 	tree->free_value = free_value;
 	tree->stack_size = RBTREE_INITIAL_BLOCK_SIZE;
 	tree->pool = pool;
+	tree->pair.free_value = free_value;
+	tree->pair.node = NULL;
 }
 
 static void
@@ -529,20 +531,54 @@ _rbtree_find_node(RBTree *tree, const void *key, bool build_stack)
 	return NULL;
 }
 
-void *
-rbtree_lookup(const RBTree *tree, const void *key)
+RBTreePair *
+rbtree_lookup(RBTree *tree, const void *key)
 {
-	const RBNode *node;
+	RBNode *node;
 
 	assert(tree != NULL);
 	assert(key != NULL);
 
 	if((node = _rbtree_find_node((RBTree *)tree, key, false)))
 	{
-		return node->value;
+		tree->pair.node = node;
+
+		return &tree->pair;
 	}
 
 	return NULL;
+}
+
+void *
+rbtree_pair_get_key(const RBTreePair *pair)
+{
+	assert(pair != NULL);
+	assert(pair->node != NULL);
+
+	return pair->node->key;
+}
+
+void *
+rbtree_pair_get_value(const RBTreePair *pair)
+{
+	assert(pair != NULL);
+	assert(pair->node != NULL);
+
+	return pair->node->value;
+}
+
+void
+rbtree_pair_set_value(RBTreePair *pair, void *value)
+{
+	assert(pair != NULL);
+	assert(pair->node != NULL);
+
+	if(pair->free_value && pair->node->value)
+	{
+		pair->free_value(pair->node->value);
+	}
+
+	pair->node->value = value;
 }
 
 bool

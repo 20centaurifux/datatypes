@@ -70,7 +70,18 @@ typedef struct
 	Pool *pool;
 	/*! Number of stored items. */
 	size_t count;
+	/*! A found key-value pair. */
+	struct _RBTreePair
+	{
+		/*! A function to free the associated value. */
+		FreeFunc free_value;
+		/*! Found node. */
+		RBNode *node;
+	} pair;
 } RBTree;
+
+/*! A found key-value pair. */
+typedef struct _RBTreePair RBTreePair;
 
 /**
  *\enum RBTreeInsertResult
@@ -180,11 +191,41 @@ size_t rbtree_count(const RBTree *tree);
 /**
  *\param tree a RBTree
  *\param key key to find
- *\return pointer to found value or NULL
+ *\return the found key-value pair or NULL
  *
- * Looks up a key in the RBTree and returns its value.
+ * Looks up a key-value pair in the RBTree.
  */
-void *rbtree_lookup(const RBTree *tree, const void *key);
+RBTreePair *rbtree_lookup(RBTree *tree, const void *key);
+
+/**
+ *\param pair a key-value pair
+ *\return key of the pair
+ *
+ * Retrieves the key of a key-value pair.
+ */
+void *rbtree_pair_get_key(const RBTreePair *pair);
+
+/*! Accesses the key of a key-value pair directly. */
+#define rbtree_pair_key(p) p->node->key
+
+/**
+ *\param pair a key-value pair
+ *\return value of the pair
+ *
+ * Retrieves the value of a key-value pair.
+ */
+void *rbtree_pair_get_value(const RBTreePair *pair);
+
+/*! Accesses the value of a key-value pair directly. */
+#define rbtree_pair_value(p) p->node->value
+
+/**
+ *\param pair a RBTreePair
+ *\param value new value to set
+ *
+ * Overwrites the value of a key-value pair.
+ */
+void rbtree_pair_set_value(RBTreePair *pair, void *value);
 
 /**
  *\param tree a RBTree
@@ -244,6 +285,9 @@ bool rbtree_iter_next(RBTreeIter *iter);
  */
 void *rbtree_iter_get_key(const RBTreeIter *iter);
 
+/*! Accesses the key of the current element directly. */
+#define rbtree_iter_key(iter) iter->sp->node->key
+
 /**
  *\param iter a RBTreeIter
  *\return value of current element
@@ -251,6 +295,9 @@ void *rbtree_iter_get_key(const RBTreeIter *iter);
  * Retrieves the value of the current element.
  */
 void *rbtree_iter_get_value(const RBTreeIter *iter);
+
+/*! Accesses the value of the current element directly. */
+#define rbtree_iter_value(iter) iter->sp->node->value
 
 #endif
 
