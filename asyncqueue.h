@@ -25,6 +25,7 @@
 #define ASYNCQUEUE_H
 
 #include <pthread.h>
+
 #include "datatypes.h"
 
 /**

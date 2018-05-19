@@ -23,6 +23,7 @@
 #define POOL_H
 
 #include <stdint.h>
+#include <stddef.h>
 
 /**
  *\struct Pool

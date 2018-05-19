@@ -22,6 +22,7 @@
 #ifndef HASHTABLE_H
 #define HASHTABLE_H
 
+#include <stddef.h>
 #include <stdbool.h>
 
 #include "datatypes.h"
@@ -96,14 +97,6 @@ typedef struct
 		/*! true if iteration is completed. */
 	bool finished;
 } HashTableIter;
-
-/**
- *\param ptr pointer to plain text
- *\return a hash value
- *
- * Calculates the hash of the specified plain text.
- */
-uint32_t str_hash(const void *ptr);
 
 /**
  *\param size size of the hash table (number of buckets), HASHTABLE_AUTO_RESIZE to grow automatically

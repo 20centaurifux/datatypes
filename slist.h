@@ -20,13 +20,14 @@
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
  */
 #include "datatypes.h"
-#include "pool.h"
 
 #ifndef SLIST_H
 #define SLIST_H
 
 #include <stdint.h>
 #include <stdbool.h>
+
+#include "pool.h"
 
 /**
  * \struct SListItem

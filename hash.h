@@ -1,5 +1,5 @@
 /***************************************************************************
-    begin........: June 2012
+    begin........: May 2012
     copyright....: Sebastian Fedrau
     email........: sebastian.fedrau@gmail.com
  ***************************************************************************/
@@ -15,35 +15,25 @@
     General Public License v3 for more details.
  ***************************************************************************/
 /**
- * \file datatypes.h
- * \brief General declarations.
+ * \file hash.h
+ * \brief Hash functions.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
  */
-#ifndef DATATYPES_H
-#define DATATYPES_H
+#ifndef HASH_H
+#define HASH_H
 
-/*! Major version of libdatatypes. */
-#define DATATYPES_VERSION_MAJOR      0
-/*! Minor version of libdatatypes. */
-#define DATATYPES_VERSION_MINOR      3
-/*! Patchlevel of libdatatypes. */
-#define DATATYPES_VERSION_PATCHLEVEL 0
+#include <stdint.h>
 
-/*! A function to free memory. */
-typedef void (*FreeFunc)(void *p);
+/*! Specifies the type of the hash function which is passed to hashtable_new() or hashtable_init(). */
+typedef uint32_t (*HashFunc)(const void *ptr);
 
-#include "compare.h"
-#include "pool.h"
-#include "hash.h"
-#include "hashtable.h"
-#include "rbtree.h"
-#include "list.h"
-#include "slist.h"
-#include "queue.h"
-#include "stack.h"
-#include "buffer.h"
-#include "asyncqueue.h"
-#include "assocarray.h"
+/**
+ *\param ptr pointer to a string
+ *\return hash digest
+ *
+ * Calculates the hash digest of a string.
+ */
+uint32_t str_hash(const void *ptr);
 
 #endif
 

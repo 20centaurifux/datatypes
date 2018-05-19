@@ -23,6 +23,7 @@
 #define ASSOCARRAY_H
 
 #include <stdbool.h>
+#include <sys/types.h>
 
 #include "datatypes.h"
 

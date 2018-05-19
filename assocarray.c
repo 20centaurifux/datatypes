@@ -21,10 +21,14 @@
  */
 #define _GNU_SOURCE
 
-#include "assocarray.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <stddef.h>
 #include <assert.h>
 #include <string.h>
 #include <limits.h>
+
+#include "assocarray.h"
 
 static int
 _assoc_array_binary_search(CompareFunc compare, void **keys, size_t len, const void *key, ssize_t *index)
