@@ -88,6 +88,8 @@ assoc_array_init(AssocArray *array, CompareFunc compare_keys, FreeFunc free_key,
 	array->count = 0;
 	array->free_key = free_key;
 	array->free_value = free_value;
+	array->pair.array = array;
+	array->pair.offset = 0;
 
 	if(!(array->keys = (void **)calloc(array->size, sizeof(void *))))
 	{
@@ -292,8 +294,8 @@ assoc_array_remove(AssocArray *array, const void *key)
 	}
 }
 
-void *
-assoc_array_lookup(const AssocArray *array, const void *key)
+AssocArrayPair *
+assoc_array_lookup(AssocArray *array, const void *key)
 {
 	ssize_t offset = 0;
 
@@ -304,11 +306,54 @@ assoc_array_lookup(const AssocArray *array, const void *key)
 	{
 		if(!_assoc_array_binary_search(array->compare_keys, array->keys, array->count, key, &offset))
 		{
-			return array->values[offset];
+			array->pair.offset = offset;
+
+			return &array->pair;
 		}
 	}
 
 	return NULL;
+}
+
+void *
+assoc_array_pair_get_key(const AssocArrayPair *pair)
+{
+	assert(pair != NULL);
+	assert(pair->array != NULL);
+
+	if(pair)
+	{
+		return pair->array->keys[pair->offset];
+	}
+
+	return NULL;
+}
+void *
+assoc_array_pair_get_value(const AssocArrayPair *pair)
+{
+	assert(pair != NULL);
+	assert(pair->array != NULL);
+
+	if(pair)
+	{
+		return pair->array->values[pair->offset];
+	}
+
+	return NULL;
+}
+
+void
+assoc_array_pair_set_value(AssocArrayPair *pair, void *value)
+{
+	assert(pair != NULL);
+	assert(pair->array != NULL);
+
+	if(pair->array->free_value && pair->array->values[pair->offset])
+	{
+		pair->array->free_value(pair->array->values[pair->offset]);
+	}
+
+	pair->array->values[pair->offset] = value;
 }
 
 bool

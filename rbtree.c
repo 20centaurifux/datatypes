@@ -555,7 +555,12 @@ rbtree_pair_get_key(const RBTreePair *pair)
 	assert(pair != NULL);
 	assert(pair->node != NULL);
 
-	return pair->node->key;
+	if(pair)
+	{
+		return pair->node->key;
+	}
+
+	return NULL;
 }
 
 void *
@@ -564,7 +569,12 @@ rbtree_pair_get_value(const RBTreePair *pair)
 	assert(pair != NULL);
 	assert(pair->node != NULL);
 
-	return pair->node->value;
+	if(pair)
+	{
+		return pair->node->value;
+	}
+
+	return NULL;
 }
 
 void

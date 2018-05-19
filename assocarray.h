@@ -30,7 +30,7 @@
  *\struct AssocArray
  *\brief A datatype to create associations between keys and values.
  */
-typedef struct
+typedef struct _AssocArray
 {
 	/*! A function to compare two keys. */
 	CompareFunc compare_keys;
@@ -46,19 +46,21 @@ typedef struct
 	size_t size;
 	/*! Number of inserted values. */
 	size_t count;
+	/*! Found key-value pair. */
+	struct _AssocArrayPair
+	{
+		/*! Reference to the array. */
+		const struct _AssocArray *array;
+		/*! Index of the found key-value pair. */
+		ssize_t offset;
+	} pair;
 } AssocArray;
 
-/**
- *\struct AssocArrayIter
- *\brief A structure to iterate over the elements of an AssocArray.
- */
-typedef struct
-{
-	/*! Pointer to the associated AssocArray. */
-	const AssocArray *array;
-	/*! Index of the current item. */
-	ssize_t offset;
-} AssocArrayIter;
+/*! A found key-value pair. */
+typedef struct _AssocArrayPair AssocArrayPair;
+
+/*! A structure to iterate over the elements of an AssocArray. */
+typedef struct _AssocArrayPair AssocArrayIter;
 
 /**
  *\param compare_keys function to compare of two keys
@@ -123,11 +125,41 @@ void assoc_array_remove(AssocArray *array, const void *key);
 /**
  *\param array an AssocArray
  *\param key a key
- *\return the value associated to the key or NULL
+ *\return the found key-value pair or NULL.
  *
- * Looks up a key in the AssocArray and returns its value.
+ * Looks up a key-value pair in the AssocArray.
  */
-void *assoc_array_lookup(const AssocArray *array, const void *key);
+AssocArrayPair *assoc_array_lookup(AssocArray *array, const void *key);
+
+/**
+ *\param pair a key-value pair
+ *\return key of the pair
+ *
+ * Retrieves the key of a key-value pair.
+ */
+void *assoc_array_pair_get_key(const AssocArrayPair *pair);
+
+/*! Accesses the key of a key-value pair directly. */
+#define assoc_array_pair_key(p) p->array->keys[p->offset]
+
+/**
+ *\param pair a key-value pair
+ *\return value of the pair
+ *
+ * Retrieves the value of a key-value pair.
+ */
+void *assoc_array_pair_get_value(const AssocArrayPair *pair);
+
+/*! Accesses the value of a key-value pair directly. */
+#define assoc_array_pair_value(p) p->array->values[p->offset]
+
+/**
+ *\param pair a AssocArrayPair
+ *\param value new value to set
+ *
+ * Overwrites the value of a key-value pair.
+ */
+void assoc_array_pair_set_value(AssocArrayPair *pair, void *value);
 
 /**
  *\param array an AssocArray
@@ -179,6 +211,9 @@ bool assoc_array_iter_next(AssocArrayIter *iter);
  */
 void *assoc_array_iter_get_key(const AssocArrayIter *iter);
 
+/*! Accesses the key of the current element directly. */
+#define assoc_array_iter_key(iter) assoc_array_pair_key(iter)
+
 /**
  *\param iter an AssocArrayIter
  *\return value of current element
@@ -186,6 +221,9 @@ void *assoc_array_iter_get_key(const AssocArrayIter *iter);
  * Retrieves the value of the current element.
  */
 void *assoc_array_iter_get_value(const AssocArrayIter *iter);
+
+/*! Accesses the value of the current element directly. */
+#define assoc_array_iter_value(iter) assoc_array_pair_value(iter)
 
 #endif
 

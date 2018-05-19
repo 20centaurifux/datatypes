@@ -16,21 +16,18 @@ main(int argc, char *argv[])
 	AssocArrayIter iter;
 	char word[32];
 
-	// initialize array:
 	array = assoc_array_new(str_compare, &free, NULL);
 
 	assert(array != NULL);
 
-	// read test file:
 	if((fp = fopen("bible.txt", "r")))
 	{
-		// count words:
 		while(fscanf(fp, "%s", word) > 0)
 		{
 			if(assoc_array_key_exists(array, word))
 			{
-				v = (size_t)assoc_array_lookup(array, word) + 1;
-				assoc_array_set(array, (void*)word, (void *)v, false);
+				AssocArrayPair *pair = assoc_array_lookup(array, word);
+				assoc_array_pair_value(pair)++;
 			}
 			else
 			{
@@ -41,14 +38,14 @@ main(int argc, char *argv[])
 
 		assert(count == assoc_array_count(array));
 
-		// iterate:
 		count = 0;
 
 		assoc_array_iter_init(array, &iter);
 
 		while(assoc_array_iter_next(&iter))
 		{
-			v = (size_t)assoc_array_lookup(array, assoc_array_iter_get_key(&iter));
+			AssocArrayPair *pair = assoc_array_lookup(array, assoc_array_iter_get_key(&iter));
+			v = (size_t)assoc_array_pair_value(pair);
 
 			assert(v == (size_t)assoc_array_iter_get_value(&iter));
 			assert(v > 0);
@@ -58,7 +55,6 @@ main(int argc, char *argv[])
 
 		assert(count == assoc_array_count(array));
 
-		// remove keys:
 		assoc_array_remove(array, "she");
 		assoc_array_remove(array, "dead");
 		assoc_array_remove(array, "those");
@@ -68,7 +64,6 @@ main(int argc, char *argv[])
 
 		assert(count - 5 == assoc_array_count(array));
 
-		// key lookup:
 		assert(assoc_array_key_exists(array, "she") == false);
 		assert(assoc_array_key_exists(array, "dead") == false);
 		assert(assoc_array_key_exists(array, "those") == false);
@@ -77,7 +72,6 @@ main(int argc, char *argv[])
 		assert(assoc_array_key_exists(array, "Eris") == false);
 		assert(assoc_array_key_exists(array, "god") == true);
 
-		// clear array:
 		assoc_array_clear(array);
 
 		assert(assoc_array_count(array) == 0);
@@ -94,7 +88,6 @@ main(int argc, char *argv[])
 
 		assert(count == 0);
 
-		// close file:
 		fclose(fp);
 	}
 	else

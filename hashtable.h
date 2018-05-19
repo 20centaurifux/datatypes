@@ -68,7 +68,7 @@ typedef struct _HashTable
 	size_t count;
 	/*! Pool used to create/destroy list elements. */
 	Pool *pool;
-	/*! A Found key-value pair. */
+	/*! A found key-value pair. */
 	struct _HashTablePair
 	{
 		/*! A function to free the associated value. */
@@ -186,7 +186,7 @@ HashTablePair *hashtable_lookup(HashTable *table, const void *key);
  */
 void *hashtable_pair_get_key(const HashTablePair *pair);
 
-/*! Access the key of a key-value pair directly. */
+/*! Accesses the key of a key-value pair directly. */
 #define hashtable_pair_key(p) p->bucket->key
 
 /**
@@ -197,7 +197,7 @@ void *hashtable_pair_get_key(const HashTablePair *pair);
  */
 void *hashtable_pair_get_value(const HashTablePair *pair);
 
-/*! Access the value of a key-value pair directly. */
+/*! Accesses the value of a key-value pair directly. */
 #define hashtable_pair_value(p) p->bucket->data
 
 /**
@@ -250,7 +250,7 @@ bool hashtable_iter_next(HashTableIter *iter);
  */
 void *hashtable_iter_get_key(const HashTableIter *iter);
 
-/*! Access the key of the current element directly. */
+/*! Accesses the key of the current element directly. */
 #define hashtable_iter_key(iter) iter.liter->key
 
 /**
@@ -261,7 +261,7 @@ void *hashtable_iter_get_key(const HashTableIter *iter);
  */
 void *hashtable_iter_get_value(const HashTableIter *iter);
 
-/*! Access the value of the current element directly. */
+/*! Accesses the value of the current element directly. */
 #define hashtable_iter_value(iter) iter.liter->data
 
 #endif

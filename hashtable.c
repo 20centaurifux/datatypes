@@ -384,7 +384,7 @@ hashtable_pair_get_key(const HashTablePair *pair)
 	assert(pair->bucket != NULL);
 	assert(pair->bucket->key != NULL);
 
-	if(pair && pair->bucket)
+	if(pair)
 	{
 		return pair->bucket->key;
 	}
@@ -399,7 +399,7 @@ hashtable_pair_get_value(const HashTablePair *pair)
 	assert(pair->bucket != NULL);
 	assert(pair->bucket->key != NULL);
 
-	if(pair && pair->bucket)
+	if(pair)
 	{
 		return pair->bucket->data;
 	}
@@ -414,7 +414,7 @@ hashtable_pair_set_value(HashTablePair *pair, void *value)
 	assert(pair->bucket != NULL);
 	assert(pair->bucket->key != NULL);
 
-	if(pair->free_value)
+	if(pair->free_value && pair->bucket->data)
 	{
 		pair->free_value(pair->bucket->data);
 	}
