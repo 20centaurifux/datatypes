@@ -286,7 +286,7 @@ bool rbtree_iter_next(RBTreeIter *iter);
 void *rbtree_iter_get_key(const RBTreeIter *iter);
 
 /*! Accesses the key of the current element directly. */
-#define rbtree_iter_key(iter) iter->sp->node->key
+#define rbtree_iter_key(iter) iter.sp->node->key
 
 /**
  *\param iter a RBTreeIter
@@ -297,7 +297,7 @@ void *rbtree_iter_get_key(const RBTreeIter *iter);
 void *rbtree_iter_get_value(const RBTreeIter *iter);
 
 /*! Accesses the value of the current element directly. */
-#define rbtree_iter_value(iter) iter->sp->node->value
+#define rbtree_iter_value(iter) iter.sp->node->value
 
 #endif
 

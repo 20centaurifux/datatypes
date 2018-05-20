@@ -3,7 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <datatypes.h>
+
+#include <datatypes/datatypes.h>
 
 int
 main(int argc, char *argv[])

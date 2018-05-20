@@ -6,7 +6,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <string.h>
-#include <datatypes.h>
+
+#include <datatypes/datatypes.h>
 
 #define BUFFER_SIZE 4096
 

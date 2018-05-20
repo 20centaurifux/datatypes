@@ -213,7 +213,7 @@ bool assoc_array_iter_next(AssocArrayIter *iter);
 void *assoc_array_iter_get_key(const AssocArrayIter *iter);
 
 /*! Accesses the key of the current element directly. */
-#define assoc_array_iter_key(iter) assoc_array_pair_key(iter)
+#define assoc_array_iter_key(iter) iter.array->keys[iter.offset]
 
 /**
  *\param iter an AssocArrayIter
@@ -224,7 +224,7 @@ void *assoc_array_iter_get_key(const AssocArrayIter *iter);
 void *assoc_array_iter_get_value(const AssocArrayIter *iter);
 
 /*! Accesses the value of the current element directly. */
-#define assoc_array_iter_value(iter) assoc_array_pair_value(iter)
+#define assoc_array_iter_value(iter) iter.array->values[iter.offset]
 
 #endif
 

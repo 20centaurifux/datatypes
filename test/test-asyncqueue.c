@@ -4,7 +4,8 @@
 #include <unistd.h>
 #include <stdbool.h>
 #include <assert.h>
-#include <datatypes.h>
+
+#include <datatypes/datatypes.h>
 
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 static bool finished = false;
