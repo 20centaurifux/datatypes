@@ -16,7 +16,6 @@ main(int argc, char *argv[])
 	SListItem *item, *prev;
 	char *ptr;
 
-	// initialize lists:
 	list = slist_new(str_compare, &free, NULL);
 
 	assert(list != NULL);
@@ -25,7 +24,6 @@ main(int argc, char *argv[])
 	// put words from bible into list:
 	if((fp = fopen("bible.txt", "r")))
 	{
-		// count words:
 		while(fscanf(fp, "%s", word) > 0)
 		{
 			slist_append(list, strdup(word));
