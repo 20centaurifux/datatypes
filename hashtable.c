@@ -27,10 +27,71 @@
 #include "hashtable.h"
 
 /*! Memory pool block size. */
-#define HASHTABLE_BUCKET_POOL_BLOCK_SIZE 64
+#define HASHTABLE_BUCKET_POOL_BLOCK_SIZE 128
 
 /*! Initial hashtable size when resizing automatically. */
-#define HASHTABLE_INITIAL_SIZE           256
+#define HASHTABLE_INITIAL_SIZE           257
+
+/*! Prime numbers used for table size. */
+static const size_t PRIMES[] =
+{
+	257,
+	1031,
+	4127,
+	16519,
+	66083,
+	264343,
+	1057387,
+	4229573,
+	8459173,
+	16918357,
+	33836729,
+	67673503,
+	135347029,
+	270694063,
+	541388129,
+	1082776297,
+	2165552617,
+	#if SIZE_MAX == 18446744073709551615UL
+	4331105239,
+	8662210517,
+	17324420957,
+	34648841923,
+	69297683827,
+	138595367657,
+	277190735317,
+	554381470637,
+	110876294129,
+	221752588259,
+	443505176519,
+	887010353059,
+	1774020706189,
+	3548041412411,
+	7096082824837,
+	14192165649709,
+	28384331299451,
+	56768662598903,
+	113537325197831,
+	227074650395669,
+	454149300791371,
+	908298601582769,
+	1816597203165593,
+	3633194406331187,
+	7266388812662387,
+	14532777625324787,
+	29065555250649649,
+	58131110501299349,
+	116262221002598761,
+	232524442005197556,
+	465048884010395089,
+	930097768020790181,
+	1860195536041580371,
+	3720391072083160831,
+	7440782144166321683,
+	18446744073709551521UL,
+	#endif
+	0
+};
 
 /**
  *\param table a HashTable
@@ -83,7 +144,18 @@ hashtable_init(HashTable *table, size_t size, HashFunc hash_func, EqualFunc comp
 	table->free_key = free_key;
 	table->free_value = free_value;
 	table->size = table_size;
-	table->grow = size == HASHTABLE_AUTO_RESIZE;
+
+	if(size == HASHTABLE_AUTO_RESIZE)
+	{
+		table->grow = true;
+		table->sizeptr = PRIMES;
+	}
+	else
+	{
+		table->grow = false;
+		table->sizeptr = NULL;
+	}
+
 	table->hash = hash_func;
 	table->count = 0;
 	table->pair.free_value = free_value;
@@ -185,9 +257,10 @@ _hashtable_resize(HashTable *table)
 
 	assert(table != NULL);
 
-	/* resize table */
 	old_size = table->size;
-	table->size *= (table->size >= 0x400000) ? 2 : 4;
+
+	table->sizeptr++;
+	table->size = *table->sizeptr;
 
 	if(old_size > table->size)
 	{
@@ -195,7 +268,6 @@ _hashtable_resize(HashTable *table)
 		abort();
 	}
 
-	/* create new bucket list */
 	buckets = table->buckets;
 
 	if(!(table->buckets = (struct _Bucket **)calloc(table->size, sizeof(struct _Bucket *))))
@@ -204,7 +276,6 @@ _hashtable_resize(HashTable *table)
 		abort();
 	}
 
-	/* copy items to new bucket array */
 	for(size_t i = 0; i < old_size; ++i)
 	{
 		struct _Bucket *iter = buckets[i];
@@ -245,7 +316,7 @@ hashtable_set(HashTable *table, void * restrict key, void * restrict value, bool
 	assert(key != NULL);
 
 	/* resize table */
-	if(table->grow && table->size == table->count)
+	if(table->grow && table->count > table->size)
 	{
 		_hashtable_resize(table);
 	}

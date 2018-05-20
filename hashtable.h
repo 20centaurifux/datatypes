@@ -47,6 +47,8 @@ typedef struct _HashTable
 	HashFunc hash;
 	/*! Size of the hash table. */
 	size_t size;
+	/*! Pointer to a prime number specifying the current table size. */
+	const size_t *sizeptr;
 	/*! Enable/disable auto-resize. */
 	bool grow;
 	/**
