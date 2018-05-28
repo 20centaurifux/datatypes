@@ -35,5 +35,13 @@ typedef uint32_t (*HashFunc)(const void *ptr);
  */
 uint32_t str_hash(const void *ptr);
 
+/**
+ *\param ptr pointer to convert
+ *\return hash digest
+ *
+ * Converts a pointer to a hash value.
+ */
+uint32_t direct_hash(const void *ptr);
+
 #endif
 

@@ -19,6 +19,7 @@
  * \brief Hash functions.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
  */
+#include <stdio.h>
 #include <assert.h>
 
 #include "hash.h"
@@ -26,10 +27,10 @@
 uint32_t
 str_hash(const void *ptr)
 {
+	assert(ptr != NULL);
+
 	const char *plain = ptr;
 	uint32_t hash = 0;
-
-	assert(ptr != NULL);
 
 	while(*plain)
 	{
@@ -37,5 +38,19 @@ str_hash(const void *ptr)
 	}
 
 	return hash;
+}
+
+uint32_t
+direct_hash(const void *ptr)
+{
+	uintptr_t v = (uintptr_t)ptr;
+
+	if(v > UINT32_MAX)
+	{
+		fprintf(stderr, "%s: warning, integer overflow.\n", __func__);
+		v = UINT32_MAX;
+	}
+
+	return (uint32_t)v;
 }
 
