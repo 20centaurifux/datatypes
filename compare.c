@@ -30,11 +30,11 @@
 bool
 str_equal(const void * restrict a, const void * restrict b)
 {
-	const char *s0 = (const char *)a;
-	const char *s1 = (const char *)b;
-
 	assert(a != NULL);
 	assert(b != NULL);
+
+	const char *s0 = (const char *)a;
+	const char *s1 = (const char *)b;
 
 	while(*s0 && *s1)
 	{
@@ -50,10 +50,10 @@ str_equal(const void * restrict a, const void * restrict b)
 int32_t
 direct_compare(const void *a, const void *b)
 {
-	ptrdiff_t result = a - b;
-
 	assert(a != NULL);
 	assert(b != NULL);
+
+	ptrdiff_t result = a - b;
 
 	if(result > INT32_MAX)
 	{
