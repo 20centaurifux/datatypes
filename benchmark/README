@@ -1,7 +1,0 @@
-This is just a silly benchmark :)
-
-Generate test data with the generator.py script:
-
-$ python generator.py > words.txt
-
-Then build & run the examples.

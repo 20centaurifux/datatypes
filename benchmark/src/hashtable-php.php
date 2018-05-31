@@ -1,6 +1,6 @@
 <?php
 
-ini_set('memory_limit', '2G');
+ini_set('memory_limit', '6G');
 
 function assoc(&$m, $word)
 {

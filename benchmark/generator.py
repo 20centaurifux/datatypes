@@ -7,5 +7,5 @@ def random_word():
 
 sys.stdout.write(random_word())
 
-for _ in range(WORDS - 1):
+for _ in xrange(WORDS - 1):
     sys.stdout.write(" %s" % random_word())
