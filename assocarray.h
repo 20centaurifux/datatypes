@@ -27,21 +27,24 @@
 
 #include "datatypes.h"
 
+/*! Supported maximum size. */
+#define ASSOC_ARRAY_MAX_SIZE (SSIZE_MAX / sizeof(void *))
+
 /**
  *\struct AssocArray
  *\brief A datatype to create associations between keys and values.
  */
 typedef struct _AssocArray
 {
-	/*! A function to compare two keys. */
+	/*! Function to compare two keys. */
 	CompareFunc compare_keys;
 	/*! Sorted array containing keys. */
 	void **keys;
 	/*! Array containing values. */
 	void **values;
-	/*! A function to free keys. */
+	/*! Function to free keys. */
 	FreeFunc free_key;
-	/*! A function to free values. */
+	/*! Function to free values. */
 	FreeFunc free_value;
 	/*! Size of the array. */
 	size_t size;
@@ -64,7 +67,7 @@ typedef struct _AssocArrayPair AssocArrayPair;
 typedef struct _AssocArrayPair AssocArrayIter;
 
 /**
- *\param compare_keys function to compare of two keys
+ *\param compare_keys function to compare two keys
  *\param free_key function to free keys or NULL
  *\param free_value function to free values or NULL
  *\return a new AssocArray

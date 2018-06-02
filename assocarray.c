@@ -33,32 +33,42 @@
 static int
 _assoc_array_binary_search(CompareFunc compare, void **keys, size_t len, const void *key, ssize_t *index)
 {
-	ssize_t begin = 0, end = len  - 1;
 	int32_t result = 0;
+
+	assert(compare != NULL);
+	assert(keys != NULL);
+	assert(len <= ASSOC_ARRAY_MAX_SIZE + 1);
+	assert(key != NULL);
+	assert(index != NULL);
 
 	if(len == 1)
 	{
 		*index = 0;
-		return compare(key, *keys);
+		result = compare(key, *keys);
 	}
-
-	while(begin <= end)
+	else
 	{
-		*index = (begin + end) / 2;
+		ssize_t begin = 0;
+		ssize_t end = len - 1;
 
-		result = compare(key, keys[*index]);
+		while(begin <= end)
+		{
+			*index = (begin + end) / 2;
 
-		if(result > 0)
-		{
-			begin = *index + 1;
-		}
-		else if(result < 0)
-		{
-			end = *index - 1;
-		}
-		else
-		{
-			break;
+			result = compare(key, keys[*index]);
+
+			if(result > 0)
+			{
+				begin = *index + 1;
+			}
+			else if(result < 0)
+			{
+				end = *index - 1;
+			}
+			else
+			{
+				break;
+			}
 		}
 	}
 	
@@ -70,7 +80,11 @@ assoc_array_new(CompareFunc compare_keys, FreeFunc free_key, FreeFunc free_value
 {
 	AssocArray *array;
 
-	if(!(array = (AssocArray *)malloc(sizeof(AssocArray))))
+	assert(compare_keys != NULL);
+
+	array = (AssocArray *)malloc(sizeof(AssocArray));
+
+	if(!array)
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
 		abort();
@@ -95,13 +109,17 @@ assoc_array_init(AssocArray *array, CompareFunc compare_keys, FreeFunc free_key,
 	array->pair.array = array;
 	array->pair.offset = 0;
 
-	if(!(array->keys = (void **)calloc(array->size, sizeof(void *))))
+	array->keys = (void **)calloc(array->size, sizeof(void *));
+
+	if(!array->keys)
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
 		abort();
 	}
 
-	if(!(array->values = (void **)calloc(array->size, sizeof(void *))))
+	array->values = (void **)calloc(array->size, sizeof(void *));
+
+	if(!array->values)
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
 		abort();
@@ -117,8 +135,8 @@ assoc_array_destroy(AssocArray *array)
 	free(array);
 }
 
-void
-assoc_array_free(AssocArray *array)
+static void
+_assoc_array_free_memory(AssocArray *array)
 {
 	assert(array != NULL);
 
@@ -131,12 +149,20 @@ assoc_array_free(AssocArray *array)
 				array->free_key(array->keys[i]);
 			}
 
-			if(array->free_value)
+			if(array->free_value && array->values[i])
 			{
 				array->free_value(array->values[i]);
 			}
 		}
 	}
+}
+
+void
+assoc_array_free(AssocArray *array)
+{
+	assert(array != NULL);
+
+	_assoc_array_free_memory(array);
 
 	free(array->keys);
 	free(array->values);
@@ -147,23 +173,110 @@ assoc_array_clear(AssocArray *array)
 {
 	assert(array != NULL);
 
-	if(array->free_key || array->free_value)
-	{
-		for(size_t i = 0; i < array->count; ++i)
-		{
-			if(array->free_key)
-			{
-				array->free_key(array->keys[i]);
-			}
-
-			if(array->free_value)
-			{
-				array->free_value(array->values[i]);
-			}
-		}
-	}
+	_assoc_array_free_memory(array);
 
 	array->count = 0;
+}
+
+static void
+_assoc_array_insert_first(AssocArray *array, void * restrict key, void * restrict value)
+{
+	assert(array != NULL);
+	assert(key != NULL);
+
+	*array->keys = key;
+	*array->values = value;
+	++array->count;
+}
+
+static void
+_assoc_array_replace(AssocArray *array, void * restrict key, void * restrict value, ssize_t offset, bool overwrite_key)
+{
+	assert(array != NULL);
+	assert(key != NULL);
+	assert(offset >= 0 && array->count > (size_t)offset);
+
+	if(overwrite_key)
+	{
+		if(array->free_key)
+		{
+			array->free_key(array->keys[offset]);
+		}
+
+		array->keys[offset] = key;
+	}
+
+	if(array->free_value && array->values[offset])
+	{
+		array->free_value(array->values[offset]);
+	}
+
+	array->values[offset] = value;
+}
+
+static void
+_assoc_array_resize_if_neccessary(AssocArray *array)
+{
+	assert(array != NULL);
+
+	if(array->count == array->size)
+	{
+		if(array->size > ASSOC_ARRAY_MAX_SIZE / 2)
+		{
+			fprintf(stderr, "Integer overflow.\n");
+			abort();
+		}
+
+		array->size *= 2;
+		array->keys = (void **)realloc(array->keys, array->size * sizeof(void *));
+
+		if(!array->keys)
+		{
+			fprintf(stderr, "Couldn't allocate memory.\n");
+			abort();
+		}
+
+		array->values = (void **)realloc(array->values, array->size * sizeof(void *));
+
+		if(!array->values)
+		{
+			fprintf(stderr, "Couldn't allocate memory.\n");
+			abort();
+		}
+	}
+}
+
+void
+_assoc_array_insert_before_offset(AssocArray *array, void * restrict key, void * restrict value, ssize_t offset)
+{
+	assert(array != NULL);
+	assert(key != NULL);
+	assert(offset >= 0 && array->count > (size_t)offset);
+
+	memmove(&array->keys[offset + 1], &array->keys[offset], (array->count - offset) * sizeof(void *));
+	memmove(&array->values[offset + 1], &array->values[offset], (array->count - offset) * sizeof(void *));
+
+	array->keys[offset] = key;
+	array->values[offset] = value;
+}
+
+void
+_assoc_array_insert_after_offset(AssocArray *array, void * restrict key, void * restrict value, ssize_t offset)
+{
+	assert(array != NULL);
+	assert(key != NULL);
+	assert(offset >= 0 && array->count > (size_t)offset);
+
+	++offset;
+
+	if((size_t)offset < array->count)
+	{
+		memmove(&array->keys[offset + 1], &array->keys[offset], (array->count - offset) * sizeof(void *));
+		memmove(&array->values[offset + 1], &array->values[offset], (array->count - offset) * sizeof(void *));
+	}
+
+	array->keys[offset] = key;
+	array->values[offset] = value;
 }
 
 void
@@ -178,90 +291,29 @@ assoc_array_set(AssocArray *array, void * restrict key, void * restrict value, b
 	{
 		int result = _assoc_array_binary_search(array->compare_keys, array->keys, array->count, key, &offset);
 
-		if(result == 0)
+		if(result)
 		{
-			/* overwrite key & value */
-			if(overwrite_key)
-			{
-				if(array->free_key)
-				{
-					array->free_key(array->keys[offset]);
-				}
-
-				array->keys[offset] = key;
-			}
-
-			if(array->free_value)
-			{
-				array->free_value(array->values[offset]);
-			}
-
-			array->values[offset] = value;
-		}
-		else
-		{
-			/* resize array if necessary */
-			if(array->count == array->size)
-			{
-				array->size *= 2;
-
-				if(array->size <= array->count)
-				{
-					fprintf(stderr, "Integer overflow.\n");
-					abort();
-				}
-
-				if(array->size > SSIZE_MAX)
-				{
-					fprintf(stderr, "Array exceeds maximum size.\n");
-					abort();
-				}
-
-				if(!(array->keys = (void **)realloc(array->keys, array->size * (sizeof(void *)))))
-				{
-					fprintf(stderr, "Couldn't allocate memory.\n");
-					abort();
-				}
-
-				if(!(array->values = (void **)realloc(array->values, array->size * sizeof(void *))))
-				{
-					fprintf(stderr, "Couldn't allocate memory.\n");
-					abort();
-				}
-			}
+			_assoc_array_resize_if_neccessary(array);
 
 			if(result < 0)
 			{
-				/* insert key & value before offset */
-				memmove(&array->keys[offset + 1], &array->keys[offset], (array->count - offset) * sizeof(void *));
-				memmove(&array->values[offset + 1], &array->values[offset], (array->count - offset) * sizeof(void *));
-
-				array->keys[offset] = key;
-				array->values[offset] = value;
+				_assoc_array_insert_before_offset(array, key, value, offset);
 			}
 			else
 			{
-				/* insert key & value after offset */
-				++offset;
-
-				if((size_t)offset < array->count)
-				{
-					memmove(&array->keys[offset + 1], &array->keys[offset], (array->count - offset) * sizeof(void *));
-					memmove(&array->values[offset + 1], &array->values[offset], (array->count - offset) * sizeof(void *));
-				}
-
-				array->keys[offset] = key;
-				array->values[offset] = value;
+				_assoc_array_insert_after_offset(array, key, value, offset);
 			}
 
 			++array->count;
 		}
+		else
+		{
+			_assoc_array_replace(array, key, value, offset, overwrite_key);
+		}
 	}
 	else
 	{
-		*array->keys = key;
-		*array->values = value;
-		++array->count;
+		_assoc_array_insert_first(array, key, value);
 	}
 }
 
@@ -282,7 +334,7 @@ assoc_array_remove(AssocArray *array, const void *key)
 				array->free_key(array->keys[offset]);
 			}
 
-			if(array->free_value)
+			if(array->free_value && array->values[offset])
 			{
 				array->free_value(array->values[offset]);
 			}
@@ -325,25 +377,16 @@ assoc_array_pair_get_key(const AssocArrayPair *pair)
 	assert(pair != NULL);
 	assert(pair->array != NULL);
 
-	if(pair)
-	{
-		return pair->array->keys[pair->offset];
-	}
-
-	return NULL;
+	return pair->array->keys[pair->offset];
 }
+
 void *
 assoc_array_pair_get_value(const AssocArrayPair *pair)
 {
 	assert(pair != NULL);
 	assert(pair->array != NULL);
 
-	if(pair)
-	{
-		return pair->array->values[pair->offset];
-	}
-
-	return NULL;
+	return pair->array->values[pair->offset];
 }
 
 void
@@ -370,7 +413,7 @@ assoc_array_key_exists(const AssocArray *array, const void *key)
 
 	if(array->count)
 	{
-		return _assoc_array_binary_search(array->compare_keys, array->keys, array->count, key, &offset) == 0;
+		return !_assoc_array_binary_search(array->compare_keys, array->keys, array->count, key, &offset);
 	}
 
 	return false;
