@@ -116,39 +116,38 @@ _async_queue_pop(AsyncQueue *queue, void *data, uint32_t ms)
 
 	pthread_mutex_lock(&queue->mutex);
 
-	if((success = queue_pop(&queue->queue, data)))
+	success = queue_pop(&queue->queue, data);
+
+	if(!success)
 	{
-		goto out;
-	}
+		++queue->waiting;
 
-	++queue->waiting;
-
-	if(ms)
-	{
-		struct timespec val;
-		struct timeval now;
-
-		gettimeofday(&now, NULL);
-
-		val.tv_sec = now.tv_sec + (ms / 1000);
-		val.tv_nsec = 0;
-
-		if(!pthread_cond_timedwait(&queue->cond, &queue->mutex, &val))
+		if(ms)
 		{
-			success = queue_pop(&queue->queue, data);
+			struct timespec val;
+			struct timeval now;
+
+			gettimeofday(&now, NULL);
+
+			val.tv_sec = now.tv_sec + (ms / 1000);
+			val.tv_nsec = 0;
+
+			if(!pthread_cond_timedwait(&queue->cond, &queue->mutex, &val))
+			{
+				success = queue_pop(&queue->queue, data);
+			}
 		}
-	}
-	else
-	{
-		if(!pthread_cond_wait(&queue->cond, &queue->mutex))
+		else
 		{
-			success = pthread_cond_wait(&queue->cond, &queue->mutex);
+			if(!pthread_cond_wait(&queue->cond, &queue->mutex))
+			{
+				success = queue_pop(&queue->queue, data);
+			}
 		}
+
+		--queue->waiting;
 	}
 
-	--queue->waiting;
-
-out:
 	pthread_mutex_unlock(&queue->mutex);
 
 	return success;

@@ -41,7 +41,7 @@ typedef struct
 	/*! The underlying queue. */
 	Queue queue;
 	/*! Number of waiting consumers. */
-	uint32_t waiting;
+	size_t waiting;
 } AsyncQueue;
 
 /**

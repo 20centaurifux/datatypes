@@ -19,7 +19,18 @@ _worker(void *arg)
 
 	while(1)
 	{
-		if(async_queue_pop_timeout(queue, &n, 10))
+		bool success;
+
+		if(sum % 6)
+		{
+			success = async_queue_pop_timeout(queue, &n, 1000);
+		}
+		else
+		{
+			success = async_queue_pop(queue, &n);
+		}
+
+		if(success)
 		{
 			sum += n % 3;
 		}
