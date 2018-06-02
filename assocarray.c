@@ -215,7 +215,7 @@ _assoc_array_replace(AssocArray *array, void * restrict key, void * restrict val
 }
 
 static void
-_assoc_array_resize_if_neccessary(AssocArray *array)
+_assoc_array_resize_if_necessary(AssocArray *array)
 {
 	assert(array != NULL);
 
@@ -293,7 +293,7 @@ assoc_array_set(AssocArray *array, void * restrict key, void * restrict value, b
 
 		if(result)
 		{
-			_assoc_array_resize_if_neccessary(array);
+			_assoc_array_resize_if_necessary(array);
 
 			if(result < 0)
 			{
