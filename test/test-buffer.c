@@ -22,7 +22,6 @@ main(int argc, char *argv[])
 	size_t len = 0;
 	char *dst = NULL;
 
-	// initialize tree:
 	buf = buffer_new(BUFFER_SIZE);
 
 	assert(buf != NULL);

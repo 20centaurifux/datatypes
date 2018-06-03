@@ -31,7 +31,7 @@
 /**
  *\struct Buffer
  *\brief A byte buffer. If the data exceeds the maximum length
- *       the buffer becomes invalid and new data will be ignored.
+ *       the buffer becomes invalid and new data is ignored.
  */
 typedef struct Buffer
 {
@@ -122,7 +122,7 @@ bool buffer_fill(Buffer *buf, const char *data, size_t len);
  *\param buf a Buffer
  *\param fd a file descriptor
  *\param count bytes to read from the file descriptor
- *\return number of bytes read from the file descriptor and written to the buffer
+ *\return number of bytes read from the file descriptor and written to the buffer, -1 on failure
  *
  * Reads bytes from a file and writes the data to the buffer.
  */
@@ -134,7 +134,7 @@ ssize_t buffer_fill_from_fd(Buffer *buf, int fd, size_t count);
  *\param len length of dst
  *\return true if a line could be read from the buffer
  *
- * Tries to read a line from the buffer.
+ * Tries to read a line from the buffer. dst will be resized automatically if necessary.
  */
 bool buffer_read_line(Buffer *buf, char **dst, size_t *len);
 
@@ -144,7 +144,7 @@ bool buffer_read_line(Buffer *buf, char **dst, size_t *len);
  *\param len buffer length
  *\return true on success
  *
- * Copies data from the buffer to a string (if buffer is valid).
+ * Copies data from the buffer to a string (if buffer is valid). dst will be resized automatically if necessary.
  */
 bool buffer_flush(Buffer *buf, char **dst, size_t *len);
 
@@ -152,7 +152,7 @@ bool buffer_flush(Buffer *buf, char **dst, size_t *len);
  *\param buf a Buffer
  *\return a newly-allocated string
  *
- * Converts the data from the buffer to a string. Returns NULL if buffer is invalid.
+ * Converts the data from the buffer to a new string. Returns NULL if buffer is invalid.
  */
 char *buffer_to_string(const Buffer *buf);
 

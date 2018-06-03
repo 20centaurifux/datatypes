@@ -19,10 +19,13 @@
  * \brief A byte buffer.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
  */
+#define _GNU_SOURCE
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <limits.h>
 #include <assert.h>
 
 #include "buffer.h"
@@ -30,14 +33,15 @@
 /*! @cond INTERNAL */
 #define RETURN_IF_INVALID(b) if(!buffer_is_valid(b)) return
 #define RETURN_VAL_IF_INVALID(b, v) if(!buffer_is_valid(b)) return v
-#define BUFFER_LIMIT (SIZE_MAX / 2)
-#define EXCEEDS_BUFFER_LIMIT(buf, len) BUFFER_LIMIT - buf->len < len
+#define BUFFER_LIMIT (SSIZE_MAX - 1)
 #define EXCEEDS_BUFFER_MAX_SIZE(buf, len) buf->max_size - buf->len < len
 /*! @endcond */
 
 Buffer *
 buffer_new(size_t max_size)
 {
+	assert(max_size > 0 && max_size <= BUFFER_LIMIT);
+
 	Buffer *buf = (Buffer *)malloc(sizeof(Buffer));
 
 	if(!buf)
@@ -100,6 +104,8 @@ buffer_clear(Buffer *buf)
 size_t
 buffer_len(const Buffer *buf)
 {
+	assert(buf != NULL);
+
 	RETURN_VAL_IF_INVALID(buf, 0);
 
 	return buf->len;
@@ -116,6 +122,8 @@ buffer_is_valid(const Buffer *buf)
 bool
 buffer_is_empty(const Buffer *buf)
 {
+	assert(buf != NULL);
+
 	RETURN_VAL_IF_INVALID(buf, false);
 
 	return buf->len == 0;
@@ -124,28 +132,32 @@ buffer_is_empty(const Buffer *buf)
 static size_t
 _buffer_new_realloc_size(size_t from, size_t to)
 {
-	while(from < to)
+	assert(from < to);
+
+	size_t size = from;
+
+	while(size < to)
 	{
-		from *= 2;
-		assert(from <= BUFFER_LIMIT);
+		size *= 2;
+
+		if(size < from) /* integer overflow */
+		{
+			size = to;
+		}
 	}
 
-	return from;
+	return size;
 }
 
 bool
 buffer_fill(Buffer *buf, const char *data, size_t len)
 {
-	RETURN_VAL_IF_INVALID(buf, false);
-
+	assert(buf != NULL);
 	assert(data != NULL);
 
-	if(EXCEEDS_BUFFER_LIMIT(buf, len))
-	{
-		fprintf(stderr, "Buffer size exceeds supported limit.\n");
-		buf->valid = false;
-	}
-	else if(EXCEEDS_BUFFER_MAX_SIZE(buf, len))
+	RETURN_VAL_IF_INVALID(buf, false);
+
+	if(EXCEEDS_BUFFER_MAX_SIZE(buf, len))
 	{
 		fprintf(stderr, "Buffer exceeds allowed maximum size.\n");
 		buf->valid = false;
@@ -176,12 +188,14 @@ buffer_fill(Buffer *buf, const char *data, size_t len)
 ssize_t
 buffer_fill_from_fd(Buffer *buf, int fd, size_t count)
 {
-	ssize_t bytes;
-	char data[count];
+	assert(buf != NULL);
+	assert(fd >= 0);
+	assert(count <= buf->max_size);
 
 	RETURN_VAL_IF_INVALID(buf, 0);
 
-	assert(fd >= 0);
+	ssize_t bytes;
+	char data[count];
 
 	if((bytes = read(fd, data, count)) > 0)
 	{
@@ -221,12 +235,14 @@ _buffer_copy_to_string(Buffer *buf, size_t count, char **dst, size_t *len)
 bool
 buffer_read_line(Buffer *buf, char **dst, size_t *len)
 {
-	char *ptr;
+	assert(buf != NULL);
+	assert(dst != NULL);
+	assert(len != NULL);
 
 	RETURN_VAL_IF_INVALID(buf, false);
 
-	assert(dst != NULL);
-	assert(len != NULL);
+	char *ptr;
+	bool found = false;
 
 	if((ptr = memchr(buf->data, '\n', buf->len)))
 	{
@@ -237,41 +253,43 @@ buffer_read_line(Buffer *buf, char **dst, size_t *len)
 		buf->len -= slen + 1;
 		memmove(buf->data, ptr + 1, buf->len);
 
-		return true;
+		found = true;
 	}
 
-	return false;
+	return found;
 }
 
 bool
 buffer_flush(Buffer *buf, char **dst, size_t *len)
 {
-	RETURN_VAL_IF_INVALID(buf, false);
-
+	assert(buf != NULL);
 	assert(dst != NULL);
 	assert(len != NULL);
 
-	if(!buf->len)
+	RETURN_VAL_IF_INVALID(buf, false);
+
+	bool flushed = false;
+
+	if(buf->len)
 	{
-		return false;
+		_buffer_copy_to_string(buf, buf->len, dst, len);
+		flushed = true;
 	}
 
-	_buffer_copy_to_string(buf, buf->len, dst, len);
-
-	return true;
+	return flushed;
 }
 
 char *
 buffer_to_string(const Buffer *buf)
 {
+	assert(buf != NULL);
+
 	RETURN_VAL_IF_INVALID(buf, NULL);
 
 	char *str = NULL;
 
 	if(buf->len)
 	{
-		assert(buf->len <= BUFFER_LIMIT);
-
 		str = (char *)malloc(buf->len + 1);
 
 		if(!str)
@@ -282,8 +300,6 @@ buffer_to_string(const Buffer *buf)
 
 		memcpy(str, buf->data, buf->len);
 		str[buf->len] = '\0';
-
-		return str;
 	}
 
 	return str;
