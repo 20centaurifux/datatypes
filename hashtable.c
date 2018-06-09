@@ -26,13 +26,15 @@
 
 #include "hashtable.h"
 
-/*! Memory pool block size. */
+/*! @cond INTERNAL */
+
+/* Memory pool block size. */
 #define HASHTABLE_BUCKET_POOL_BLOCK_SIZE 128
 
-/*! Initial hashtable size when resizing automatically. */
+/* Initial hashtable size when resizing automatically. */
 #define HASHTABLE_INITIAL_SIZE           257
 
-/*! Prime numbers used for table size. */
+/* Prime numbers used for table size. */
 static const size_t PRIMES[] =
 {
 	257,
@@ -93,21 +95,20 @@ static const size_t PRIMES[] =
 	0
 };
 
-/**
- *\param table a HashTable
- *\param key a key
- *\return index of the given key
- *
- * Calculates table index of a key.
- */
+/* Calculates table index of a key. */
 #define HASHTABLE_INDEX(table, key) table->hash(key) % table->size
+
+/*! @endcond */
 
 HashTable *
 hashtable_new(size_t size, HashFunc hash_func, EqualFunc compare_keys, FreeFunc free_key, FreeFunc free_value)
 {
-	HashTable *table;
+	assert(hash_func != NULL);
+	assert(compare_keys != NULL);
 
-	if(!(table = (HashTable *)malloc(sizeof(HashTable))))
+	HashTable *table = (HashTable *)malloc(sizeof(HashTable));
+
+	if(!table)
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
 		abort();
@@ -121,18 +122,20 @@ hashtable_new(size_t size, HashFunc hash_func, EqualFunc compare_keys, FreeFunc 
 inline void
 hashtable_init(HashTable *table, size_t size, HashFunc hash_func, EqualFunc compare_keys, FreeFunc free_key, FreeFunc free_value)
 {
-	size_t table_size = HASHTABLE_INITIAL_SIZE;
-
 	assert(table != NULL);
 	assert(hash_func != NULL);
 	assert(compare_keys != NULL);
+
+	size_t table_size = HASHTABLE_INITIAL_SIZE;
 
 	if(size != HASHTABLE_AUTO_RESIZE)
 	{
 		table_size = size;
 	}
 
-	if(!(table->buckets = (struct _Bucket **)calloc(table_size, sizeof(struct _Bucket *))))
+	table->buckets = (struct _Bucket **)calloc(table_size, sizeof(struct _Bucket *));
+
+	if(!table->buckets)
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
 		abort();
@@ -171,17 +174,17 @@ hashtable_destroy(HashTable *table)
 	free(table);
 }
 
-void
-hashtable_free(HashTable *table)
+static void
+_hashtable_free_memory(HashTable *table)
 {
-	struct _Bucket *iter;
-
 	assert(table != NULL);
 
 	if(table->free_key || table->free_value)
 	{
 		for(size_t i = 0; i < table->size; ++i)
 		{
+			struct _Bucket *iter;
+
 			if((iter = table->buckets[i]))
 			{
 				while(iter)
@@ -191,7 +194,7 @@ hashtable_free(HashTable *table)
 						table->free_key(iter->key);
 					}
 
-					if(table->free_value)
+					if(table->free_value && iter->data)
 					{
 						table->free_value(iter->data);
 					}
@@ -201,7 +204,14 @@ hashtable_free(HashTable *table)
 			}
 		}
 	}
+}
 
+void
+hashtable_free(HashTable *table)
+{
+	assert(table != NULL);
+
+	_hashtable_free_memory(table);
 	memory_pool_destroy((MemoryPool *)table->pool);
 	free(table->buckets);
 }
@@ -209,39 +219,10 @@ hashtable_free(HashTable *table)
 void
 hashtable_clear(HashTable *table)
 {
-	struct _Bucket *iter;
-
 	assert(table != NULL);
 
-	if(!table->free_key && !table->free_value)
-	{
-		memset(table->buckets, 0, sizeof(struct _Bucket *) * table->size);
-	}
-	else
-	{
-		for(size_t i = 0; i < table->size; ++i)
-		{
-			if((iter = table->buckets[i]))
-			{
-				while(iter)
-				{
-					if(table->free_key)
-					{
-						table->free_key(iter->key);
-					}
-
-					if(table->free_value)
-					{
-						table->free_value(iter->data);
-					}
-
-					iter = iter->next;
-				}
-			}
-
-			table->buckets[i] = NULL;
-		}
-	}
+	_hashtable_free_memory(table);
+	memset(table->buckets, 0, sizeof(struct _Bucket *) * table->size);
 
 	memory_pool_destroy((MemoryPool *)table->pool);
 	table->pool = (Pool *)memory_pool_new(sizeof(struct _Bucket), HASHTABLE_BUCKET_POOL_BLOCK_SIZE);
@@ -252,12 +233,9 @@ hashtable_clear(HashTable *table)
 static void
 _hashtable_resize(HashTable *table)
 {
-	size_t old_size;
-	struct _Bucket **buckets;
-
 	assert(table != NULL);
 
-	old_size = table->size;
+	size_t old_size = table->size;
 
 	table->sizeptr++;
 	table->size = *table->sizeptr;
@@ -268,9 +246,11 @@ _hashtable_resize(HashTable *table)
 		abort();
 	}
 
-	buckets = table->buckets;
+	struct _Bucket **buckets = table->buckets;
 
-	if(!(table->buckets = (struct _Bucket **)calloc(table->size, sizeof(struct _Bucket *))))
+	table->buckets = (struct _Bucket **)calloc(table->size, sizeof(struct _Bucket *));
+
+	if(!table->buckets)
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
 		abort();
@@ -283,7 +263,6 @@ _hashtable_resize(HashTable *table)
 		while(iter)
 		{
 			struct _Bucket *next = iter->next;
-
 			size_t index = HASHTABLE_INDEX(table, iter->key);
 
 			if(table->buckets[index])
@@ -304,44 +283,45 @@ _hashtable_resize(HashTable *table)
 	free(buckets);
 }
 
-void
-hashtable_set(HashTable *table, void * restrict key, void * restrict value, bool overwrite_key)
+static struct _Bucket *
+_hashtable_find_bucket(const HashTable *table, struct _Bucket *head, const void *key)
 {
-	size_t index;
-	struct _Bucket *head = NULL;
-	struct _Bucket *iter;
-	struct _Bucket *item = NULL;
-
 	assert(table != NULL);
 	assert(key != NULL);
 
-	/* resize table */
+	struct _Bucket *iter = head;
+	struct _Bucket *item = NULL;
+
+	while(iter && !item)
+	{
+		if(table->compare_keys(key, iter->key))
+		{
+			item = iter;
+		}
+
+		iter = iter->next;
+	}
+
+	return item;
+}
+
+void
+hashtable_set(HashTable *table, void * restrict key, void * restrict value, bool overwrite_key)
+{
+	assert(table != NULL);
+	assert(key != NULL);
+
 	if(table->grow && table->count > table->size)
 	{
 		_hashtable_resize(table);
 	}
 
-	index = HASHTABLE_INDEX(table, key);
-	assert(index < table->size);
-
-	if((iter = head = table->buckets[index]))
-	{
-		/* found bucket => try to find list item with given key */
-		while(iter)
-		{
-			if(table->compare_keys(key, iter->key))
-			{
-				item = iter;
-				break;
-			}
-
-			iter = iter->next;
-		}
-	}
+	size_t index = HASHTABLE_INDEX(table, key);
+	struct _Bucket *head = table->buckets[index];
+	struct _Bucket *item = _hashtable_find_bucket(table, head, key);
 
 	if(item)
 	{
-		/* overwrite existing item */
 		if(overwrite_key)
 		{
 			if(table->free_key)
@@ -352,7 +332,7 @@ hashtable_set(HashTable *table, void * restrict key, void * restrict value, bool
 			item->key = key;
 		}
 
-		if(table->free_value)
+		if(table->free_value && item->data)
 		{
 			table->free_value(item->data);
 		}
@@ -361,8 +341,8 @@ hashtable_set(HashTable *table, void * restrict key, void * restrict value, bool
 	}
 	else
 	{
-		/* insert new item */
 		item = (struct _Bucket *)table->pool->alloc(table->pool);
+
 		item->key = key;
 		item->data = value;
 		table->buckets[index] = item;
@@ -374,14 +354,12 @@ hashtable_set(HashTable *table, void * restrict key, void * restrict value, bool
 void
 hashtable_remove(HashTable *table, const void *key)
 {
-	struct _Bucket *bucket;
-	struct _Bucket *iter;
-	int32_t index;
-
 	assert(table != NULL);
 	assert(key != NULL);
 
-	index = HASHTABLE_INDEX(table, key);
+	struct _Bucket *bucket;
+	struct _Bucket *iter;
+	size_t index = HASHTABLE_INDEX(table, key);
 
 	if((iter = bucket = table->buckets[index]))
 	{
@@ -396,7 +374,7 @@ hashtable_remove(HashTable *table, const void *key)
 					table->free_key(iter->key);
 				}
 
-				if(table->free_value)
+				if(table->free_value && iter->data)
 				{
 					table->free_value(iter->data);
 				}
@@ -425,24 +403,17 @@ hashtable_remove(HashTable *table, const void *key)
 HashTablePair *
 hashtable_lookup(HashTable *table, const void *key)
 {
-	struct _Bucket *iter;
-
 	assert(table != NULL);
 	assert(key != NULL);
 
-	if((iter = table->buckets[HASHTABLE_INDEX(table, key)]))
+	struct _Bucket *head = table->buckets[HASHTABLE_INDEX(table, key)];
+	struct _Bucket *item = _hashtable_find_bucket(table, head, key);
+
+	if(item)
 	{
-		while(iter)
-		{
-			if(table->compare_keys(iter->key, key))
-			{
-				table->pair.bucket = iter;
+		table->pair.bucket = item;
 
-				return &table->pair;
-			}
-
-			iter = iter->next;
-		}
+		return &table->pair;
 	}
 
 	return NULL;
@@ -455,12 +426,7 @@ hashtable_pair_get_key(const HashTablePair *pair)
 	assert(pair->bucket != NULL);
 	assert(pair->bucket->key != NULL);
 
-	if(pair)
-	{
-		return pair->bucket->key;
-	}
-
-	return NULL;
+	return pair->bucket->key;
 }
 
 void *
@@ -470,12 +436,7 @@ hashtable_pair_get_value(const HashTablePair *pair)
 	assert(pair->bucket != NULL);
 	assert(pair->bucket->key != NULL);
 
-	if(pair)
-	{
-		return pair->bucket->data;
-	}
-
-	return NULL;
+	return pair->bucket->data;
 }
 
 void
@@ -496,25 +457,12 @@ hashtable_pair_set_value(HashTablePair *pair, void *value)
 bool
 hashtable_key_exists(const HashTable *table, const void *key)
 {
-	struct _Bucket *iter;
-
 	assert(table != NULL);
 	assert(key != NULL);
 
-	if((iter = table->buckets[HASHTABLE_INDEX(table, key)]))
-	{
-		while(iter)
-		{
-			if(table->compare_keys(key, iter->key))
-			{
-				return true;
-			}
+	struct _Bucket *head = table->buckets[HASHTABLE_INDEX(table, key)];
 
-			iter = iter->next;
-		}
-	}
-
-	return false;
+	return _hashtable_find_bucket(table, head, key) != NULL;
 }
 
 inline size_t
@@ -554,34 +502,23 @@ hashtable_iter_next(HashTableIter *iter)
 {
 	assert(iter != NULL);
 
-	if(iter->finished)
-	{
-		return false;
-	}
+	bool success = false;
 
-	for(;;)
+	while(!success && !iter->finished)
 	{
 		if(iter->liter)
 		{
-			if((iter->liter = iter->liter->next))
-			{
-				return true;
-			}
+			iter->liter = iter->liter->next;
+			success = iter->liter != NULL;
 		}
 		else
 		{
-			if(!_hashtable_iter_get_next_bucket(iter))
-			{
-				iter->finished = true;
-
-				return false;
-			}
-			else
-			{
-				return true;
-			}
+			success = _hashtable_iter_get_next_bucket(iter);
+			iter->finished = !success;
 		}
 	}
+
+	return success;
 }
 
 inline void *
@@ -589,12 +526,7 @@ hashtable_iter_get_key(const HashTableIter *iter)
 {
 	assert(iter != NULL);
 
-	if(iter->liter)
-	{
-		return iter->liter->key;
-	}
-
-	return NULL;
+	return iter->liter->key;
 }
 
 inline void *
@@ -602,11 +534,6 @@ hashtable_iter_get_value(const HashTableIter *iter)
 {
 	assert(iter != NULL);
 
-	if(iter->liter)
-	{
-		return iter->liter->data;
-	}
-
-	return NULL;
+	return iter->liter->data;
 }
 

@@ -37,13 +37,13 @@
  */
 typedef struct _HashTable
 {
-	/*! A function to check equality of two keys. */
+	/*! Function to check equality of two keys. */
 	EqualFunc compare_keys;
-	/*! A function to free keys. */
+	/*! Function to free keys. */
 	FreeFunc free_key;
-	/*! A function to free values. */
+	/*! Function to free values. */
 	FreeFunc free_value;
-	/*! A function to create a hash from a value. */
+	/*! Function to create a hash from a value. */
 	HashFunc hash;
 	/*! Size of the hash table. */
 	size_t size;
@@ -96,7 +96,7 @@ typedef struct
 	size_t offset;
 	/*! Pointer to current list element. */
 	struct _Bucket *liter;
-		/*! true if iteration is completed. */
+	/*! true if iteration is completed. */
 	bool finished;
 } HashTableIter;
 
