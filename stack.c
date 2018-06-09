@@ -28,6 +28,9 @@ bool
 stack_pop(Stack *stack, void **data)
 {
 	assert(stack != NULL);
+	assert(data != NULL);
+
+	bool success = false;
 
 	if(slist_count(stack))
 	{
@@ -38,32 +41,31 @@ stack_pop(Stack *stack, void **data)
 			*data = ptr;
 		}
 
-		return true;
+		success = true;
 	}
-
-	if(data)
+	else if(data)
 	{
 		*data = NULL;
 	}
 
-	return false;
+	return success;
 }
 
 bool
 stack_head(Stack *stack, void **data)
 {
-	SListItem *iter;
-
 	assert(stack != NULL);
 	assert(data != NULL);
 
-	if((iter = slist_head(stack)))
+	SListItem *iter = slist_head(stack);
+	bool success = false;
+
+	if(iter)
 	{
 		*data = iter->data;
-
-		return true;
+		success = true;
 	}
 
-	return false;
+	return success;
 }
 
