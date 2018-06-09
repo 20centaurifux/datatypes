@@ -26,104 +26,14 @@
 
 #include "slist.h"
 
-/*
- *	helpers:
- */
-static inline SListItem *
-_slist_item_new(Pool *pool, void *data)
-{
-	SListItem *item = NULL;
-
-	if(pool)
-	{
-		item = (SListItem *)pool->alloc(pool);
-	}
-
-	if(!item && !(item = (SListItem *)malloc(sizeof(SListItem))))
-	{
-		fprintf(stderr, "Couldn't allocate memory.\n");
-		abort();
-	}
-
-	memset(item, 0, sizeof(SListItem));
-	item->data = data;
-
-	return item;
-}
-
-static SListItem *
-_slist_find(const SList *list, SListItem *offset, void const *data)
-{
-	SListItem *p;
-
-	if(offset)
-	{
-		p = offset;
-	}
-	else
-	{
-		p = list->head;
-	}
-
-	while(p)
-	{
-		if(!list->compare(p->data, data))
-		{
-			return p;
-		}
-
-		p = p->next;
-	}
-
-	return NULL;
-}
-
-static void
-_slist_remove(SList *list, SListItem *prev, SListItem *item)
-{
-	assert(list != NULL);
-
-	if(prev)
-	{
-		prev->next = item->next;
-	}
-	else
-	{
-		list->head = item->next;
-	}
-
-	if(list->tail == item)
-	{
-		list->tail = prev;
-	}
-
-	/* free allocated memory */
-	if(list->free)
-	{
-		list->free(item->data);
-	}
-
-	if(list->pool)
-	{
-		list->pool->free(list->pool, item);
-	}
-	else
-	{
-		free(item);
-	}
-
-	--list->count;
-}
-
-/*
- *	public:
- */
 SList *
 slist_new(CompareFunc compare, FreeFunc free, Pool *pool)
 {
-	SList *list;
+	assert(compare != NULL);
 
-	if(!(list = (SList *)malloc(sizeof(SList))))
+	SList *list = (SList *)malloc(sizeof(SList));
+
+	if(!list)
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
 		abort();
@@ -149,18 +59,17 @@ slist_init(SList *list, CompareFunc compare, FreeFunc free, Pool *pool)
 void
 slist_free(SList *list)
 {
-	SListItem *iter;
-
 	assert(list != NULL);
 
-	iter = list->head;
+	SListItem *iter = list->head;
 
 	while(iter)
 	{
 		SListItem *item = iter;
+
 		iter = iter->next;
 
-		if(list->free)
+		if(list->free && item->data)
 		{
 			list->free(item->data);
 		}
@@ -185,14 +94,39 @@ slist_destroy(SList *list)
 	free(list);
 }
 
+static SListItem *
+_slist_item_new(Pool *pool, void *data)
+{
+	SListItem *item = NULL;
+
+	if(pool)
+	{
+		item = (SListItem *)pool->alloc(pool);
+	}
+	else
+	{
+		item = (SListItem *)malloc(sizeof(SListItem));
+
+		if(!item)
+		{
+			fprintf(stderr, "Couldn't allocate memory.\n");
+			abort();
+		}
+	}
+
+	memset(item, 0, sizeof(SListItem));
+	item->data = data;
+
+	return item;
+}
+
 SListItem *
 slist_append(SList *list, void *data)
 {
-	SListItem *item;
-
 	assert(list != NULL);
+	assert(list->count != SIZE_MAX);
 
-	item = _slist_item_new(list->pool, data);
+	SListItem *item = _slist_item_new(list->pool, data);
 
 	if(list->tail)
 	{
@@ -214,11 +148,10 @@ slist_append(SList *list, void *data)
 SListItem *
 slist_prepend(SList *list, void *data)
 {
-	SListItem *item;
-
 	assert(list != NULL);
+	assert(list->count != SIZE_MAX);
 
-	item = _slist_item_new(list->pool, data);
+	SListItem *item = _slist_item_new(list->pool, data);
 
 	if(list->head)
 	{
@@ -240,54 +173,53 @@ slist_prepend(SList *list, void *data)
 SListItem *
 slist_insert_sorted(SList *list, void *data)
 {
-	SListItem *iter;
-	SListItem *item;
-
 	assert(list != NULL);
 	assert(list->compare != NULL);
+	assert(list->count != SIZE_MAX);
 
-	if((iter = list->head))
+	SListItem *iter = list->head;
+	SListItem *item;
+
+	if(iter)
 	{
-		/* test if new item can be appended */
 		if(list->compare(list->tail->data, data) <= 0)
 		{
-			return slist_append(list, data);
+			item = slist_append(list, data);
 		}
 		else if(list->count == 1)
 		{
-			/* prepend item */
-			return slist_prepend(list, data);
+			item = slist_prepend(list, data);
 		}
-
-		/* insert list item into list */
-		item = _slist_item_new(list->pool, data);
-
-		SListItem *prev = NULL;
-
-		while(iter)
+		else
 		{
-			if(list->compare(iter->data, data) >= 0)
+			item = _slist_item_new(list->pool, data);
+
+			SListItem *prev = NULL;
+
+			while(iter)
 			{
-				if(prev)
+				if(list->compare(iter->data, data) >= 0)
 				{
-					prev->next = item;
-				}
-				else
-				{
-					list->head = item;
+					if(prev)
+					{
+						prev->next = item;
+					}
+					else
+					{
+						list->head = item;
+					}
+
+					item->next = iter;
+					break;
 				}
 
-				item->next = iter;
-				break;
+				prev = iter;
+				iter = iter->next;
 			}
-
-			prev = iter;
-			iter = iter->next;
 		}
 	}
 	else
 	{
-		/* insert head */
 		item = _slist_item_new(list->pool, data);
 		list->head = item;
 		list->tail = item;
@@ -298,42 +230,75 @@ slist_insert_sorted(SList *list, void *data)
 	return item;
 }
 
+static void
+_slist_remove(SList *list, SListItem *prev, SListItem *item)
+{
+	assert(list != NULL);
+	assert(item != NULL);
+
+	if(prev)
+	{
+		prev->next = item->next;
+	}
+	else
+	{
+		list->head = item->next;
+	}
+
+	if(list->tail == item)
+	{
+		list->tail = prev;
+	}
+
+	if(list->free && item->data)
+	{
+		list->free(item->data);
+	}
+
+	if(list->pool)
+	{
+		list->pool->free(list->pool, item);
+	}
+	else
+	{
+		free(item);
+	}
+
+	--list->count;
+}
+
 void
 slist_remove(SList *list, SListItem *item)
 {
-	SListItem *p;
-	SListItem *prev = NULL;
-
 	assert(list != NULL);
 	assert(list->head != NULL);
+	assert(item != NULL);
 
-	p = list->head;
+	SListItem *iter = list->head;
+	SListItem *prev = NULL;
 
-	while(p)
+	while(iter)
 	{
-		if(p == item)
+		if(iter == item)
 		{
-			/* remove list item */
-			_slist_remove(list, prev, p);
+			_slist_remove(list, prev, iter);
 			break;
 		}
 
-		prev = p;
-		p = p->next;
+		prev = iter;
+		iter = iter->next;
 	}
 }
 
 void
 slist_remove_by_data(SList *list, void *data, bool remove_all)
 {
-	SListItem *iter;
-	SListItem *next;
-	SListItem *prev = NULL;
-
 	assert(list != NULL);
 	assert(list->compare != NULL);
 
-	iter = list->head;
+	SListItem *iter = list->head;
+	SListItem *next;
+	SListItem *prev = NULL;
 
 	while(iter)
 	{
@@ -343,7 +308,6 @@ slist_remove_by_data(SList *list, void *data, bool remove_all)
 			_slist_remove(list, prev, iter);
 			iter = next;
 
-			/* leave loop if we don't have to remove all desired items */
 			if(!remove_all)
 			{
 				break;
@@ -365,14 +329,16 @@ slist_remove_by_data(SList *list, void *data, bool remove_all)
 void *
 slist_pop(SList *list)
 {
-	SListItem *item;
-	void *data = NULL;
-
 	assert(list != NULL);
 
-	if((item = list->head))
+	SListItem *item = list->head;
+	void *data = NULL;
+
+	if(item)
 	{
-		if(!(list->head = list->head->next))
+		list->head = list->head->next;
+
+		if(!list->head)
 		{
 			list->tail = NULL;
 		}
@@ -394,30 +360,47 @@ slist_pop(SList *list)
 	return data;
 }
 
+static SListItem *
+_slist_find(const SList *list, SListItem *offset, void const *data)
+{
+	assert(list != NULL);
+
+	SListItem *iter = offset ? offset : list->head;
+
+	while(iter)
+	{
+		if(!list->compare(iter->data, data))
+		{
+			return iter;
+		}
+
+		iter = iter->next;
+	}
+
+	return NULL;
+}
+
 bool
 slist_contains(const SList *list, void *data)
 {
 	assert(list != NULL);
 	assert(list->compare != NULL);
 
-	return _slist_find(list, NULL, data) ? true : false;
+	return _slist_find(list, NULL, data) != NULL;
 }
 
 void
 slist_clear(SList *list)
 {
-	SListItem *iter;
-	SListItem *next;
-
 	assert(list != NULL);
 
-	iter = list->head;
+	SListItem *iter = list->head;
 
 	while(iter)
 	{
-		next = iter->next;
+		SListItem *next = iter->next;
 
-		if(list->free)
+		if(list->free && iter->data)
 		{
 			list->free(iter->data);
 		}
@@ -441,10 +424,12 @@ slist_clear(SList *list)
 SListItem *
 slist_find(const SList *list, SListItem *offset, void const *data)
 {
+	assert(list != NULL);
+
 	return _slist_find(list, offset, data);
 }
 
-inline size_t
+size_t
 slist_count(const SList *list)
 {
 	assert(list != NULL);
@@ -452,7 +437,7 @@ slist_count(const SList *list)
 	return list->count;
 }
 
-inline SListItem *
+SListItem *
 slist_head(const SList *list)
 {
 	assert(list != NULL);
@@ -460,12 +445,12 @@ slist_head(const SList *list)
 	return list->head;
 }
 
-inline bool
+bool
 slist_empty(const SList *list)
 {
 	assert(list != NULL);
 
-	return list->head ? false : true;
+	return list->head == NULL;
 }
 
 void
@@ -474,7 +459,7 @@ slist_item_free_data(const SList *list, SListItem *item)
 	assert(list != NULL);
 	assert(item != NULL);
 
-	if(list->free)
+	if(list->free && item->data)
 	{
 		list->free(item->data);
 	}
@@ -485,16 +470,12 @@ slist_item_free_data(const SList *list, SListItem *item)
 void
 slist_reorder(SList *list, SListItem *item)
 {
-	SListItem *iter;
-	SListItem *prev = NULL;
-	bool inserted = false;
-
 	assert(list != NULL);
 	assert(list->compare != NULL);
 	assert(item != NULL);
 
-	/* detach list item */
-	iter = list->head;
+	SListItem *iter = list->head;
+	SListItem *prev = NULL;
 
 	while(iter)
 	{
@@ -521,9 +502,10 @@ slist_reorder(SList *list, SListItem *item)
 		iter = iter->next;
 	}
 
-	/* insert list item */
 	iter = list->head;
 	prev = NULL;
+
+	bool inserted = false;
 
 	while(iter)
 	{

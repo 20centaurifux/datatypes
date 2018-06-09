@@ -54,11 +54,11 @@ typedef struct
 	ListItem *tail;
 	/*! Number of stored items. */
 	size_t count;
-	/*! A function to compare data of two list items. */
+	/*! Function to compare data of two list items. */
 	CompareFunc compare;
-	/*! A function to free item data. */
+	/*! Function to free item data. */
 	FreeFunc free;
-	/*! A memory pool. */
+	/*! A memory pool for creating new list items. */
 	Pool *pool;
 } List;
 
