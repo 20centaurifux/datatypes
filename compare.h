@@ -27,10 +27,10 @@
 #include <string.h>
 
 /*! A function to compare two values. */
-typedef int32_t (*CompareFunc)(const void *a, const void *b);
+typedef int32_t (*CompareFunc)(const void * restrict a, const void * restrict b);
 
 /*! A function to check if two values are equal. */
-typedef bool (*EqualFunc)(const void *a, const void *b);
+typedef bool (*EqualFunc)(const void * restrict a, const void * restrict b);
 
 /*! Compares two strings. Returns 0 if values are equal, or a positive integer if the first value comes after the second. */
 #define str_compare (CompareFunc)strcmp
@@ -51,7 +51,7 @@ bool str_equal(const void * restrict a, const void * restrict b);
  *
  * Compares two pointers.
  */
-int32_t direct_compare(const void *a, const void *b);
+int32_t direct_compare(const void * restrict a, const void * restrict b);
 
 /**
  *\param a a pointer
@@ -60,7 +60,7 @@ int32_t direct_compare(const void *a, const void *b);
  *
  * Tests if two pointers are equal.
  */
-bool direct_equal(const void *a, const void *b);
+bool direct_equal(const void * restrict a, const void * restrict b);
 
 #endif
 

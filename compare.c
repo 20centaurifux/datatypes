@@ -48,7 +48,7 @@ str_equal(const void * restrict a, const void * restrict b)
 }
 
 int32_t
-direct_compare(const void *a, const void *b)
+direct_compare(const void * restrict a, const void * restrict b)
 {
 	assert(a != NULL);
 	assert(b != NULL);
@@ -70,7 +70,7 @@ direct_compare(const void *a, const void *b)
 }
 
 inline bool
-direct_equal(const void *a, const void *b)
+direct_equal(const void * restrict a, const void * restrict b)
 {
 	assert(a != NULL);
 	assert(b != NULL);

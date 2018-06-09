@@ -246,7 +246,7 @@ _assoc_array_resize_if_necessary(AssocArray *array)
 	}
 }
 
-void
+static void
 _assoc_array_insert_before_offset(AssocArray *array, void * restrict key, void * restrict value, ssize_t offset)
 {
 	assert(array != NULL);
@@ -260,7 +260,7 @@ _assoc_array_insert_before_offset(AssocArray *array, void * restrict key, void *
 	array->values[offset] = value;
 }
 
-void
+static void
 _assoc_array_insert_after_offset(AssocArray *array, void * restrict key, void * restrict value, ssize_t offset)
 {
 	assert(array != NULL);
