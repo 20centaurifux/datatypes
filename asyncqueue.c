@@ -31,9 +31,11 @@
 AsyncQueue *
 async_queue_new(CompareFunc compare, FreeFunc free, Pool *pool)
 {
-	AsyncQueue *queue;
+	assert(compare);
 
-	if(!(queue = (AsyncQueue *)malloc(sizeof(AsyncQueue))))
+	AsyncQueue *queue = (AsyncQueue *)malloc(sizeof(AsyncQueue));
+
+	if(!queue)
 	{
 		fprintf(stderr, "Couldn't allocate memory.\n");
 		abort();
@@ -47,10 +49,6 @@ async_queue_new(CompareFunc compare, FreeFunc free, Pool *pool)
 void
 async_queue_init(AsyncQueue *queue, CompareFunc compare, FreeFunc free, Pool *pool)
 {
-	#ifndef NDEBUG
-	int success;
-	#endif
-
 	assert(queue != NULL);
 	assert(compare != NULL);
 
@@ -58,16 +56,16 @@ async_queue_init(AsyncQueue *queue, CompareFunc compare, FreeFunc free, Pool *po
 	queue->waiting = 0;
 
 	#ifndef NDEBUG
-	success =
+	int success =
 	#endif
-	          pthread_mutex_init(&queue->mutex, NULL);
+	pthread_mutex_init(&queue->mutex, NULL);
 
 	assert(success == 0);
 
 	#ifndef NDEBUG
 	success =
 	#endif
-	          pthread_cond_init(&queue->cond, NULL);
+	pthread_cond_init(&queue->cond, NULL);
 
 	assert(success == 0);
 }
@@ -75,6 +73,8 @@ async_queue_init(AsyncQueue *queue, CompareFunc compare, FreeFunc free, Pool *po
 void
 async_queue_destroy(AsyncQueue *queue)
 {
+	assert(queue != NULL);
+
 	async_queue_free(queue);
 	free(queue);
 }
@@ -110,13 +110,11 @@ async_queue_push(AsyncQueue *queue, void *data)
 static bool
 _async_queue_pop(AsyncQueue *queue, void *data, uint32_t ms)
 {
-	bool success;
-
 	assert(queue != NULL);
 
 	pthread_mutex_lock(&queue->mutex);
 
-	success = queue_pop(&queue->queue, data);
+	bool success = queue_pop(&queue->queue, data);
 
 	if(!success)
 	{
@@ -156,6 +154,8 @@ _async_queue_pop(AsyncQueue *queue, void *data, uint32_t ms)
 bool
 async_queue_pop(AsyncQueue *queue, void *data)
 {
+	assert(queue != NULL);
+
 	return _async_queue_pop(queue, data, 0);
 }
 
@@ -180,13 +180,11 @@ async_queue_clear(AsyncQueue *queue)
 size_t
 async_queue_count(AsyncQueue *queue)
 {
-	size_t count;
-
 	assert(queue != NULL);
 
 	pthread_mutex_lock(&queue->mutex);
 
-	count = queue_count(&queue->queue);
+	size_t count = queue_count(&queue->queue);
 
 	pthread_mutex_unlock(&queue->mutex);
 
