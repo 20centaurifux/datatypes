@@ -1,4 +1,5 @@
 define(`PREFIX', `hashtable')
 define(`TYPENAME', `HashTable')
-define(`NEW_ARGS', `HASHTABLE_AUTO_RESIZE, str_hash, str_equal, free, NULL')
+define(`NEW_STR_ARGS', `HASHTABLE_AUTO_RESIZE, str_hash, str_equal, free, NULL')
+define(`NEW_INT_ARGS', `HASHTABLE_AUTO_RESIZE, direct_hash, direct_equal, NULL, NULL')
 include(`test-map.m4')

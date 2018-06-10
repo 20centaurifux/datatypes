@@ -10,7 +10,7 @@
 static void
 test_count_words_with_macros(void)
 {
-	TYPENAME *map = PREFIX`_new'(NEW_ARGS);
+	TYPENAME *map = PREFIX`_new'(NEW_STR_ARGS);
 
 	assert(map != NULL);
 
@@ -62,6 +62,8 @@ test_count_words_with_macros(void)
 			++count;
 		}
 
+		ifdef(`HAS_ITER_FREE_FUNC', PREFIX`_iter_free'(&iter);)
+
 		assert(count == PREFIX`_count'(map));
 
 		fclose(fp);
@@ -73,7 +75,7 @@ test_count_words_with_macros(void)
 static void
 test_count_words_without_macros(void)
 {
-	TYPENAME *map = PREFIX`_new'(NEW_ARGS);
+	TYPENAME *map = PREFIX`_new'(NEW_STR_ARGS);
 
 	assert(map != NULL);
 
@@ -127,6 +129,8 @@ test_count_words_without_macros(void)
 			++count;
 		}
 
+		ifdef(`HAS_ITER_FREE_FUNC', PREFIX`_iter_free'(&iter);)
+
 		assert(count == PREFIX`_count'(map));
 
 		fclose(fp);
@@ -138,7 +142,7 @@ test_count_words_without_macros(void)
 static void
 test_remove_and_clear(void)
 {
-	TYPENAME *map = PREFIX`_new'(NEW_ARGS);
+	TYPENAME *map = PREFIX`_new'(NEW_STR_ARGS);
 
 	assert(map != NULL);
 
@@ -207,12 +211,74 @@ test_remove_and_clear(void)
 	PREFIX`_destroy'(map);
 }
 
+#define INT_TO_PTR(i) (void *)(intptr_t)i
+
+static void
+test_int(void)
+{
+	TYPENAME *map = PREFIX`_new'(NEW_INT_ARGS);
+
+	assert(map != NULL);
+
+	int total = 0;
+
+	for(int32_t i = 1; i <= 10000; ++i)
+	{
+		if(i % 3)
+		{
+			if(i % 2)
+			{
+				total += i * 2;
+			}
+			else
+			{
+				total += i;
+			}
+		}
+	}
+
+	for(int32_t i = 1; i <= 10000; ++i)
+	{
+		PREFIX`_set'(map, INT_TO_PTR(i), INT_TO_PTR(i), false);
+	}
+
+	for(int32_t i = 1; i <= 9999; i += 2)
+	{
+		TYPENAME`Pair' *pair = PREFIX`_lookup'(map, INT_TO_PTR(i));
+
+		int v = (intptr_t)PREFIX`_pair_get_value'(pair) * 2;
+		PREFIX`_set'(map, INT_TO_PTR(i), INT_TO_PTR(v), false);
+	}
+
+	for(int32_t i = 3; i <= 9999; i += 3)
+	{
+		PREFIX`_remove'(map, INT_TO_PTR(i));
+	}
+
+	TYPENAME`Iter' iter;
+	int total_iter = 0;
+
+	PREFIX`_iter_init'(map, &iter);
+
+	while(PREFIX`_iter_next'(&iter))
+	{
+		total_iter += (intptr_t)PREFIX`_iter_value'(iter);
+	}
+
+	ifdef(`HAS_ITER_FREE_FUNC', PREFIX`_iter_free'(&iter);)
+
+	assert(total == total_iter);
+
+	PREFIX`_destroy'(map);
+}
+
 int
 main(int argc, char *argv[])
 {
 	test_count_words_with_macros();
 	test_count_words_without_macros();
 	test_remove_and_clear();
+	test_int();
 
 	return 0;
 }

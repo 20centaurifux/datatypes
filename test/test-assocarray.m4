@@ -1,4 +1,5 @@
 define(`PREFIX', `assoc_array')
 define(`TYPENAME', `AssocArray')
-define(`NEW_ARGS', `str_compare, free, NULL')
+define(`NEW_STR_ARGS', `str_compare, free, NULL')
+define(`NEW_INT_ARGS', `direct_compare, NULL, NULL')
 include(`test-map.m4')
