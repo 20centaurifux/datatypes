@@ -87,10 +87,6 @@ static const size_t PRIMES[] =
 	232524442005197556,
 	465048884010395089,
 	930097768020790181,
-	1860195536041580371,
-	3720391072083160831,
-	7440782144166321683,
-	18446744073709551521UL,
 	#endif
 	0
 };
@@ -105,6 +101,7 @@ hashtable_new(size_t size, HashFunc hash_func, EqualFunc compare_keys, FreeFunc 
 {
 	assert(hash_func != NULL);
 	assert(compare_keys != NULL);
+	assert(size <= SIZE_MAX / sizeof(struct _Bucket));
 
 	HashTable *table = (HashTable *)malloc(sizeof(HashTable));
 
@@ -125,6 +122,7 @@ hashtable_init(HashTable *table, size_t size, HashFunc hash_func, EqualFunc comp
 	assert(table != NULL);
 	assert(hash_func != NULL);
 	assert(compare_keys != NULL);
+	assert(size <= SIZE_MAX / sizeof(struct _Bucket));
 
 	size_t table_size = HASHTABLE_INITIAL_SIZE;
 
@@ -221,13 +219,13 @@ hashtable_clear(HashTable *table)
 {
 	assert(table != NULL);
 
+	table->count = 0;
+
 	_hashtable_free_memory(table);
 	memset(table->buckets, 0, sizeof(struct _Bucket *) * table->size);
 
 	memory_pool_destroy((MemoryPool *)table->pool);
 	table->pool = (Pool *)memory_pool_new(sizeof(struct _Bucket), HASHTABLE_BUCKET_POOL_BLOCK_SIZE);
-
-	table->count = 0;
 }
 
 static void
