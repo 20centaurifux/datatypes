@@ -16,7 +16,7 @@
  ***************************************************************************/
 /**
  * \file asyncqueue.c
- * \brief An asynchronous queue.
+ * \brief Asynchronous queue.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
  */
 #ifdef WITH_PTHREAD

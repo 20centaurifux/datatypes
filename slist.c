@@ -16,7 +16,7 @@
  ***************************************************************************/
 /**
  * \file slist.c
- * \brief A singly-linked list.
+ * \brief Singly-linked list.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
  */
 #include <stdlib.h>

@@ -16,7 +16,7 @@
  ***************************************************************************/
 /**
  * \file buffer.h
- * \brief A byte buffer.
+ * \brief Byte buffer.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
  */
 #include <stdlib.h>

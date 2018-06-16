@@ -16,7 +16,7 @@
  ***************************************************************************/
 /**
  * \file rbtree.h
- * \brief A generic red-black tree.
+ * \brief Generic red-black tree.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
  */
 #ifndef RBTREE_H
@@ -48,7 +48,7 @@ typedef struct _rbnode
 
 /**
  *\struct RBTree
- *\brief A red-black tree.
+ *\brief Red-black tree.
  */
 typedef struct
 {
@@ -70,7 +70,13 @@ typedef struct
 	Pool *pool;
 	/*! Number of stored items. */
 	size_t count;
-	/*! A found key-value pair. */
+	/**
+	 *\struct _RBTreePair
+	 *\brief Found key-value pair.
+	 *
+	 *\var pair
+	 *\brief Last found key-value pair.
+	 */
 	struct _RBTreePair
 	{
 		/*! A function to free the associated value. */
@@ -109,7 +115,7 @@ typedef struct
 
 /**
  *\struct RBTreeIter
- *\brief A structure to iterate over the elements of a RBTree.
+ *\brief Structure to iterate over the elements of a RBTree.
  */
 typedef struct
 {
@@ -150,14 +156,14 @@ void rbtree_init(RBTree *tree, CompareFunc compare_keys, FreeFunc free_key, Free
 /**
  *\param tree a RBTree
  *
- * Frees resources of the tree.
+ * Frees resources without freeing the tree pointer.
  */
 void rbtree_free(RBTree *tree);
 
 /**
  *\param tree a RBTree
  *
- * Frees resources and memory allocated for tree.
+ * Frees resources and the tree pointer.
  */
 void rbtree_destroy(RBTree *tree);
 

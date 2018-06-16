@@ -16,7 +16,7 @@
  ***************************************************************************/
 /**
  * \file assocarray.c
- * \brief A generic associative array.
+ * \brief Generic associative array.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
  */
 #define _GNU_SOURCE

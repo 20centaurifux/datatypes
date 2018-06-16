@@ -16,7 +16,7 @@
  ***************************************************************************/
 /**
  * \file list.h
- * \brief A doubly-linked list.
+ * \brief Doubly-linked list.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
  */
 #ifndef LIST_H
@@ -44,7 +44,7 @@ typedef struct _ListItem
 
 /**
  * \struct List
- * \brief A doubly-linked list.
+ * \brief Doubly-linked list.
  */
 typedef struct
 {
@@ -176,7 +176,7 @@ void list_remove_by_data(List *list, void *data, bool remove_all);
  *\param list a List
  *\return list item data
  *
- * Removes first element from list and returns data.
+ * Removes first element from list and returns its associated data.
  */
 void *list_pop(List *list);
 
@@ -222,7 +222,7 @@ ListItem *list_find(const List *list, ListItem *offset, void const *data);
  *\param list a List
  *\param item a ListItem
  *
- * Sets the associated list item to NULL and frees memory.
+ * Sets the associated list item data to NULL and frees its memory.
  */
 void list_item_free_data(const List *list, ListItem *item);
 

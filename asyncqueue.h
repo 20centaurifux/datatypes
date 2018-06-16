@@ -16,7 +16,7 @@
  ***************************************************************************/
 /**
  * \file asyncqueue.h
- * \brief An asynchronous queue.
+ * \brief Asynchronous queue.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
  */
 #ifdef WITH_PTHREAD
@@ -30,7 +30,7 @@
 
 /**
  *\struct AsyncQueue
- *\brief An asynchronous queue.
+ *\brief Asynchronous communication between threads.
  */
 typedef struct
 {

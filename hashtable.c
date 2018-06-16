@@ -16,7 +16,7 @@
  ***************************************************************************/
 /**
  * \file hashtable.c
- * \brief A generic hashtable.
+ * \brief Generic hashtable.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
  */
 #include <stdlib.h>
@@ -119,7 +119,7 @@ hashtable_new(size_t size, HashFunc hash_func, EqualFunc compare_keys, FreeFunc 
 	return table;
 }
 
-inline void
+void
 hashtable_init(HashTable *table, size_t size, HashFunc hash_func, EqualFunc compare_keys, FreeFunc free_key, FreeFunc free_value)
 {
 	assert(table != NULL);
@@ -465,7 +465,7 @@ hashtable_key_exists(const HashTable *table, const void *key)
 	return _hashtable_find_bucket(table, head, key) != NULL;
 }
 
-inline size_t
+size_t
 hashtable_count(const HashTable *table)
 {
 	assert(table != NULL);
@@ -482,7 +482,7 @@ hashtable_iter_init(const HashTable *table, HashTableIter *iter)
 	iter->table = table;
 }
 
-static inline bool
+static bool
 _hashtable_iter_get_next_bucket(HashTableIter *iter)
 {
 	assert(iter != NULL);
@@ -521,7 +521,7 @@ hashtable_iter_next(HashTableIter *iter)
 	return success;
 }
 
-inline void *
+void *
 hashtable_iter_get_key(const HashTableIter *iter)
 {
 	assert(iter != NULL);
@@ -529,7 +529,7 @@ hashtable_iter_get_key(const HashTableIter *iter)
 	return iter->liter->key;
 }
 
-inline void *
+void *
 hashtable_iter_get_value(const HashTableIter *iter)
 {
 	assert(iter != NULL);

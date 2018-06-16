@@ -16,7 +16,7 @@
  ***************************************************************************/
 /**
  * \file slist.h
- * \brief A singly-linked list.
+ * \brief Singly-linked list.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
  */
 #include "datatypes.h"
@@ -43,7 +43,7 @@ typedef struct _SListItem
 
 /**
  * \struct SList
- * \brief A singly-linked list.
+ * \brief Singly-linked list.
  */
 typedef struct _SList
 {

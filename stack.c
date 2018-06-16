@@ -16,7 +16,7 @@
  ***************************************************************************/
 /**
  * \file stack.c
- * \brief A generic stack.
+ * \brief Generic stack.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
  */
 #include <stdlib.h>

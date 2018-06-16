@@ -27,7 +27,7 @@
 
 /**
  *\struct Pool
- *\brief A memory pool.
+ *\brief Allocate groups of equal-sized chunks of memory.
  */
 typedef struct _Pool
 {
@@ -39,7 +39,7 @@ typedef struct _Pool
 
 /**
  *\struct MemoryPool
- *\brief This memory pool allocates memorys of memory and grows automatically.
+ *\brief This memory pool allocates blocks of memory and grows automatically.
  */
 typedef struct
 {
@@ -48,7 +48,7 @@ typedef struct
 
 	/**
 	 *\struct _MemoryBlock
-	 *\brief Memorys of memory are stored in a singly-linked list.
+	 *\brief Blocks of memory are stored in a singly-linked list.
 	 *
 	 *\var block
 	 *\brief First memory block.
@@ -64,7 +64,7 @@ typedef struct
 	} *block;
 	/**
 	 *\struct _MemoryPtrBlock
-	 *\brief Freed pointers are stored in memorys holding addresses.
+	 *\brief Freed pointers are stored in blocks holding addresses.
 	 *
 	 *\var free_block
 	 *\brief First pointer block.
@@ -94,7 +94,7 @@ typedef struct
 MemoryPool *memory_pool_new(size_t item_size, size_t block_size);
 
 /**
- *\param pool a memory pool
+ *\param pool MemoryPool to destroy
  *
  * Destroys the given MemoryPool.
  */

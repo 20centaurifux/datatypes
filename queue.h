@@ -16,7 +16,7 @@
  ***************************************************************************/
 /**
  * \file queue.h
- * \brief A generic queue.
+ * \brief Generic queue.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
  */
 #ifndef QUEUE_H
@@ -26,7 +26,7 @@
 
 /**
  *\typedef Queue
- *\brief A generic queue.
+ *\brief Generic queue.
  */
 typedef SList Queue;
 
@@ -59,14 +59,14 @@ typedef SList QueueItem;
 /**
  *\param queue a Queue
  *
- * Destroys all items in the queue. Frees also memory allocated for the Queue instance.
+ * Destroys all items in the queue and the queue pointer.
  */
 #define queue_destroy(queue) stack_destroy(queue)
 
 /**
  *\param queue a Queue
  *
- * Destroys all items in the queue.
+ * Destroys all items in the queue without freeing the queue pointer.
  */
 #define queue_free(queue) stack_free(queue)
 
@@ -90,7 +90,7 @@ typedef SList QueueItem;
 /**
  *\param queue a Queue
  *\param data location to store data
- *\return true if stack is not empty
+ *\return true if queue is not empty
  *
  * Gets first element from queue without removing it.
  */

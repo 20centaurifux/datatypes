@@ -16,7 +16,7 @@
  ***************************************************************************/
 /**
  * \file assocarray.h
- * \brief A generic associative array.
+ * \brief Generic associative array.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
  */
 #ifndef ASSOCARRAY_H
@@ -32,7 +32,7 @@
 
 /**
  *\struct AssocArray
- *\brief A datatype to create associations between keys and values.
+ *\brief Array containing associations between keys and values.
  */
 typedef struct _AssocArray
 {
@@ -50,7 +50,13 @@ typedef struct _AssocArray
 	size_t size;
 	/*! Number of inserted values. */
 	size_t count;
-	/*! Found key-value pair. */
+	/**
+	 *\struct _AssocArrayPair
+	 *\brief A key-value pair.
+	 *
+	 *\var pair
+	 *\brief Last found key-value pair.
+	 */
 	struct _AssocArrayPair
 	{
 		/*! Reference to the array. */
@@ -78,7 +84,7 @@ AssocArray *assoc_array_new(CompareFunc compare_keys, FreeFunc free_key, FreeFun
 
 /**
  *\param array an AssocArray
- *\param compare_keys function to compare of two keys
+ *\param compare_keys function to compare two keys
  *\param free_key function to free keys or NULL
  *\param free_value function to free values or NULL
  *
@@ -109,7 +115,7 @@ void assoc_array_clear(AssocArray *array);
 
 /**
  *\param array an AssocArray
- *\param key a key to insert
+ *\param key key to insert
  *\param value the value to associate with the key
  *\param overwrite_key true to overwrite already exisiting keys
  *
@@ -128,7 +134,7 @@ void assoc_array_remove(AssocArray *array, const void *key);
 
 /**
  *\param array an AssocArray
- *\param key a key
+ *\param key key to lookup
  *\return the found key-value pair or NULL.
  *
  * Looks up a key-value pair in the AssocArray.
@@ -167,7 +173,7 @@ void assoc_array_pair_set_value(AssocArrayPair *pair, void *value);
 
 /**
  *\param array an AssocArray
- *\param key a key
+ *\param key key to test
  *\return true if given key does exist
  *
  * Checks if a key does exist.

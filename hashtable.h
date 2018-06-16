@@ -16,7 +16,7 @@
  ***************************************************************************/
 /**
  * \file hashtable.h
- * \brief A generic hashtable.
+ * \brief Generic hashtable.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
  */
 #ifndef HASHTABLE_H
@@ -33,7 +33,7 @@
 
 /**
  *\struct HashTable
- *\brief A datatype to create associations between keys and values.
+ *\brief Table containing lists of buckets to create associations between keys and values.
  */
 typedef struct _HashTable
 {
@@ -53,10 +53,10 @@ typedef struct _HashTable
 	bool grow;
 	/**
 	 *\struct _Bucket
-	 *\brief A singly-linked list implementation storing keys & values.
+	 *\brief Singly-linked list implementation storing keys & values.
 	 *
 	 *\var buckets
-	 *\brief An array containing pointers to buckets.
+	 *\brief Array containing pointers to buckets.
 	 */
 	struct _Bucket
 	{
@@ -71,10 +71,16 @@ typedef struct _HashTable
 	size_t count;
 	/*! Pool used to create/destroy list elements. */
 	Pool *pool;
-	/*! A found key-value pair. */
+	/**
+	 *\struct _HashTablePair
+	 *\brief Found key-value pair.
+	 *
+	 *\var pair
+	 *\brief Last found key-value pair.
+	 */
 	struct _HashTablePair
 	{
-		/*! A function to free the associated value. */
+		/*! Function to free the associated value. */
 		FreeFunc free_value;
 		/*! Bucket containing the found key-value pair. */
 		struct _Bucket *bucket;
@@ -86,7 +92,7 @@ typedef struct _HashTablePair HashTablePair;
 
 /**
  *\struct HashTableIter
- *\brief A structure to iterate over the elements of a HashTable.
+ *\brief Structure to iterate over the elements of a HashTable.
  */
 typedef struct
 {
@@ -147,7 +153,7 @@ void hashtable_clear(HashTable *table);
 
 /**
  *\param table a HashTable
- *\param key a key to insert
+ *\param key key to insert
  *\param value the value to associate with the key
  *\param overwrite_key true to overwrite already existing keys
  *
@@ -166,7 +172,7 @@ void hashtable_remove(HashTable *table, const void *key);
 
 /**
  *\param table a HashTable
- *\param key a key
+ *\param key key to lookup
  *\return the found key-value pair or NULL
  *
  * Looks up a key-value pair in the HashTable.
@@ -205,7 +211,7 @@ void hashtable_pair_set_value(HashTablePair *pair, void *value);
 
 /**
  *\param table a HashTable
- *\param key a key
+ *\param key key to test
  *\return true if given key does exist
  *
  * Checks if a key does exist.

@@ -16,7 +16,7 @@
  ***************************************************************************/
 /**
  * \file buffer.c
- * \brief A byte buffer.
+ * \brief Byte buffer.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
  */
 #define _GNU_SOURCE

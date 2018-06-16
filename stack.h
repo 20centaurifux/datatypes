@@ -16,7 +16,7 @@
  ***************************************************************************/
 /**
  * \file stack.h
- * \brief A generic stack.
+ * \brief Generic stack.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
  */
 #ifndef STACK_H
@@ -26,7 +26,7 @@
 
 /**
  *\typedef Stack
- *\brief A generic stack.
+ *\brief Generic stack.
  */
 typedef SList Stack;
 
