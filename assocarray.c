@@ -37,7 +37,7 @@ _assoc_array_binary_search(CompareFunc compare, void **keys, size_t len, const v
 
 	assert(compare != NULL);
 	assert(keys != NULL);
-	assert(len <= ASSOC_ARRAY_MAX_SIZE + 1);
+	assert(len <= ASSOC_ARRAY_MAX_SIZE);
 	assert(key != NULL);
 	assert(index != NULL);
 
@@ -78,11 +78,9 @@ _assoc_array_binary_search(CompareFunc compare, void **keys, size_t len, const v
 AssocArray *
 assoc_array_new(CompareFunc compare_keys, FreeFunc free_key, FreeFunc free_value)
 {
-	AssocArray *array;
-
 	assert(compare_keys != NULL);
 
-	array = (AssocArray *)malloc(sizeof(AssocArray));
+	AssocArray *array = (AssocArray *)malloc(sizeof(AssocArray));
 
 	if(!array)
 	{
@@ -174,7 +172,6 @@ assoc_array_clear(AssocArray *array)
 	assert(array != NULL);
 
 	_assoc_array_free_memory(array);
-
 	array->count = 0;
 }
 
@@ -221,13 +218,21 @@ _assoc_array_resize_if_necessary(AssocArray *array)
 
 	if(array->count == array->size)
 	{
-		if(array->size > ASSOC_ARRAY_MAX_SIZE / 2)
+		if(array->size == ASSOC_ARRAY_MAX_SIZE)
 		{
-			fprintf(stderr, "Integer overflow.\n");
+			fprintf(stderr, "Array exceeds allowed maximum size.\n");
 			abort();
 		}
 
-		array->size *= 2;
+		if(array->size > ASSOC_ARRAY_MAX_SIZE / 2)
+		{
+			array->size = ASSOC_ARRAY_MAX_SIZE;
+		}
+		else
+		{
+			array->size *= 2;
+		}
+
 		array->keys = (void **)realloc(array->keys, array->size * sizeof(void *));
 
 		if(!array->keys)
@@ -282,13 +287,12 @@ _assoc_array_insert_after_offset(AssocArray *array, void * restrict key, void * 
 void
 assoc_array_set(AssocArray *array, void * restrict key, void * restrict value, bool overwrite_key)
 {
-	ssize_t offset = 0;
-
 	assert(array != NULL);
 	assert(key != NULL);
 
 	if(array->count)
 	{
+		ssize_t offset = 0;
 		int result = _assoc_array_binary_search(array->compare_keys, array->keys, array->count, key, &offset);
 
 		if(result)
@@ -320,13 +324,13 @@ assoc_array_set(AssocArray *array, void * restrict key, void * restrict value, b
 void
 assoc_array_remove(AssocArray *array, const void *key)
 {
-	ssize_t offset = 0;
-
 	assert(array != NULL);
 	assert(key != NULL);
 
 	if(array->count)
 	{
+		ssize_t offset = 0;
+
 		if(!_assoc_array_binary_search(array->compare_keys, array->keys, array->count, key, &offset))
 		{
 			if(array->free_key)
@@ -353,13 +357,13 @@ assoc_array_remove(AssocArray *array, const void *key)
 AssocArrayPair *
 assoc_array_lookup(AssocArray *array, const void *key)
 {
-	ssize_t offset = 0;
-
 	assert(array != NULL);
 	assert(key != NULL);
 
 	if(array->count)
 	{
+		ssize_t offset = 0;
+
 		if(!_assoc_array_binary_search(array->compare_keys, array->keys, array->count, key, &offset))
 		{
 			array->pair.offset = offset;
@@ -406,13 +410,13 @@ assoc_array_pair_set_value(AssocArrayPair *pair, void *value)
 bool
 assoc_array_key_exists(const AssocArray *array, const void *key)
 {
-	ssize_t offset;
-
 	assert(array != NULL);
 	assert(key != NULL);
 
 	if(array->count)
 	{
+		ssize_t offset = 0;
+
 		return !_assoc_array_binary_search(array->compare_keys, array->keys, array->count, key, &offset);
 	}
 
