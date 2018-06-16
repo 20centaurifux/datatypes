@@ -2,9 +2,9 @@
 
 ## Introduction
 
-**libdatatypes** is a library providing various abstract data types in plain C (C11).
-It's fast, has a small memory footprint and is well-documented. The library
-has been tested under GCC and Clang.
+**libdatatypes** provides various abstract data types in plain C (C11). It's fast,
+has a small memory footprint and is well-documented. The library has been tested
+on x86, x86-64 and ARMv6 with GCC and Clang.
 
 The following data types are available:
 
