@@ -45,7 +45,7 @@ rbtree_new(CompareFunc compare_keys, FreeFunc free_key, FreeFunc free_value, Poo
 	return tree;
 }
 
-inline void
+void
 rbtree_init(RBTree *tree, CompareFunc compare_keys, FreeFunc free_key, FreeFunc free_value, Pool *pool)
 {
 	assert(tree != NULL);
@@ -140,7 +140,7 @@ rbtree_clear(RBTree *tree)
 	tree->root = NULL;
 }
 
-inline size_t
+size_t
 rbtree_count(const RBTree *tree)
 {
 	assert(tree != NULL);
@@ -151,7 +151,7 @@ rbtree_count(const RBTree *tree)
 /*
  *	stack helpers:
  */
-static inline bool
+static bool
 _rbtree_stack_push(RBTree *tree, RBNode *node)
 {
 	if(!tree->sp)
@@ -204,7 +204,7 @@ _rbtree_stack_push(RBTree *tree, RBNode *node)
  */
 #define _rbnode_is_black(n) (n == NULL ? 1 : n->black)
 
-static inline RBNode *
+static RBNode *
 _rbnode_create_new(Pool *pool, void *key, void *value, int black, RBNode *left, RBNode *right)
 {
 	RBNode *node;
@@ -231,7 +231,7 @@ _rbnode_create_new(Pool *pool, void *key, void *value, int black, RBNode *left, 
 /*
  *	replace & rotate nodes:
  */
-static inline void
+static void
 _rbnode_replace(RBTree *tree, RBNode *old_node, RBNode *parent, RBNode *new_node)
 {
 	if(parent)
@@ -251,7 +251,7 @@ _rbnode_replace(RBTree *tree, RBNode *old_node, RBNode *parent, RBNode *new_node
 	}
 }
 
-static inline void
+static void
 _rbnode_rotate_left(RBTree *tree, RBNode *node, RBNode *parent)
 {
 	RBNode *right;
@@ -266,7 +266,7 @@ _rbnode_rotate_left(RBTree *tree, RBNode *node, RBNode *parent)
 	right->left = node;
 }
 
-static inline void
+static void
 _rbnode_rotate_right(RBTree *tree, RBNode *node, RBNode *parent)
 {
 	RBNode *left;
@@ -493,7 +493,7 @@ rbtree_set(RBTree *tree, void * restrict key, void * restrict value, bool overwr
 /*
  *	search nodes:
  */
-static inline RBNode *
+static RBNode *
 _rbtree_find_node(RBTree *tree, const void *key, bool build_stack)
 {
 	RBNode *node;
@@ -600,7 +600,7 @@ rbtree_key_exists(const RBTree *tree, const void *key)
 /*
  *	remove nodes:
  */
-static inline RBNode *
+static RBNode *
 _rbtree_find_max_node(RBTree *tree, RBNode *node)
 {
 	assert(node != NULL);
@@ -752,7 +752,7 @@ _rbtree_remove_case2(RBTree *tree)
 	_rbtree_remove_case3_to_6(tree);
 }
 
-static inline void
+static void
 _rbtree_remove_case1(RBTree *tree)
 {
 	if(tree->sp > tree->stack)
@@ -972,7 +972,7 @@ rbtree_iter_next(RBTreeIter *iter)
 	return true;
 }
 
-inline void *
+void *
 rbtree_iter_get_key(const RBTreeIter *iter)
 {
 	assert(iter != NULL);
@@ -985,7 +985,7 @@ rbtree_iter_get_key(const RBTreeIter *iter)
 	return NULL;
 }
 
-inline void *
+void *
 rbtree_iter_get_value(const RBTreeIter *iter)
 {
 	assert(iter != NULL);

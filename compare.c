@@ -69,7 +69,7 @@ direct_compare(const void * restrict a, const void * restrict b)
 	return (int32_t)result;
 }
 
-inline bool
+bool
 direct_equal(const void * restrict a, const void * restrict b)
 {
 	assert(a != NULL);
