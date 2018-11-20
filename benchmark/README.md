@@ -63,7 +63,7 @@ values of the measured execution times and memory consumptions.
 
 ## Results
 
-utash and sparsehash-dense were terminated during the execution of the last
+uthash and sparsehash-dense were terminated during the execution of the last
 test. I aborted also the last std::unordered\_map test because my system started
 to swap.
 
@@ -95,7 +95,7 @@ to swap.
 
 ## Summary
 
-* utash and sparsehash-dense are very fast but their memory footprints are high.
+* uthash and sparsehash-dense are very fast but their memory footprints are high.
 * sparsehash-sparse is between 2-3 times slower than other hash tables. It has
   the smallest memory footprint of all C++ implementations in return.
 * Speed and memory consumption of libdatatypes and glib are a bit similar,
