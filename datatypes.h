@@ -27,7 +27,7 @@
 /*! Minor version of libdatatypes. */
 #define DATATYPES_VERSION_MINOR      3
 /*! Patchlevel of libdatatypes. */
-#define DATATYPES_VERSION_PATCHLEVEL 0
+#define DATATYPES_VERSION_PATCHLEVEL 1
 
 /*! A function to free memory. */
 typedef void (*FreeFunc)(void *p);

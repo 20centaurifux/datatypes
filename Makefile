@@ -32,7 +32,7 @@ LDFLAGS=$(PTHREAD_LIB)
 # version information:
 MAJOR_VERSION=0
 MINOR_VERSION=3
-PATCHLEVEL=0
+PATCHLEVEL=1
 
 # destination library files:
 STATIC_LIB=libdatatypes-$(MAJOR_VERSION).$(MINOR_VERSION).$(PATCHLEVEL).a
