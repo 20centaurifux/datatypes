@@ -304,7 +304,7 @@ _hashtable_find_bucket(const HashTable *table, struct _Bucket *head, const void 
 }
 
 void
-hashtable_set(HashTable *table, void * restrict key, void * restrict value, bool overwrite_key)
+hashtable_set(HashTable *table, void *key, void *value, bool overwrite_key)
 {
 	assert(table != NULL);
 	assert(key != NULL);

@@ -122,7 +122,7 @@ void assoc_array_clear(AssocArray *array);
  * Inserts a new key and value in the AssocArray. If overwrite_key is set an existing key is
  * freed using the specified free_key function before it gets replaced.
  */
-void assoc_array_set(AssocArray *array, void * restrict key, void * restrict value, bool overwrite_key);
+void assoc_array_set(AssocArray *array, void *key, void *value, bool overwrite_key);
 
 /**
  *\param array an AssocArray

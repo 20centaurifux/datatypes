@@ -384,7 +384,7 @@ _rbtree_insert_case1(RBTree *tree)
 }
 
 RBTreeInsertResult
-rbtree_set(RBTree *tree, void * restrict key, void * restrict value, bool overwrite_key)
+rbtree_set(RBTree *tree, void *key, void *value, bool overwrite_key)
 {
 	assert(tree != NULL);
 	assert(tree->compare_keys != NULL);

@@ -176,7 +176,7 @@ assoc_array_clear(AssocArray *array)
 }
 
 static void
-_assoc_array_insert_first(AssocArray *array, void * restrict key, void * restrict value)
+_assoc_array_insert_first(AssocArray *array, void *key, void *value)
 {
 	assert(array != NULL);
 	assert(key != NULL);
@@ -187,7 +187,7 @@ _assoc_array_insert_first(AssocArray *array, void * restrict key, void * restric
 }
 
 static void
-_assoc_array_replace(AssocArray *array, void * restrict key, void * restrict value, ssize_t offset, bool overwrite_key)
+_assoc_array_replace(AssocArray *array, void *key, void *value, ssize_t offset, bool overwrite_key)
 {
 	assert(array != NULL);
 	assert(key != NULL);
@@ -252,7 +252,7 @@ _assoc_array_resize_if_necessary(AssocArray *array)
 }
 
 static void
-_assoc_array_insert_before_offset(AssocArray *array, void * restrict key, void * restrict value, ssize_t offset)
+_assoc_array_insert_before_offset(AssocArray *array, void *key, void *value, ssize_t offset)
 {
 	assert(array != NULL);
 	assert(key != NULL);
@@ -266,7 +266,7 @@ _assoc_array_insert_before_offset(AssocArray *array, void * restrict key, void *
 }
 
 static void
-_assoc_array_insert_after_offset(AssocArray *array, void * restrict key, void * restrict value, ssize_t offset)
+_assoc_array_insert_after_offset(AssocArray *array, void *key, void *value, ssize_t offset)
 {
 	assert(array != NULL);
 	assert(key != NULL);
@@ -285,7 +285,7 @@ _assoc_array_insert_after_offset(AssocArray *array, void * restrict key, void * 
 }
 
 void
-assoc_array_set(AssocArray *array, void * restrict key, void * restrict value, bool overwrite_key)
+assoc_array_set(AssocArray *array, void *key, void *value, bool overwrite_key)
 {
 	assert(array != NULL);
 	assert(key != NULL);

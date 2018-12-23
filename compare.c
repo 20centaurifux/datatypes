@@ -28,7 +28,7 @@
 #include "datatypes.h"
 
 bool
-str_equal(const void * restrict a, const void * restrict b)
+str_equal(const void *a, const void *b)
 {
 	assert(a != NULL);
 	assert(b != NULL);
@@ -48,29 +48,16 @@ str_equal(const void * restrict a, const void * restrict b)
 }
 
 int32_t
-direct_compare(const void * restrict a, const void * restrict b)
+direct_compare(const void *a, const void *b)
 {
 	assert(a != NULL);
 	assert(b != NULL);
 
-	ptrdiff_t result = a - b;
-
-	if(result > INT32_MAX)
-	{
-		fprintf(stderr, "%s: warning, integer overflow.\n", __func__);
-		result = INT32_MAX;
-	}
-	else if(result < INT32_MIN)
-	{
-		fprintf(stderr, "%s: warning, integer underflow.\n", __func__);
-		result = INT32_MIN;
-	}
-
-	return (int32_t)result;
+	return (a > b) - (a < b);
 }
 
 bool
-direct_equal(const void * restrict a, const void * restrict b)
+direct_equal(const void *a, const void *b)
 {
 	assert(a != NULL);
 	assert(b != NULL);

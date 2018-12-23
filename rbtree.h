@@ -184,7 +184,7 @@ void rbtree_clear(RBTree *tree);
  * Inserts a new key and value in the RBTree. If replace_key is set an existing key is
  * freed using the specified free_key function before it gets replaced.
  */
-RBTreeInsertResult rbtree_set(RBTree *tree, void * restrict key, void * restrict value, bool replace_key);
+RBTreeInsertResult rbtree_set(RBTree *tree, void *key, void *value, bool replace_key);
 
 /**
  *\param tree a RBTree

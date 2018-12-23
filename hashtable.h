@@ -160,7 +160,7 @@ void hashtable_clear(HashTable *table);
  * Inserts a new key and value in the HashTable. If overwrite_key is set an existing key is
  * freed using the specified free_key function before it gets replaced.
  */
-void hashtable_set(HashTable *table, void * restrict key, void * restrict value, bool overwrite_key);
+void hashtable_set(HashTable *table, void *key, void *value, bool overwrite_key);
 
 /**
  *\param table a HashTable
