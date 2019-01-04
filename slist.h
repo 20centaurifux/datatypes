@@ -214,12 +214,5 @@ SListItem *slist_find(const SList *list, SListItem *offset, void const *data);
  */
 void slist_item_free_data(const SList *list, SListItem *item);
 
-/**
- *\param list a SList
- *\param item a SListItem
- *
- * Arrange given SListItem in order using the associated compare function to determine its position.
- */
-void slist_reorder(SList *list, SListItem *item);
 #endif
 
