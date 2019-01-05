@@ -357,25 +357,29 @@ _test_pop(Pool *pool)
 
 	slist_append(slist, strdup("a"));
 	slist_append(slist, strdup("b"));
-	slist_append(slist, strdup("c"));
+	SListItem *tail = slist_append(slist, strdup("c"));
 
 	assert(slist->count == 3);
 
 	char *a = slist_pop(slist);
 
 	assert(slist->count == 2);
+	assert(slist->tail == tail);
 
 	char *b = slist_pop(slist);
 
 	assert(slist->count == 1);
+	assert(slist->tail == tail);
 
 	char *c = slist_pop(slist);
 
 	assert(slist->count == 0);
+	assert(slist->tail == NULL);
 
 	char *d = slist_pop(slist);
 
 	assert(slist->count == 0);
+	assert(slist->tail == NULL);
 
 	assert(!strcmp(a, "a"));
 	assert(!strcmp(b, "b"));
@@ -448,6 +452,7 @@ _test_find_with_offset(Pool *pool)
 	SListItem *b = slist_find(slist, offset, (void *)"b");
 
 	assert(slist->tail == b);
+	assert(b == offset);
 	assert(!strcmp(b->data, "b"));
 
 	slist_destroy(slist);

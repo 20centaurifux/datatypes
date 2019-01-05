@@ -185,7 +185,7 @@ slist_prepend(SList *list, void *data)
 }
 
 static SListItem *
-_slist_insert_new_sorted(SList *list, void *data)
+_slist_prepend_new_sorted(SList *list, void *data)
 {
 	assert(list != NULL);
 	assert(list->compare != NULL);
@@ -234,7 +234,7 @@ slist_insert_sorted(SList *list, void *data)
 			}
 			else
 			{
-				item = _slist_insert_new_sorted(list, data);
+				item = _slist_prepend_new_sorted(list, data);
 			}
 		}
 		else

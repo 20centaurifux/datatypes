@@ -226,13 +226,5 @@ ListItem *list_find(const List *list, ListItem *offset, void const *data);
  */
 void list_item_free_data(const List *list, ListItem *item);
 
-/**
- *\param list a List
- *\param item a ListItem
- *
- * Arrange given ListItem in order using the associated compare function to determine its position.
- */
-void list_reorder(List *list, ListItem *item);
-
 #endif
 
