@@ -175,7 +175,8 @@ _rbtree_stack_push(RBTree *tree, RBNode *node)
 			if(tree->stack_size > (INT32_MAX / 2))
 			{
 				fprintf(stderr, "%s: maximum stack size reached\n", __func__);
-				abort();
+
+				return false;
 			}
 
 			tree->stack_size *= 2;
@@ -383,95 +384,137 @@ _rbtree_insert_case1(RBTree *tree)
 	}
 }
 
-RBTreeInsertResult
-rbtree_set(RBTree *tree, void *key, void *value, bool overwrite_key)
+static bool
+_rbtree_insert_root(RBTree *tree, void *key, void *value)
+{
+	bool inserted = false;
+
+	assert(tree != NULL);
+	assert(key != NULL);
+
+	if(!tree->root)
+	{
+		inserted = true;
+
+		tree->root = _rbnode_create_new(tree->pool, key, value, 1, NULL, NULL);
+		tree->count = 1;
+	}
+
+	return inserted;
+}
+
+static void
+_rbtree_replace_node(RBTree *tree, RBNode *node, void *key, void *value, bool overwrite_key)
 {
 	assert(tree != NULL);
+	assert(node != NULL);
+	assert(key != NULL);
+
+	if(overwrite_key)
+	{
+		if(tree->free_key)
+		{
+			tree->free_key(node->key);
+		}
+
+		node->key = key;
+	}
+
+	if(tree->free_value && node->value)
+	{
+		tree->free_value(node->value);
+	}
+
+	node->value = value;
+}
+
+static RBTreeInsertResult
+_rbtree_insert_child(RBTree *tree, void *key, void *value, bool overwrite_key)
+{
+	int result = -1;
+
+	assert(tree != NULL);
+	assert(tree->root != NULL);
 	assert(tree->compare_keys != NULL);
 	assert(key != NULL);
 
 	tree->sp = NULL;
 
-	if(!tree->root)
-	{
-		tree->root = _rbnode_create_new(tree->pool, key, value, 1, NULL, NULL);
-		++tree->count;
-
-		return RBTREE_INSERT_RESULT_NEW;
-	}
-
 	RBNode *node = tree->root;
-	RBNode *new_node = NULL;
 
-	while(1)
+	while(result == -1)
 	{
-		if(!_rbtree_stack_push(tree, node))
+		if(_rbtree_stack_push(tree, node))
 		{
-			break;
-		}
+			int32_t cmp = tree->compare_keys(key, node->key);
 
-		int32_t result = tree->compare_keys(key, node->key);
-
-		if(!result)
-		{
-			if(overwrite_key)
+			if(!cmp)
 			{
-				if(tree->free_key)
+				result = RBTREE_INSERT_RESULT_REPLACED;
+
+				_rbtree_replace_node(tree, node, key, value, overwrite_key);
+
+			}
+			else if(tree->count < SIZE_MAX)
+			{
+				RBNode **child = (cmp < 0) ? &node->left : &node->right;
+
+				if(*child)
 				{
-					tree->free_key(node->key);
+					node = *child;
 				}
+				else
+				{
+					result = RBTREE_INSERT_RESULT_NEW;
 
-				node->key = key;
-			}
+					*child = _rbnode_create_new(tree->pool, key, value, 0, NULL, NULL);
 
-			if(tree->free_value && node->value)
-			{
-				tree->free_value(node->value);
-			}
-
-			node->value = value;
-
-			return RBTREE_INSERT_RESULT_REPLACED;
-		}
-		else if(result < 0)
-		{
-			if(node->left)
-			{
-				node = node->left;
+					if(_rbtree_stack_push(tree, *child))
+					{
+						_rbtree_insert_case2_to_6(tree);
+					}
+					else
+					{
+						result = RBTREE_INSERT_RESULT_FAILED;
+					}
+				}
 			}
 			else
 			{
-				new_node = _rbnode_create_new(tree->pool, key, value, 0, NULL, NULL);
-				node->left = new_node;
-				break;
+				result = RBTREE_INSERT_RESULT_FAILED;
+
+				fprintf(stderr, "%s: integer overflow.\n", __func__);
 			}
 		}
-		else if(result > 0)
+		else
 		{
-			if(node->right)
-			{
-				node = node->right;
-			}
-			else
-			{
-				new_node = _rbnode_create_new(tree->pool, key, value, 0, NULL, NULL);
-				node->right = new_node;
-				break;
-			}
+			result = RBTREE_INSERT_RESULT_FAILED;
 		}
 	}
 
-	if(new_node)
+	if(result == RBTREE_INSERT_RESULT_NEW)
 	{
-		if(_rbtree_stack_push(tree, new_node))
-		{
-			_rbtree_insert_case2_to_6(tree);
-		}
+		++tree->count;
 	}
 
-	++tree->count;
+	return result;
+}
 
-	return RBTREE_INSERT_RESULT_NEW;
+RBTreeInsertResult
+rbtree_set(RBTree *tree, void *key, void *value, bool overwrite_key)
+{
+	RBTreeInsertResult result = RBTREE_INSERT_RESULT_NEW;
+
+	assert(tree != NULL);
+	assert(tree->compare_keys != NULL);
+	assert(key != NULL);
+
+	if(!_rbtree_insert_root(tree, key, value))
+	{
+		result = _rbtree_insert_child(tree, key, value, overwrite_key);
+	}
+
+	return result;
 }
 
 /*

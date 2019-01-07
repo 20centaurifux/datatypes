@@ -107,6 +107,20 @@ typedef struct
 } HashTableIter;
 
 /**
+ *\enum HashTableInsertResult
+ *\brief result of hashtable_set() method.
+ */
+typedef enum
+{
+	/*! Item has been inserted. */
+	HASHTABLE_INSERT_RESULT_NEW,
+	/*! Item has been replaced. */
+	HASHTABLE_INSERT_RESULT_REPLACED,
+	/*! Item insertion failed. */
+	HASHTABLE_INSERT_RESULT_FAILED
+} HashTableInsertResult;
+
+/**
  *\param size size of the hash table (number of buckets), HASHTABLE_AUTO_RESIZE to grow automatically
  *\param hash_func function to create hash from a key
  *\param compare_keys function to check equality of two keys
@@ -156,11 +170,12 @@ void hashtable_clear(HashTable *table);
  *\param key key to insert
  *\param value the value to associate with the key
  *\param overwrite_key true to overwrite already existing keys
+ *\return type of the performed insert operation
  *
  * Inserts a new key and value in the HashTable. If overwrite_key is set an existing key is
  * freed using the specified free_key function before it gets replaced.
  */
-void hashtable_set(HashTable *table, void *key, void *value, bool overwrite_key);
+HashTableInsertResult hashtable_set(HashTable *table, void *key, void *value, bool overwrite_key);
 
 /**
  *\param table a HashTable

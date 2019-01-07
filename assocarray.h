@@ -73,6 +73,20 @@ typedef struct _AssocArrayPair AssocArrayPair;
 typedef struct _AssocArrayPair AssocArrayIter;
 
 /**
+ *\enum AssocArrayInsertResult
+ *\brief result of assoc_array_set() method.
+ */
+typedef enum
+{
+	/*! Item has been inserted. */
+	ASSOCARRAY_INSERT_RESULT_NEW,
+	/*! Item has been replaced. */
+	ASSOCARRAY_INSERT_RESULT_REPLACED,
+	/*! Item insertion failed. */
+	ASSOCARRAY_INSERT_RESULT_FAILED
+} AssocArrayInsertResult;
+
+/**
  *\param compare_keys function to compare two keys
  *\param free_key function to free keys or NULL
  *\param free_value function to free values or NULL
@@ -118,11 +132,12 @@ void assoc_array_clear(AssocArray *array);
  *\param key key to insert
  *\param value the value to associate with the key
  *\param overwrite_key true to overwrite already exisiting keys
+ *\return type of the performed insert operation
  *
  * Inserts a new key and value in the AssocArray. If overwrite_key is set an existing key is
  * freed using the specified free_key function before it gets replaced.
  */
-void assoc_array_set(AssocArray *array, void *key, void *value, bool overwrite_key);
+AssocArrayInsertResult assoc_array_set(AssocArray *array, void *key, void *value, bool overwrite_key);
 
 /**
  *\param array an AssocArray

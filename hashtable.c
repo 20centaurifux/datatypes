@@ -303,9 +303,11 @@ _hashtable_find_bucket(const HashTable *table, struct _Bucket *head, const void 
 	return item;
 }
 
-void
+HashTableInsertResult
 hashtable_set(HashTable *table, void *key, void *value, bool overwrite_key)
 {
+	HashTableInsertResult result = HASHTABLE_INSERT_RESULT_FAILED;
+
 	assert(table != NULL);
 	assert(key != NULL);
 
@@ -320,6 +322,8 @@ hashtable_set(HashTable *table, void *key, void *value, bool overwrite_key)
 
 	if(item)
 	{
+		result = HASHTABLE_INSERT_RESULT_REPLACED;
+
 		if(overwrite_key)
 		{
 			if(table->free_key)
@@ -337,16 +341,25 @@ hashtable_set(HashTable *table, void *key, void *value, bool overwrite_key)
 
 		item->data = value;
 	}
-	else
+	else if(table->count < SIZE_MAX)
 	{
+		result = HASHTABLE_INSERT_RESULT_NEW;
+
 		item = (struct _Bucket *)table->pool->alloc(table->pool);
 
 		item->key = key;
 		item->data = value;
 		table->buckets[index] = item;
 		item->next = head;
+
 		++table->count;
 	}
+	else
+	{
+		fprintf(stderr, "%s: integer overflow.\n", __func__);
+	}
+
+	return result;
 }
 
 void

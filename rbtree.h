@@ -91,14 +91,16 @@ typedef struct _RBTreePair RBTreePair;
 
 /**
  *\enum RBTreeInsertResult
- *\brief result of rbtree_set() method
+ *\brief result of rbtree_set() method.
  */
 typedef enum
 {
 	/*! Node has been inserted. */
 	RBTREE_INSERT_RESULT_NEW,
 	/*! Node has been replaced. */
-	RBTREE_INSERT_RESULT_REPLACED
+	RBTREE_INSERT_RESULT_REPLACED,
+	/*! Node insertion failed. */
+	RBTREE_INSERT_RESULT_FAILED
 } RBTreeInsertResult;
 
 /**
@@ -179,7 +181,7 @@ void rbtree_clear(RBTree *tree);
  *\param key key of the item
  *\param value value of the item
  *\param replace_key true to overwrite exisiting key
- *\return RBTREE_INSERT_RESULT_NEW or RBTREE_INSERT_RESULT_REPLACED
+ *\return type of the performed insert operation
  *
  * Inserts a new key and value in the RBTree. If replace_key is set an existing key is
  * freed using the specified free_key function before it gets replaced.

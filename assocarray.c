@@ -284,41 +284,58 @@ _assoc_array_insert_after_offset(AssocArray *array, void *key, void *value, ssiz
 	array->values[offset] = value;
 }
 
-void
+AssocArrayInsertResult
 assoc_array_set(AssocArray *array, void *key, void *value, bool overwrite_key)
 {
+	AssocArrayInsertResult result = ASSOCARRAY_INSERT_RESULT_FAILED;
+
 	assert(array != NULL);
 	assert(key != NULL);
 
 	if(array->count)
 	{
 		ssize_t offset = 0;
-		int result = _assoc_array_binary_search(array->compare_keys, array->keys, array->count, key, &offset);
+		int cmp = _assoc_array_binary_search(array->compare_keys, array->keys, array->count, key, &offset);
 
-		if(result)
+		if(cmp)
 		{
-			_assoc_array_resize_if_necessary(array);
+			result = ASSOCARRAY_INSERT_RESULT_NEW;
 
-			if(result < 0)
+			if(array->count < SIZE_MAX)
 			{
-				_assoc_array_insert_before_offset(array, key, value, offset);
+				_assoc_array_resize_if_necessary(array);
+
+				if(cmp < 0)
+				{
+					_assoc_array_insert_before_offset(array, key, value, offset);
+				}
+				else
+				{
+					_assoc_array_insert_after_offset(array, key, value, offset);
+				}
+
+				++array->count;
 			}
 			else
 			{
-				_assoc_array_insert_after_offset(array, key, value, offset);
+				fprintf(stderr, "%s: integer overflow.\n", __func__);
 			}
-
-			++array->count;
 		}
 		else
 		{
+			result = ASSOCARRAY_INSERT_RESULT_REPLACED;
+
 			_assoc_array_replace(array, key, value, offset, overwrite_key);
 		}
 	}
 	else
 	{
+		result = ASSOCARRAY_INSERT_RESULT_NEW;
+
 		_assoc_array_insert_first(array, key, value);
 	}
+
+	return result;
 }
 
 void
