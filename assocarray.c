@@ -84,7 +84,7 @@ assoc_array_new(CompareFunc compare_keys, FreeFunc free_key, FreeFunc free_value
 
 	if(!array)
 	{
-		fprintf(stderr, "Couldn't allocate memory.\n");
+		perror("malloc()");
 		abort();
 	}
 
@@ -111,7 +111,7 @@ assoc_array_init(AssocArray *array, CompareFunc compare_keys, FreeFunc free_key,
 
 	if(!array->keys)
 	{
-		fprintf(stderr, "Couldn't allocate memory.\n");
+		perror("calloc()");
 		abort();
 	}
 
@@ -119,7 +119,7 @@ assoc_array_init(AssocArray *array, CompareFunc compare_keys, FreeFunc free_key,
 
 	if(!array->values)
 	{
-		fprintf(stderr, "Couldn't allocate memory.\n");
+		perror("calloc()");
 		abort();
 	}
 }
@@ -220,7 +220,7 @@ _assoc_array_resize_if_necessary(AssocArray *array)
 	{
 		if(array->size == ASSOC_ARRAY_MAX_SIZE)
 		{
-			fprintf(stderr, "Array exceeds allowed maximum size.\n");
+			fprintf(stderr, "%s(): integer overflow.\n", __func__);
 			abort();
 		}
 
@@ -237,7 +237,7 @@ _assoc_array_resize_if_necessary(AssocArray *array)
 
 		if(!array->keys)
 		{
-			fprintf(stderr, "Couldn't allocate memory.\n");
+			perror("realloc()");
 			abort();
 		}
 
@@ -245,7 +245,7 @@ _assoc_array_resize_if_necessary(AssocArray *array)
 
 		if(!array->values)
 		{
-			fprintf(stderr, "Couldn't allocate memory.\n");
+			perror("realloc()");
 			abort();
 		}
 	}
@@ -318,7 +318,7 @@ assoc_array_set(AssocArray *array, void *key, void *value, bool overwrite_key)
 			}
 			else
 			{
-				fprintf(stderr, "%s: integer overflow.\n", __func__);
+				fprintf(stderr, "%s(): integer overflow.\n", __func__);
 			}
 		}
 		else

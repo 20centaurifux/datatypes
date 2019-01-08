@@ -37,7 +37,7 @@ async_queue_new(CompareFunc compare, FreeFunc free, Pool *pool)
 
 	if(!queue)
 	{
-		fprintf(stderr, "Couldn't allocate memory.\n");
+		perror("malloc()");
 		abort();
 	}
 

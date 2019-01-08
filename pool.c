@@ -32,13 +32,13 @@ _memory_pool_create_block(const MemoryPool *pool)
 
 	if(!(block = (struct _MemoryBlock *)malloc(sizeof(struct _MemoryBlock))))
 	{
-		fprintf(stderr, "Couldn't allocate memory.\n");
+		perror("malloc()");
 		abort();
 	}
 
 	if(!(block->items = malloc(pool->item_size * pool->block_size)))
 	{
-		fprintf(stderr, "Couldn't allocate memory.\n");
+		perror("malloc()");
 		abort();
 	}
 
@@ -55,13 +55,13 @@ _memory_pool_create_ptr_block(const MemoryPool *pool)
 
 	if(!(block = (struct _MemoryPtrBlock *)malloc(sizeof(struct _MemoryPtrBlock))))
 	{
-		fprintf(stderr, "Couldn't allocate memory.\n");
+		perror("malloc()");
 		abort();
 	}
 
 	if(!(block->items = (void **)malloc(pool->block_size * sizeof(void *))))
 	{
-		fprintf(stderr, "Couldn't allocate memory.\n");
+		perror("malloc()");
 		abort();
 	}
 
@@ -150,7 +150,7 @@ memory_pool_new(size_t item_size, size_t block_size)
 
 	if(!(pool = (MemoryPool *)malloc(sizeof(MemoryPool))))
 	{
-		fprintf(stderr, "Couldn't allocate memory.\n");
+		perror("malloc()");
 		abort();
 	}
 

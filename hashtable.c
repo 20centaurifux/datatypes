@@ -101,13 +101,13 @@ hashtable_new(size_t size, HashFunc hash_func, EqualFunc compare_keys, FreeFunc 
 {
 	assert(hash_func != NULL);
 	assert(compare_keys != NULL);
-	assert(size <= SIZE_MAX / sizeof(struct _Bucket));
+	assert(size <= SIZE_MAX / sizeof(struct _Bucket *));
 
 	HashTable *table = (HashTable *)malloc(sizeof(HashTable));
 
 	if(!table)
 	{
-		fprintf(stderr, "Couldn't allocate memory.\n");
+		perror("malloc()");
 		abort();
 	}
 
@@ -122,7 +122,7 @@ hashtable_init(HashTable *table, size_t size, HashFunc hash_func, EqualFunc comp
 	assert(table != NULL);
 	assert(hash_func != NULL);
 	assert(compare_keys != NULL);
-	assert(size <= SIZE_MAX / sizeof(struct _Bucket));
+	assert(size <= SIZE_MAX / sizeof(struct _Bucket *));
 
 	size_t table_size = HASHTABLE_INITIAL_SIZE;
 
@@ -135,7 +135,7 @@ hashtable_init(HashTable *table, size_t size, HashFunc hash_func, EqualFunc comp
 
 	if(!table->buckets)
 	{
-		fprintf(stderr, "Couldn't allocate memory.\n");
+		perror("calloc()");
 		abort();
 	}
 
@@ -232,15 +232,16 @@ static void
 _hashtable_resize(HashTable *table)
 {
 	assert(table != NULL);
+	assert(table->size > 0);
 
 	size_t old_size = table->size;
 
 	table->sizeptr++;
 	table->size = *table->sizeptr;
 
-	if(old_size > table->size)
+	if(!table->size && table->size <= SIZE_MAX / sizeof(struct _Bucket *))
 	{
-		fprintf(stderr, "%s: integer overflow.\n", __func__);
+		fprintf(stderr, "%s(): integer overflow.\n", __func__);
 		abort();
 	}
 
@@ -250,7 +251,7 @@ _hashtable_resize(HashTable *table)
 
 	if(!table->buckets)
 	{
-		fprintf(stderr, "Couldn't allocate memory.\n");
+		perror("calloc()");
 		abort();
 	}
 
@@ -356,7 +357,7 @@ hashtable_set(HashTable *table, void *key, void *value, bool overwrite_key)
 	}
 	else
 	{
-		fprintf(stderr, "%s: integer overflow.\n", __func__);
+		fprintf(stderr, "%s(): integer overflow.\n", __func__);
 	}
 
 	return result;
@@ -375,8 +376,9 @@ hashtable_remove(HashTable *table, const void *key)
 	if((iter = bucket = table->buckets[index]))
 	{
 		struct _Bucket *prev = NULL;
+		bool removed = false;
 
-		while(iter)
+		while(iter && !removed)
 		{
 			if(table->compare_keys(iter->key, key))
 			{
@@ -402,7 +404,7 @@ hashtable_remove(HashTable *table, const void *key)
 				table->pool->free(table->pool, iter);
 				--table->count;
 
-				break;
+				removed = true;
 			}
 
 			prev = iter;

@@ -46,7 +46,7 @@ buffer_new(size_t max_size)
 
 	if(!buf)
 	{
-		fprintf(stderr, "Couldn't allocate memory.\n");
+		perror("malloc()");
 		abort();
 	}
 
@@ -70,7 +70,7 @@ buffer_init(Buffer *buf, size_t max_size)
 
 	if(!buf->data)
 	{
-		fprintf(stderr, "Couldn't allocate memory.\n");
+		perror("malloc()");
 		abort();
 	}
 }
@@ -140,7 +140,7 @@ _buffer_new_realloc_size(size_t from, size_t to)
 	{
 		size *= 2;
 
-		if(size < from) /* integer overflow */
+		if(size < from)
 		{
 			size = to;
 		}
@@ -159,7 +159,7 @@ buffer_fill(Buffer *buf, const char *data, size_t len)
 
 	if(EXCEEDS_BUFFER_MAX_SIZE(buf, len))
 	{
-		fprintf(stderr, "Buffer exceeds allowed maximum size.\n");
+		fprintf(stderr, "%s(): buffer exceeds allowed maximum size.\n", __func__);
 		buf->valid = false;
 	}
 	else
@@ -173,7 +173,7 @@ buffer_fill(Buffer *buf, const char *data, size_t len)
 
 			if(!buf->data)
 			{
-				fprintf(stderr, "Couldn't resize buffer.\n");
+				perror("realloc()");
 				abort();
 			}
 		}
@@ -223,7 +223,7 @@ _buffer_copy_to_string(Buffer *buf, size_t count, char **dst, size_t *len)
 
 		if(!dst)
 		{
-			fprintf(stderr, "Couldn't resize dst.\n");
+			perror("realloc()");
 			abort();
 		}
 	}
@@ -294,7 +294,7 @@ buffer_to_string(const Buffer *buf)
 
 		if(!str)
 		{
-			fprintf(stderr, "Couldn't allocate memory.\n");
+			perror("malloc()");
 			abort();
 		}
 

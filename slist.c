@@ -35,7 +35,7 @@ slist_new(CompareFunc compare, FreeFunc free, Pool *pool)
 
 	if(!list)
 	{
-		fprintf(stderr, "Couldn't allocate memory.\n");
+		perror("malloc()");
 		abort();
 	}
 
@@ -118,7 +118,7 @@ _slist_item_new(Pool *pool, void *data)
 
 		if(!item)
 		{
-			fprintf(stderr, "Couldn't allocate memory.\n");
+			perror("malloc()");
 			abort();
 		}
 	}

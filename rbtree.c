@@ -19,9 +19,12 @@
  * \brief Generic red-black tree.
  * \author Sebastian Fedrau <sebastian.fedrau@gmail.com>
  */
+#define _GNU_SOURCE
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <limits.h>
 #include <assert.h>
 
 #include "rbtree.h"
@@ -38,7 +41,7 @@ rbtree_new(CompareFunc compare_keys, FreeFunc free_key, FreeFunc free_value, Poo
 
 	if(!tree)
 	{
-		fprintf(stderr, "Couldn't allocate memory.\n");
+		perror("malloc()");
 		abort();
 	}
 
@@ -59,7 +62,7 @@ rbtree_init(RBTree *tree, CompareFunc compare_keys, FreeFunc free_key, FreeFunc 
 
 	if(!tree->stack)
 	{
-		fprintf(stderr, "Couldn't allocate memory.\n");
+		perror("malloc()");
 		abort();
 	}
 
@@ -168,15 +171,14 @@ _rbtree_stack_push(RBTree *tree, RBNode *node)
 	}
 	else
 	{
-		int sp = tree->sp - tree->stack;
+		intptr_t sp = tree->sp - tree->stack;
 
 		if(sp >= 0 && (size_t)sp >= tree->stack_size - 1)
 		{
-			if(tree->stack_size > (INT32_MAX / 2))
+			if(tree->stack_size > (SSIZE_MAX / sizeof(RBNode *)) / 2)
 			{
-				fprintf(stderr, "%s: maximum stack size reached\n", __func__);
-
-				return false;
+				fprintf(stderr, "%s(): integer overflow.\n", __func__);
+				abort();
 			}
 
 			tree->stack_size *= 2;
@@ -184,7 +186,7 @@ _rbtree_stack_push(RBTree *tree, RBNode *node)
 
 			if(!tree->stack)
 			{
-				fprintf(stderr, "Couldn't allocate memory.\n");
+				perror("realloc()");
 				abort();
 			}
 
@@ -220,7 +222,7 @@ _rbnode_create_new(Pool *pool, void *key, void *value, int black, RBNode *left, 
 	}
 	else if(!(node = (RBNode *)malloc(sizeof(RBNode))))
 	{
-		fprintf(stderr, "Couldn't allocate memory.\n");
+		perror("malloc()");
 		abort();
 	}
 
@@ -483,7 +485,7 @@ _rbtree_insert_child(RBTree *tree, void *key, void *value, bool overwrite_key)
 			{
 				result = RBTREE_INSERT_RESULT_FAILED;
 
-				fprintf(stderr, "%s: integer overflow.\n", __func__);
+				fprintf(stderr, "%s(): integer overflow.\n", __func__);
 			}
 		}
 		else
@@ -883,7 +885,7 @@ rbtree_iter_init(const RBTree *tree, RBTreeIter *iter)
 
 		if(!iter->stack)
 		{
-			fprintf(stderr, "Couldn't allocate memory.\n");
+			perror("malloc()");
 			abort();
 		}
 	}
@@ -919,7 +921,7 @@ rbtree_iter_reuse(const RBTree *tree, RBTreeIter *iter)
 
 			if(!iter->stack)
 			{
-				fprintf(stderr, "Couldn't allocate memory.\n");
+				perror("realloc()");
 				abort();
 			}
 		}

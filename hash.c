@@ -47,7 +47,7 @@ direct_hash(const void *ptr)
 
 	if(v > UINT32_MAX)
 	{
-		fprintf(stderr, "%s: warning, integer overflow.\n", __func__);
+		fprintf(stderr, "%s(): integer overflow.\n", __func__);
 		v = UINT32_MAX;
 	}
 
