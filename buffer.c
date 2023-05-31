@@ -204,6 +204,10 @@ buffer_fill_from_fd(Buffer *buf, int fd, size_t count)
 			bytes = -1;
 		}
 	}
+	else if(bytes == -1)
+	{
+		perror("read()");
+	}
 
 	return bytes;
 }
@@ -221,7 +225,7 @@ _buffer_copy_to_string(Buffer *buf, size_t count, char **dst, size_t *len)
 		*len = count;
 		*dst = (char *)realloc(*dst, count + 1);
 
-		if(!dst)
+		if(!*dst)
 		{
 			perror("realloc()");
 			abort();
