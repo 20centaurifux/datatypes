@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <sys/time.h>
 #include <assert.h>
+#include <err.h>
 
 #include "asyncqueue.h"
 
@@ -46,6 +47,16 @@ async_queue_new(CompareFunc compare, FreeFunc free, Pool *pool)
 	return queue;
 }
 
+#define PTHREAD_CRITICAL_CALL(fn, ...) \
+{ \
+	int rc = fn(__VA_ARGS__); \
+	if (rc) \
+	{ \
+		err(rc, "%s()", #fn); \
+		abort(); \
+	} \
+}
+
 void
 async_queue_init(AsyncQueue *queue, CompareFunc compare, FreeFunc free, Pool *pool)
 {
@@ -55,19 +66,8 @@ async_queue_init(AsyncQueue *queue, CompareFunc compare, FreeFunc free, Pool *po
 	queue_init(&queue->queue, compare, free, pool);
 	queue->waiting = 0;
 
-	#ifndef NDEBUG
-	int success =
-	#endif
-	pthread_mutex_init(&queue->mutex, NULL);
-
-	assert(success == 0);
-
-	#ifndef NDEBUG
-	success =
-	#endif
-	pthread_cond_init(&queue->cond, NULL);
-
-	assert(success == 0);
+	PTHREAD_CRITICAL_CALL(pthread_mutex_init, &queue->mutex, NULL);
+	PTHREAD_CRITICAL_CALL(pthread_cond_init, &queue->cond, NULL);
 }
 
 void
@@ -79,6 +79,15 @@ async_queue_destroy(AsyncQueue *queue)
 	free(queue);
 }
 
+#define PTHREAD_CALL(fn, ...) \
+{ \
+	int rc = fn(__VA_ARGS__); \
+	if (rc) \
+	{ \
+		err(rc, "%s()", #fn); \
+	} \
+}
+
 void
 async_queue_free(AsyncQueue *queue)
 {
@@ -86,8 +95,8 @@ async_queue_free(AsyncQueue *queue)
 
 	queue_free(&queue->queue);
 
-	pthread_mutex_destroy(&queue->mutex);
-	pthread_cond_destroy(&queue->cond);
+	PTHREAD_CALL(pthread_mutex_destroy, &queue->mutex);
+	PTHREAD_CALL(pthread_cond_destroy, &queue->cond);
 }
 
 void
@@ -95,28 +104,41 @@ async_queue_push(AsyncQueue *queue, void *data)
 {
 	assert(queue != NULL);
 
-	pthread_mutex_lock(&queue->mutex);
+	PTHREAD_CRITICAL_CALL(pthread_mutex_lock, &queue->mutex);
 
 	queue_push(&queue->queue, data);
 
 	if(queue->waiting)
 	{
-		pthread_cond_signal(&queue->cond);
+		PTHREAD_CALL(pthread_cond_signal, &queue->cond);
 	}
 
-	pthread_mutex_unlock(&queue->mutex);
+	PTHREAD_CRITICAL_CALL(pthread_mutex_unlock, &queue->mutex);
 }
 
 static bool
-_async_queue_pop(AsyncQueue *queue, void *data, uint32_t ms)
+_async_queue_try_lock(AsyncQueue *queue)
 {
 	assert(queue != NULL);
 
-	pthread_mutex_lock(&queue->mutex);
+	int rc = pthread_mutex_lock(&queue->mutex);
 
-	bool success = queue_pop(&queue->queue, data);
+	if(rc)
+	{
+		err(rc, "pthread_mutex_lock()");
+	}
 
-	if(!success)
+	return !rc;
+}
+
+static bool
+_async_queue_cond_wait(AsyncQueue *queue, uint32_t ms)
+{
+	assert(queue != NULL);
+
+	bool success = false;
+
+	if(queue->waiting < SIZE_MAX)
 	{
 		++queue->waiting;
 
@@ -130,23 +152,37 @@ _async_queue_pop(AsyncQueue *queue, void *data, uint32_t ms)
 			val.tv_sec = now.tv_sec + (ms / 1000);
 			val.tv_nsec = 0;
 
-			if(!pthread_cond_timedwait(&queue->cond, &queue->mutex, &val))
-			{
-				success = queue_pop(&queue->queue, data);
-			}
+			success = !pthread_cond_timedwait(&queue->cond, &queue->mutex, &val);
 		}
 		else
 		{
-			if(!pthread_cond_wait(&queue->cond, &queue->mutex))
-			{
-				success = queue_pop(&queue->queue, data);
-			}
+			success = !pthread_cond_wait(&queue->cond, &queue->mutex);
 		}
 
 		--queue->waiting;
 	}
+	else
+	{
+		fprintf(stderr, "%s(): integer overflow.\n", __func__);
+	}
 
-	pthread_mutex_unlock(&queue->mutex);
+	return success;
+}
+
+static bool
+_async_queue_pop(AsyncQueue *queue, void *data, uint32_t ms)
+{
+	assert(queue != NULL);
+
+	bool success = false;
+
+	if(_async_queue_try_lock(queue))
+	{
+		success = queue_pop(&queue->queue, data)
+			|| (_async_queue_cond_wait(queue, ms) && queue_pop(&queue->queue, data));
+
+		PTHREAD_CRITICAL_CALL(pthread_mutex_unlock, &queue->mutex);
+	}
 
 	return success;
 }
@@ -170,11 +206,11 @@ async_queue_clear(AsyncQueue *queue)
 {
 	assert(queue != NULL);
 
-	pthread_mutex_lock(&queue->mutex);
+	PTHREAD_CRITICAL_CALL(pthread_mutex_lock, &queue->mutex);
 
 	queue_clear(&queue->queue);
 
-	pthread_mutex_unlock(&queue->mutex);
+	PTHREAD_CRITICAL_CALL(pthread_mutex_unlock, &queue->mutex);
 }
 
 size_t
@@ -182,11 +218,11 @@ async_queue_count(AsyncQueue *queue)
 {
 	assert(queue != NULL);
 
-	pthread_mutex_lock(&queue->mutex);
+	PTHREAD_CRITICAL_CALL(pthread_mutex_lock, &queue->mutex);
 
 	size_t count = queue_count(&queue->queue);
 
-	pthread_mutex_unlock(&queue->mutex);
+	PTHREAD_CRITICAL_CALL(pthread_mutex_unlock, &queue->mutex);
 
 	return count;
 }
