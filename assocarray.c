@@ -37,7 +37,7 @@ _assoc_array_binary_search(CompareFunc compare, void **keys, size_t len, const v
 
 	assert(compare != NULL);
 	assert(keys != NULL);
-	assert(len <= ASSOC_ARRAY_MAX_SIZE);
+	assert(len > 0 && len <= ASSOC_ARRAY_MAX_SIZE);
 	assert(key != NULL);
 	assert(index != NULL);
 
@@ -220,7 +220,7 @@ _assoc_array_resize_if_necessary(AssocArray *array)
 	{
 		if(array->size == ASSOC_ARRAY_MAX_SIZE)
 		{
-			fprintf(stderr, "%s(): integer overflow.\n", __func__);
+			fprintf(stderr, "%s(): array exceeds size limit.\n", __func__);
 			abort();
 		}
 
@@ -301,25 +301,18 @@ assoc_array_set(AssocArray *array, void *key, void *value, bool overwrite_key)
 		{
 			result = ASSOCARRAY_INSERT_RESULT_NEW;
 
-			if(array->count < SIZE_MAX)
+			_assoc_array_resize_if_necessary(array);
+
+			if(cmp < 0)
 			{
-				_assoc_array_resize_if_necessary(array);
-
-				if(cmp < 0)
-				{
-					_assoc_array_insert_before_offset(array, key, value, offset);
-				}
-				else
-				{
-					_assoc_array_insert_after_offset(array, key, value, offset);
-				}
-
-				++array->count;
+				_assoc_array_insert_before_offset(array, key, value, offset);
 			}
 			else
 			{
-				fprintf(stderr, "%s(): integer overflow.\n", __func__);
+				_assoc_array_insert_after_offset(array, key, value, offset);
 			}
+
+			++array->count;
 		}
 		else
 		{
