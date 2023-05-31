@@ -239,7 +239,7 @@ _hashtable_resize(HashTable *table)
 	table->sizeptr++;
 	table->size = *table->sizeptr;
 
-	if(!table->size && table->size <= SIZE_MAX / sizeof(struct _Bucket *))
+	if(!table->size || table->size > SIZE_MAX / sizeof(struct _Bucket *))
 	{
 		fprintf(stderr, "%s(): integer overflow.\n", __func__);
 		abort();
@@ -369,11 +369,10 @@ hashtable_remove(HashTable *table, const void *key)
 	assert(table != NULL);
 	assert(key != NULL);
 
-	struct _Bucket *bucket;
 	struct _Bucket *iter;
 	size_t index = HASHTABLE_INDEX(table, key);
 
-	if((iter = bucket = table->buckets[index]))
+	if((iter = table->buckets[index]))
 	{
 		struct _Bucket *prev = NULL;
 		bool removed = false;
