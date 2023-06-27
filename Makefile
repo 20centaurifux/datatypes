@@ -83,7 +83,7 @@ uninstall:
 	rm -f $(DESTDIR)$(LIBDIR)/$(SHARED_FULLNAME_SYMLINK)
 
 cppcheck:
-	$(CPPCHECK) --enable=style --enable=performance --enable=information --std=c99 --force -j2 --template gcc *.h *.c
+	$(CPPCHECK) --std=c99 --force -j2 --enable=all --suppress=missingIncludeSystem --template gcc *.h *.c
 
 doc:
 	$(DOXYGEN) $(SRC)/doxygen_config
