@@ -239,7 +239,7 @@ _rbnode_create_new(Pool *pool, void *key, void *value, int black, RBNode *left, 
  *	replace & rotate nodes:
  */
 static void
-_rbnode_replace(RBTree *tree, RBNode *old_node, RBNode *parent, RBNode *new_node)
+_rbnode_replace(RBTree *tree, const RBNode *old_node, RBNode *parent, RBNode *new_node)
 {
 	assert(tree != NULL);
 
@@ -581,8 +581,7 @@ rbtree_lookup(RBTree *tree, const void *key)
 void *
 rbtree_pair_get_key(const RBTreePair *pair)
 {
-	assert(pair != NULL);
-	assert(pair->node != NULL);
+	assert(pair != NULL && pair->node != NULL);
 
 	if(pair)
 	{
@@ -595,8 +594,7 @@ rbtree_pair_get_key(const RBTreePair *pair)
 void *
 rbtree_pair_get_value(const RBTreePair *pair)
 {
-	assert(pair != NULL);
-	assert(pair->node != NULL);
+	assert(pair != NULL && pair->node != NULL);
 
 	if(pair)
 	{
@@ -656,7 +654,7 @@ _rbtree_remove_case3_to_6(RBTree *tree)
 {
 	assert(tree != NULL);
 
-	RBNode *node = *tree->sp;
+	const RBNode *node = *tree->sp;
 	RBNode *parent = *(tree->sp - 1);
 	RBNode *sibling;
 
@@ -979,7 +977,7 @@ rbtree_iter_next(RBTreeIter *iter)
 
 			if(iter->sp->node)
 			{
-				if(iter->sp->node && iter->sp->state == 0)
+				if(iter->sp->state == 0)
 				{
 					return true;
 				}
