@@ -187,7 +187,7 @@ void *list_pop(List *list);
  *
  * Tests if a list contains the specified data.
  */
-bool list_contains(const List *list, void *data);
+bool list_contains(const List *list, const void *data);
 
 /**
  *\param list a List

@@ -378,7 +378,7 @@ _slist_find(const SList *list, SListItem *offset, void const *data)
 }
 
 bool
-slist_contains(const SList *list, void *data)
+slist_contains(const SList *list, const void *data)
 {
 	assert(list != NULL);
 	assert(list->compare != NULL);

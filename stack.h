@@ -85,7 +85,7 @@ typedef SList StackItem;
  *
  * Gets first element from stack without removing it.
  */
-bool stack_head(Stack *stack, void **data);
+bool stack_head(const Stack *stack, void **data);
 
 /**
  *\param stack a Stack

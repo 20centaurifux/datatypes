@@ -390,7 +390,7 @@ _list_find(const List *list, ListItem *offset, void const *data)
 }
 
 bool
-list_contains(const List *list, void *data)
+list_contains(const List *list, const void *data)
 {
 	assert(list != NULL);
 	assert(list->compare != NULL);

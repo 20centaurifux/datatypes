@@ -178,7 +178,7 @@ void *slist_pop(SList *list);
  *
  * Tests if a list contains the specified data.
  */
-bool slist_contains(const SList *list, void *data);
+bool slist_contains(const SList *list, const void *data);
 
 /**
  *\param list a SList

@@ -52,7 +52,7 @@ stack_pop(Stack *stack, void **data)
 }
 
 bool
-stack_head(Stack *stack, void **data)
+stack_head(const Stack *stack, void **data)
 {
 	assert(stack != NULL);
 	assert(data != NULL);
