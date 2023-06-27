@@ -213,7 +213,7 @@ buffer_fill_from_fd(Buffer *buf, int fd, size_t count)
 }
 
 static void
-_buffer_copy_to_string(Buffer *buf, size_t count, char **dst, size_t *len)
+_buffer_copy_to_string(const Buffer *buf, size_t count, char **dst, size_t *len)
 {
 	assert(buf != NULL);
 	assert(dst != NULL);
@@ -264,7 +264,7 @@ buffer_read_line(Buffer *buf, char **dst, size_t *len)
 }
 
 bool
-buffer_flush(Buffer *buf, char **dst, size_t *len)
+buffer_flush(const Buffer *buf, char **dst, size_t *len)
 {
 	assert(buf != NULL);
 	assert(dst != NULL);

@@ -146,7 +146,7 @@ bool buffer_read_line(Buffer *buf, char **dst, size_t *len);
  *
  * Copies data from the buffer to a string (if buffer is valid). dst will be resized automatically if necessary.
  */
-bool buffer_flush(Buffer *buf, char **dst, size_t *len);
+bool buffer_flush(const Buffer *buf, char **dst, size_t *len);
 
 /**
  *\param buf a Buffer
