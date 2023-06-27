@@ -28,6 +28,8 @@
 static struct _MemoryBlock *
 _memory_pool_create_block(const MemoryPool *pool)
 {
+	assert(pool != NULL);
+
 	struct _MemoryBlock *block;
 
 	if(!(block = (struct _MemoryBlock *)malloc(sizeof(struct _MemoryBlock))))
@@ -51,6 +53,8 @@ _memory_pool_create_block(const MemoryPool *pool)
 static struct _MemoryPtrBlock *
 _memory_pool_create_ptr_block(const MemoryPool *pool)
 {
+	assert(pool != NULL);
+
 	struct _MemoryPtrBlock *block;
 
 	if(!(block = (struct _MemoryPtrBlock *)malloc(sizeof(struct _MemoryPtrBlock))))
@@ -72,14 +76,12 @@ _memory_pool_create_ptr_block(const MemoryPool *pool)
 }
 
 static void *
-_memory_pool_alloc(Pool *alloc)
+_memory_pool_try_get_detached_item(MemoryPool *pool)
 {
-	MemoryPool *pool = (MemoryPool *)alloc;
-	struct _MemoryBlock *block;
-	struct _MemoryPtrBlock *pblock;
+	assert(pool != NULL);
+
 	void *item = NULL;
 
-	/* try to get detached item */
 	if(pool->free_block)
 	{
 		assert(pool->free_block->offset > 0);
@@ -88,31 +90,62 @@ _memory_pool_alloc(Pool *alloc)
 
 		if(!pool->free_block->offset)
 		{
-			pblock = pool->free_block;
+			struct _MemoryPtrBlock *pblock = pool->free_block;
 			pool->free_block = pblock->next;
 			free(pblock->items);
 			free(pblock);
 		}
-
-		return item;
 	}
 
-	/* test if we have reached end of the current block */
+	return item;
+}
+
+static void *
+_memory_pool_try_get_current_item(const MemoryPool *pool)
+{
+	assert(pool != NULL);
+
+	void *item = NULL;
+
 	if(pool->block->offset < pool->block_size)
 	{
-		/* end not reached => return current item & increment offset */
 		item = pool->block->items + (pool->item_size * pool->block->offset++);
 	}
-	else
-	{
-		/* end reached => create a new block & prepend it to our list */
-		block = _memory_pool_create_block(pool);
-		block->next = pool->block;
-		pool->block = block;
 
-		/* return first item from current block & increment offset */
-		item = pool->block->items;
-		++pool->block->offset;
+	return item;
+}
+
+static void *
+_memory_pool_get_item_from_new_block(MemoryPool *pool)
+{
+	assert(pool != NULL);
+
+	struct _MemoryBlock *block = _memory_pool_create_block(pool);
+	block->next = pool->block;
+	pool->block = block;
+
+	/* return first item from current block & increment offset */
+	void *item = pool->block->items;
+	++pool->block->offset;
+
+	return item;
+}
+
+static void *
+_memory_pool_alloc(Pool *alloc)
+{
+	MemoryPool *pool = (MemoryPool *)alloc;
+
+	void *item = _memory_pool_try_get_detached_item(pool);
+
+	if (!item)
+	{
+		item = _memory_pool_try_get_current_item(pool);
+	}
+
+	if (!item)
+	{
+		item = _memory_pool_get_item_from_new_block(pool);
 	}
 
 	return item;
